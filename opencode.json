@@ -1,0 +1,40 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "autoupdate": false,
+  "default_agent": "build-traktion",
+
+  "permission": {
+    "read": {
+      "*": "allow",
+      "example_project/**": "deny"
+    },
+    "edit": {
+      "*": "allow",
+      "m1/**": "deny",
+      "M1_PREREGISTRATION.md": "deny",
+      "M1_RESULTS.md": "deny",
+      "M1_DECISION.md": "deny",
+      "TRAKTION_OVERALL_PLAN.md": "ask"
+    },
+    "bash": {
+      "*": "ask",
+      "grep *": "allow",
+      "rg *": "allow",
+      "ls *": "allow",
+      "find *": "allow",
+      "cat *": "allow",
+      "git status": "allow",
+      "git diff*": "allow",
+      "git log*": "allow",
+      "git add *": "allow",
+      "git commit *": "ask",
+      "git push*": "deny",
+      "./gradlew *": "allow",
+      "gradle *": "allow",
+      "rm *": "deny",
+      "sudo *": "deny"
+    },
+    "webfetch": "allow",
+    "external_directory": "ask"
+  }
+}
