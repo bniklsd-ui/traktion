@@ -51,7 +51,7 @@ updated: 2026-07-13
 **Status:** Keine Altlasten. Repo ist frisch (799f103 skeleton, 8 Commits insgesamt).
 - Kein Code existiert → keine Namensdrift möglich.
 - Keine toten Verweise → keine Doku verweist auf noch nicht existierenden Code.
-- `example_project/` steht in `.gitignore` (Zeile 1) → kein Agent liest es nach P0.
+- `example_project/` wurde vom Operator in den Operator-Bereich verschoben (nicht mehr im Repo). `.gitignore`-Eintrag (Zeile 1) bleibt als Belt-and-Suspenders. Kein Agent liest es — es ist physisch nicht mehr da.
 
 **Akzeptanz:** Step 0 ist leer. Darf leer sein, nicht fehlen. ✅
 
@@ -242,7 +242,7 @@ Wegwerf-Spike ist und die eigentliche Kategorie-B-Messung erst in P4 beginnt.
 - [ ] `docs/CONVENTIONS.md` existiert und benennt Verworfenes ✅ (P0.1, c2d132b)
 - [ ] Spike beantwortet T-D3 mit ja/nein ⏳
 - [ ] Preregistration liegt vor dem ersten Trial in der History ✅ (P0.3, a40e818)
-- [ ] `example_project/` ist stillgelegt ✅ (.gitignore Zeile 1)
+- [ ] `example_project/` ist stillgelegt ✅ (vom Operator in Operator-Bereich verschoben, `.gitignore` Zeile 1 bleibt)
 
 ---
 
@@ -267,5 +267,5 @@ Wegwerf-Spike ist und die eigentliche Kategorie-B-Messung erst in P4 beginnt.
 - **Java-Mod-Target [VERIFY]:** Build-Toolchain ist Java 21 (Loom 1.11+). Die Java-Version, die die Mod selbst targetet (für MC 26.2), ist noch offen. P0.4 muss es klären.
 - **jqwik [VERIFY]:** Ob jqwik unter Gradle 9.5.1 sauber läuft, ist ungeprüft. P0.4 soll es klären. Fallback: JUnit 5 + eigene Generatoren.
 - **PersistentState-API-Name [VERIFY]:** Der exakte API-Name des welt-attached Persistent State in 26.2 ist offen. Das Welt-Datenformat hat sich in 26.1 geändert (Plan T-D15). P0.4 muss es gegen echte 26.2-Quellen verifizieren, nicht gegen 1.21er-Tutorials.
-- **Permission-Spannung (cba0351):** `example_project/**` ist jetzt erlaubt/ask. Plan §5/P0.1 + §9 sagen "kein Agent liest es nach P0". Die Durchsetzung liegt jetzt an der Agenten-Disziplin + `.gitignore`, nicht mehr an der Permission-Sperre. Für P0.2+ relevant: der Build-Agent könnte `example_project/` lesen, wenn er nicht selbst darauf verzichtet.
+- **Permission-Spannung (cba0351) — GELÖST:** `example_project/**` war nach cba0351 erlaubt/ask, was im Widerspruch zu Plan §5/P0.1 + §9 stand. Der Operator hat `example_project/` in den Operator-Bereich verschoben — es ist physisch nicht mehr im Repo. Die Spannung ist damit aufgelöst: kein Agent kann es lesen, weil es nicht da ist. `.gitignore`-Eintrag (Zeile 1) bleibt als Belt-and-Suspenders.
 - **Tool-Calls:** Diese Session benutzte ~26 Tool-Calls. P0.2 (Skelett) und P0.4 (Spike) benötigen jeweils eigene Sessions.
