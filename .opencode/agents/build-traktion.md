@@ -6,7 +6,7 @@ temperature: 0
 permission:
   read:
     "*": allow
-    "example_project/**": deny
+    "example_project/**": allow
   edit:
     "*": allow
     "m1/**": deny

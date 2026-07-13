@@ -5,18 +5,18 @@
   "permission": {
     "read": {
       "*": "allow",
-      "example_project/**": "deny"
+      "example_project/**": "ask"
     },
     "edit": {
       "*": "allow",
-      "m1/**": "deny",
-      "M1_PREREGISTRATION.md": "deny",
-      "M1_RESULTS.md": "deny",
-      "M1_DECISION.md": "deny",
+      "m1/**": "ask",
+      "M1_PREREGISTRATION.md": "ask",
+      "M1_RESULTS.md": "ask",
+      "M1_DECISION.md": "ask",
       "TRAKTION_OVERALL_PLAN.md": "ask"
     },
     "bash": {
-      "*": "ask",
+      "*": "allow",
       "grep *": "ask",
       "rg *": "ask",
       "ls *": "allow",
@@ -27,11 +27,11 @@
       "git log*": "allow",
       "git add *": "allow",
       "git commit *": "ask",
-      "git push*": "deny",
+      "git push*": "ask",
       "./gradlew *": "allow",
       "gradle *": "allow",
-      "rm *": "deny",
-      "sudo *": "deny",
+      "rm *": "ask",
+      "sudo *": "ask",
       "head *": "ask",
       "tail *": "ask",
       "sed *": "ask",

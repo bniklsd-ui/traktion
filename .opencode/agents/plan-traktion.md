@@ -6,21 +6,22 @@ temperature: 0
 permission:
   read:
     "*": allow
-    "example_project/**": deny
+    "example_project/**": allow
   edit:
-    "*": deny
+    "*": allow
     "docs/plans/**": allow
     "docs/INDEX.md": allow
     "docs/concepts/**": allow
   bash:
-    "*": deny
+    "*": allow
     "grep *": allow
     "rg *": allow
     "ls *": allow
     "find *": allow
     "git log*": allow
     "git diff*": allow
-  webfetch: ask
+    "git status*": allow
+  webfetch: allow
 ---
 
 Du planst Phase P<N> der Fabric-Mod "Traktion". Du schreibst keinen Code und führst
