@@ -1,0 +1,5 @@
+example_project/
+.gradle/
+build/
+run/
+.opencode/auth.json
