@@ -1,7 +1,7 @@
 ---
 description: Schreibt den Phasenplan für Traktion. Schreibt keinen Code, führt nichts aus.
 mode: primary
-model: nvidia-nim/z-ai/glm-5.2
+model: nvidia/z-ai/glm5.2
 temperature: 0
 permission:
   read:
