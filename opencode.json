@@ -2,7 +2,6 @@
   "$schema": "https://opencode.ai/config.json",
   "autoupdate": false,
   "default_agent": "build-traktion",
-
   "permission": {
     "read": {
       "*": "allow",
@@ -18,11 +17,11 @@
     },
     "bash": {
       "*": "ask",
-      "grep *": "allow",
-      "rg *": "allow",
+      "grep *": "ask",
+      "rg *": "ask",
       "ls *": "allow",
       "find *": "allow",
-      "cat *": "allow",
+      "cat *": "ask",
       "git status": "allow",
       "git diff*": "allow",
       "git log*": "allow",
@@ -32,7 +31,11 @@
       "./gradlew *": "allow",
       "gradle *": "allow",
       "rm *": "deny",
-      "sudo *": "deny"
+      "sudo *": "deny",
+      "head *": "ask",
+      "tail *": "ask",
+      "sed *": "ask",
+      "awk *": "ask"
     },
     "webfetch": "allow",
     "external_directory": "ask"

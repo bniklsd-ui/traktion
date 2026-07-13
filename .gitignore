@@ -3,3 +3,7 @@ example_project/
 build/
 run/
 .opencode/auth.json
+.opencode/node_modules/
+.opencode/package.json
+.opencode/package-lock.json
+skills-lock.json
