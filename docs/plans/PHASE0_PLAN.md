@@ -252,7 +252,8 @@ Wegwerf-Spike ist und die eigentliche Kategorie-B-Messung erst in P4 beginnt.
 - `docs/CONVENTIONS.md`: P0.1 Konventions-Import erledigt (Commit c2d132b). Zwei Abschnitte: "Übernommen" (17 Konventionen) und "Bewusst verworfen" (13 Punkte, jeweils begründet). Header-Card nach Doc-Layers-Konvention.
 - P0.3 Vorregistrierung geprüft: `M1_PREREGISTRATION.md` (Commit a40e818) entspricht Plan §6 vollständig. NICHT berührt (Plan §6: nie editieren).
 - Toolchain-Versionen verifiziert (T-D12): Minecraft 26.2 ✅, fabric-api 0.154.0+26.2 ✅, loader 0.19.3 ✅, loom 1.17 ✅, gradle 9.5.1 ✅ (via Loom 1.17 changelog), Java 21 (Build-Toolchain, via Loom 1.11+ requirement).
-- `PHASE0_PLAN.md` geschrieben (diese Datei).
+- `PHASE0_PLAN.md` geschrieben (Commit c496a52).
+- Operator-Infrastruktur committet (cba0351): Permissions gelockert (deny→ask/allow), da Vorgängerversion zu restriktiv. ⚠ Spannung zu Plan §5/P0.1 + §9 notiert: `example_project/**` ist jetzt erlaubt/ask, nicht mehr deny — die Plan-Regel "kein Agent liest es nach P0" wird faktisch durch `.gitignore` getragen, nicht mehr durch Permission-Durchsetzung.
 
 ### Next
 - **P0.2 Step 1:** Root-`CLAUDE.md` · `docs/INDEX.md` · `AGENTS.md` erstellen (allererste Aktion von P0.2). Alle drei im selben Commit. `docs/INDEX.md` muss One-Liner für `docs/CONVENTIONS.md` enthalten (nachtragen).
@@ -262,9 +263,9 @@ Wegwerf-Spike ist und die eigentliche Kategorie-B-Messung erst in P4 beginnt.
 - **P0.4:** MC-Spike auf eigenem Branch `p0.4-mc-spike`. Beantwortet T-D3. [VERIFY]-Fragen: Java-Mod-Target, PersistentState-API-Name in 26.2, jqwik-Unterstützung.
 
 ### Open questions / blockers
-- **Uncommittete Änderungen im Working Tree:** `.opencode/agents/build-traktion.md`, `.opencode/agents/plan-traktion.md`, `opencode.json` sind modifiziert (nicht von mir). Das ist Operator-Infrastruktur — ich habe sie nicht committet und nicht angefasst. Der Operator sollte entscheiden, ob diese Änderungen committet oder verworfen werden.
 - **`M1_PREREGISTRATION.md` related-Verweis:** Die Datei verweist auf `./TRAKTION_OPENCODE_CONFIG.md` (related). Diese Datei ist nicht im Repo-Root sichtbar. Möglicherweise in den Operator-Bereich verschoben (Commit a0cc00d "move opencode config doc to operator-only"). Kein Build-Drift — Operator-Infrastruktur.
 - **Java-Mod-Target [VERIFY]:** Build-Toolchain ist Java 21 (Loom 1.11+). Die Java-Version, die die Mod selbst targetet (für MC 26.2), ist noch offen. P0.4 muss es klären.
 - **jqwik [VERIFY]:** Ob jqwik unter Gradle 9.5.1 sauber läuft, ist ungeprüft. P0.4 soll es klären. Fallback: JUnit 5 + eigene Generatoren.
 - **PersistentState-API-Name [VERIFY]:** Der exakte API-Name des welt-attached Persistent State in 26.2 ist offen. Das Welt-Datenformat hat sich in 26.1 geändert (Plan T-D15). P0.4 muss es gegen echte 26.2-Quellen verifizieren, nicht gegen 1.21er-Tutorials.
-- **Tool-Calls:** Diese Session benutzte ~22 Tool-Calls. P0.2 (Skelett) und P0.4 (Spike) benötigen jeweils eigene Sessions.
+- **Permission-Spannung (cba0351):** `example_project/**` ist jetzt erlaubt/ask. Plan §5/P0.1 + §9 sagen "kein Agent liest es nach P0". Die Durchsetzung liegt jetzt an der Agenten-Disziplin + `.gitignore`, nicht mehr an der Permission-Sperre. Für P0.2+ relevant: der Build-Agent könnte `example_project/` lesen, wenn er nicht selbst darauf verzichtet.
+- **Tool-Calls:** Diese Session benutzte ~26 Tool-Calls. P0.2 (Skelett) und P0.4 (Spike) benötigen jeweils eigene Sessions.
