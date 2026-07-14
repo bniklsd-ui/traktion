@@ -12,7 +12,7 @@ updated: 2026-07-14
 
 # Phase 0 — Fundament, Konventions-Import & Messinstrument
 
-> **Status:** P0.1 ✅ · P0.3 ✅ · P0.2 ⏳ (Skelett da, Test blockiert) · P0.4 ⏳
+> **Status:** P0.1 ✅ · P0.3 ✅ · P0.2 Step 2 ✅ (train-core grün) · P0.2 Step 3/4 ⏳ · P0.4 ⏳
 >
 > **Ausnahme P0:** Planung UND Ausführung in derselben Session. Ab P1 getrennt.
 >
@@ -27,49 +27,44 @@ updated: 2026-07-14
 | P0.1 — Konventions-Import | ✅ | c2d132b | `docs/CONVENTIONS.md` (17 übernommen, 13 verworfen) |
 | P0.3 — Vorregistrierung | ✅ | a40e818 | `M1_PREREGISTRATION.md` FROZEN, entspricht Plan §6 |
 | P0.2 Step 1 — Root-CLAUDE/INDEX/AGENTS | ✅ | 780c0cd | alle drei im selben Commit |
-| P0.2 Step 2 — Gradle-Skelett | ⏳ | c11ab63 | Skelett geschrieben, `gradle test` blockiert (Java 21 fehlt) |
-| P0.2 Step 2 — Doc-Layers-Migration | ✅ | (dieser Commit) | `phase0/` angelegt, Blöcke migriert, `DOC_LAYERS_CONVENTION.md` geschrieben |
+| P0.2 Step 2 — Gradle-Skelett | ✅ | c11ab63 | Skelett geschrieben |
+| P0.2 Step 2 — Gradle-Wrapper | ✅ | 75ad958 | Wrapper 9.5.1 generiert (T-D12) |
+| P0.2 Step 2 — Doc-Layers-Migration | ✅ | fabd860 | `phase0/` angelegt, `DOC_LAYERS_CONVENTION.md` |
+| P0.2 Step 2 — `gradle :train-core:test` grün | ✅ | (verifiziert) | SmokeTest PASSED, `--configure-on-demand` nötig |
 | P0.2 Step 3 — ROADMAP/ARCHITECTURE Stubs | ⏳ | — | ausstehend |
 | P0.2 Step 4 — Log-Konventionen + Testmatrix | ⏳ | — | ausstehend |
 | P0.4 — MC-Spike | ⏳ | — | eigener Branch `p0.4-mc-spike`, eigene Session |
 
 ---
 
-## Session stopped — 2026-07-14 (Verifizierungs-Session)
+## Session stopped — 2026-07-14 (Java-Setup + Wrapper + Test grün)
 
 ### Completed (diese Session)
-- **Stand verifiziert, kein Code gebaut.** Lesereihenfolge komplett durchlaufen: AGENTS.md →
-  docs/INDEX.md → CLAUDE.md → PHASE0_PLAN.md → TRAKTION_OVERALL_PLAN.md §2/§3/§4/§9.
-- **Skelett gegen Doku abgeglichen** — alle Dateien aus P0.2 Step 2 (Commit c11ab63) physisch
-  vorhanden und gelesen: `settings.gradle.kts`, `build.gradle.kts`, `gradle.properties`,
-  `train-core/build.gradle.kts`, `train-mc/build.gradle.kts`, `train-core/src/.../package-info.java`,
-  `train-core/src/test/.../SmokeTest.java`, `train-mc/src/.../package-info.java`,
-  `train-mc/src/main/resources/fabric.mod.json`. Skelett ist sauber.
-- **Anti-Pattern-Check wiederholt:** `grep net.minecraft train-core/src/` → nur Kommentar in
-  `package-info.java`. Kein Import. Kein Verstoß. ✅
-- **Java-21-Blocker bestätigt:** `java`/`javac` nicht installiert. Kein `/usr/lib/jvm`, kein
-  sdkman, kein asdf. `openjdk-21-jdk-headless` ist im apt-cache verfügbar, User `traktion` ist in
-  `sudo`-Gruppe, aber `sudo` braucht Passwort (non-interaktiv nicht lösbar). **Operator-Action nötig.**
-- **Permission-Änderung verifiziert:** `.opencode/agents/build-traktion.md` hat uncommitted Diff
-  (deny→ask für `docs/plans/**`, `M1_*.md`, `TRAKTION_OVERALL_PLAN.md`, `m1/**`). Operator hat das
-  gemacht, ich lasse es unangetastet.
-- **Doc-Layers-Migration durchgeführt:** `phase0/CLAUDE.md` + `phase0/SESSIONS_ARCHIVE.md` angelegt,
-  `docs/DOC_LAYERS_CONVENTION.md` geschrieben. Session-stopped-Block aus Root-CLAUDE.md hierher
-  migriert. Alter Block aus PHASE0_PLAN.md ins Archiv verschoben. Root-CLAUDE.md schlank gehalten.
+- **Java 21 installiert (Operator):** `openjdk-21-jdk-headless` (21.0.11). `java`/`javac` jetzt
+  verfügbar. Blocker aufgelöst.
+- **Gradle-Wrapper generiert** (Commit 75ad958): `gradle wrapper --gradle-version 9.5.1` mit
+  apt-Gradle 4.4.1 (uralt, aber Wrapper-Generierung funktioniert). `gradlew` + `gradle/wrapper/`
+  committed. `gradle-wrapper.properties` zeigt auf Gradle 9.5.1 (T-D12-konform).
+- **`./gradlew :train-core:test` GRÜN:** SmokeTest `harnessRuns()` PASSED. P0.2 Step 2
+  Akzeptanzkriterium "grün" erfüllt. ⚠ benötigt `--configure-on-demand` (siehe Open Questions).
+- **Doc-Layers-Migration** (Commit fabd860): `phase0/CLAUDE.md` + `phase0/SESSIONS_ARCHIVE.md`
+  angelegt, `docs/DOC_LAYERS_CONVENTION.md` geschrieben. Session-stopped-Blöcke aus Root-CLAUDE.md
+  und PHASE0_PLAN.md migriert. Erste Rotation durchgeführt (alter Block ins Archiv).
+- **Anti-Pattern-Check:** `grep net.minecraft train-core/src/` → nur Kommentar in `package-info.java`.
+  Kein Import. Kein Verstoß. ✅
 
 ### Completed (vorherige Sessions, zusammengefasst)
-- **P0.1** (c2d132b): Konventions-Import. `docs/CONVENTIONS.md` mit "Übernommen" (17) + "Verworfen" (13).
-- **P0.3** (a40e818): `M1_PREREGISTRATION.md` FROZEN. Entspricht Plan §6 vollständig. Nicht berührt.
+- **P0.1** (c2d132b): Konventions-Import. `docs/CONVENTIONS.md` (17 übernommen, 13 verworfen).
+- **P0.3** (a40e818): `M1_PREREGISTRATION.md` FROZEN. Entspricht Plan §6. Nicht berührt.
 - **P0.2 Step 1** (780c0cd): Root-`CLAUDE.md` · `docs/INDEX.md` · `AGENTS.md` im selben Commit.
-- **P0.2 Step 2** (c11ab63): Gradle-Multi-Modul-Skelett geschrieben. Akzeptanz "grün" blockiert.
+- **P0.2 Step 2 Skelett** (c11ab63): Gradle-Multi-Modul-Skelett geschrieben.
 
 ### Next
-- **⚠ BLOCKER — Java 21 installieren (Operator):** `sudo apt-get install -y openjdk-21-jdk-headless`
-  (Passwort nötig) ODER sdkman User-space-Installation (Operator hat freigegeben). Ohne Java kein
-  `gradle test`, kein P0.2-Abschluss, kein P0.4-Spike.
-- **P0.2 Step 2 — Rest nach Java:** Gradle-Wrapper (`gradlew` + `gradle/wrapper/`) fehlt. Nach
-  Java-Installation: `gradle wrapper --gradle-version 9.5.1` (braucht `gradle` auf PATH) ODER
-  Wrapper manuell anlegen. Dann `./gradlew :train-core:test` — muss grün sein (Smoke-Test).
+- **P0.2 Step 2 — `train-mc` Build-Fehler beheben:** `train-mc/build.gradle.kts` Zeile 5:
+  `id("fabric-loom") version "${property("loom_version")}"` — `property()` im `plugins`-Block
+  der Kotlin DSL resolved nicht (Gradle 9.5.1 Fehler). Fix: Version als String-Literal oder
+  `pluginManagement` in `settings.gradle.kts`. Das blockiert `gradle :train-mc:build` (P0.2
+  Akzeptanz), aber nicht `train-core`. Gehört zu P0.4-Vorbereitung.
 - **P0.2 Step 3:** `ROADMAP.md` + `ARCHITECTURE.md` Stubs mit Header-Card, One-Liner in `docs/INDEX.md`.
 - **P0.2 Step 4:** Log-Konventionen (slf4j, nicht System.out) + Testmatrix (Kategorie A/B) in
   `docs/CONVENTIONS.md` ergänzen.
@@ -77,11 +72,12 @@ updated: 2026-07-14
   in 26.2, jqwik-Unterstützung unter Gradle 9.5.1.
 
 ### Open questions / blockers
-- **⚠ BLOCKER: Java 21 nicht installiert.** Siehe "Next" oben. `sudo` braucht Passwort — Agent
-  kann es nicht non-interaktiv lösen. Operator hat sdkman User-space-Installation freigegeben.
+- **⚠ `train-mc` Build-Fehler:** `property("loom_version")` im `plugins`-Block von
+  `train-mc/build.gradle.kts` scheitert unter Gradle 9.5.1. `train-core:test` läuft nur mit
+  `--configure-on-demand` (überspringt `train-mc`-Konfiguration). Fix in nächster Session oder
+  P0.4. Kein Blocker für P0.2 Step 2 (`train-core` ist grün), aber für P0.2 Akzeptanz "train-mc:build".
 - **Yarn mappings Version [VERIFY]:** `train-mc/build.gradle.kts` verwendet `yarn:26.2+build.4:v2`.
-  Build-Nummer `build.4` ist Annahme — verifizieren gegen maven.fabricmc.net, sobald Java läuft.
+  Build-Nummer `build.4` ist Annahme — verifizieren gegen maven.fabricmc.net, sobald `train-mc` baut.
 - **jqwik [VERIFY]:** Auskommentiert in `train-core/build.gradle.kts`. P0.4 klärt, ob es unter
   Gradle 9.5.1 läuft. Fallback: JUnit 5 + eigene Generatoren.
-- **Gradle-Wrapper fehlt:** `gradlew` + `gradle/wrapper/` müssen noch generiert werden.
-- **Tool-Calls:** Diese Session benutzte ~22 Tool-Calls (Verifizierung + Doc-Layers-Migration).
+- **Tool-Calls:** Diese Session benutzte ~30 Tool-Calls (Verifizierung + Migration + Java/Wrapper/Test).
