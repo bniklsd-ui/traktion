@@ -9,7 +9,7 @@ down:
   - ./docs/INDEX.md              # Karte — eine Zeile pro Doku
   - ./docs/CONVENTIONS.md        # übernommene/verworfene Konventionen
   - ./docs/plans/PHASE0_PLAN.md  # aktueller Phasenplan
-updated: 2026-07-13
+updated: 2026-07-14
 ---
 
 # Traktion — Single Source of Truth
@@ -49,7 +49,7 @@ train-mc/     dünner Adapter. Blöcke, Entities, Rendering, Packets, Persistenz
 
 | Phase | Inhalt | Status |
 |---|---|---|
-| **P0** | Fundament, Konventions-Import, Skelett, Vorregistrierung, MC-Spike | ⏳ P0.2 Step 2 (Skelett geschrieben, Test blockiert — Java fehlt) |
+| **P0** | Fundament, Konventions-Import, Skelett, Vorregistrierung, MC-Spike | ⏳ P0.2 Step 2 (Skelett da, Test blockiert — Java 21 fehlt) |
 | P1 | `train-core`: Durchstich (Z1–Z4) | ⏳ |
 | P2 | Verschleiß + Ports (Z6, Z7) | ⏳ |
 | P3 | Planer (Z5 — Kern-Orakel) | ⏳ |
@@ -58,7 +58,7 @@ train-mc/     dünner Adapter. Blöcke, Entities, Rendering, Packets, Persistenz
 | P6 | Auswertung M1-Strang | ⏳ |
 
 **Aktueller Schritt:** P0.2 Step 2 — Gradle-Skelett geschrieben (c11ab63), `gradle :train-core:test`
-**blockiert** durch fehlendes Java 21. Siehe `## Session stopped` unten und `docs/plans/PHASE0_PLAN.md`.
+**blockiert** durch fehlendes Java 21. Skelett verifiziert 2026-07-14. Siehe `## Session stopped` unten.
 
 ---
 
@@ -116,30 +116,39 @@ korrigieren, nicht umgehen. Diese Momente sind Messpunkte.
 
 ---
 
-## Session stopped — 2026-07-14
+## Session stopped — 2026-07-14 (Verifizierungs-Session)
 
-### Completed
-- **P0.2 Step 1** (Commit 780c0cd): Root-`CLAUDE.md` · `docs/INDEX.md` · vollständiges `AGENTS.md`
-  erstellt. Alle drei im selben Commit. `docs/INDEX.md` listet alle bisherigen .md-Dateien mit
-  Glyph + read-when-Hook. Header-Cards ≤15 Zeilen (CLAUDE.md: 12, INDEX.md: 7).
-- **P0.2 Step 2 — Skelett geschrieben** (Commit c11ab63): `settings.gradle.kts` (inkludiert
-  `train-core` + `train-mc`), `build.gradle.kts` (Root, gemeinsame Java-21-Toolchain + Repos),
-  `gradle.properties` (alle T-D12-Versionen gepinnt), `train-core/build.gradle.kts` (plain Java,
-  JUnit 5, NULL weitere Abhängigkeiten, jqwik auskommentiert als [VERIFY]), `train-mc/build.gradle.kts`
-  (Fabric Loom 1.17, MC 26.2, Yarn mappings, fabric-api), `train-core` Package-Root + Smoke-Test,
-  `train-mc` Package-Root + `fabric.mod.json`-Stub.
-- **Anti-Pattern-Check:** `grep net.minecraft train-core/src/` → nur Kommentar in `package-info.java`
-  ("Kein Fabric, kein net.minecraft.*..."). Kein Import. Kein Verstoß.
+### Completed (diese Session)
+- **Stand verifiziert, kein Code gebaut.** Lesereihenfolge komplett durchlaufen: AGENTS.md →
+  docs/INDEX.md → CLAUDE.md → PHASE0_PLAN.md → TRAKTION_OVERALL_PLAN.md §2/§3/§4/§9.
+- **Skelett gegen Doku abgeglichen** — alle Dateien aus P0.2 Step 2 (Commit c11ab63) physisch
+  vorhanden und gelesen: `settings.gradle.kts`, `build.gradle.kts`, `gradle.properties`,
+  `train-core/build.gradle.kts`, `train-mc/build.gradle.kts`, `train-core/src/.../package-info.java`,
+  `train-core/src/test/.../SmokeTest.java`, `train-mc/src/.../package-info.java`,
+  `train-mc/src/main/resources/fabric.mod.json`. Skelett ist sauber.
+- **Anti-Pattern-Check wiederholt:** `grep net.minecraft train-core/src/` → nur Kommentar in
+  `package-info.java`. Kein Import. Kein Verstoß. ✅
+- **Java-21-Blocker bestätigt:** `java`/`javac` nicht installiert. Kein `/usr/lib/jvm`, kein
+  sdkman, kein asdf. `openjdk-21-jdk-headless` ist im apt-cache verfügbar, User `traktion` ist in
+  `sudo`-Gruppe, aber `sudo` braucht Passwort (non-interaktiv nicht lösbar). **Operator-Action nötig.**
+- **Permission-Änderung verifiziert:** `.opencode/agents/build-traktion.md` hat uncommitted Diff
+  (deny→ask für `docs/plans/**`, `M1_*.md`, `TRAKTION_OVERALL_PLAN.md`, `m1/**`). Operator hat das
+  gemacht, ich lasse es unangetastet.
+
+### Completed (vorherige Sessions, zusammengefasst)
+- **P0.1** (c2d132b): Konventions-Import. `docs/CONVENTIONS.md` mit "Übernommen" (17) + "Verworfen" (13).
+- **P0.3** (a40e818): `M1_PREREGISTRATION.md` FROZEN. Entspricht Plan §6 vollständig. Nicht berührt.
+- **P0.2 Step 1** (780c0cd): Root-`CLAUDE.md` · `docs/INDEX.md` · `AGENTS.md` im selben Commit.
+- **P0.2 Step 2** (c11ab63): Gradle-Multi-Modul-Skelett geschrieben. Akzeptanz "grün" blockiert.
 
 ### Next
-- **BLOCKER — Java 21 fehlt:** `java`/`javac` sind nicht installiert (`command not found`).
-  Kein JDK-Package, kein `/usr/lib/jvm`, kein sdkman/asdf. Node 24 ist da (via nvm).
-  → `gradle :train-core:test` kann nicht laufen. Akzeptanzkriterium "grün" ist **blockiert**.
-  **Operator muss Java 21 installieren** (z.B. `sdkman install java 21-tem` oder
-  `apt install openjdk-21-jdk`). Danach: `./gradlew :train-core:test` ausführen.
-  Gradle-Wrapper (`gradlew`) muss noch generiert werden (oder `gradle` direkt, falls installiert).
-- **P0.2 Step 2 — Rest:** Gradle-Wrapper (`gradlew` + `gradle/wrapper/`) fehlt noch. Nach
-  Java-Installation: `gradle wrapper --gradle-version 9.5.1` ausführen, dann `./gradlew :train-core:test`.
+- **⚠ BLOCKER — Java 21 installieren (Operator):** `sudo apt-get install -y openjdk-21-jdk-headless`
+  (Passwort nötig) ODER sdkman User-space-Installation. Ohne Java kein `gradle test`, kein P0.2-Abschluss,
+  kein P0.4-Spike. Alternative: sdkman ist User-space (kein sudo), aber das ist eine
+  Infrastruktur-Entscheidung, die den Operator betrifft — nicht stillschweigend vom Agenten gewählt.
+- **P0.2 Step 2 — Rest nach Java:** Gradle-Wrapper (`gradlew` + `gradle/wrapper/`) fehlt. Nach
+  Java-Installation: `gradle wrapper --gradle-version 9.5.1` (braucht `gradle` auf PATH) ODER
+  Wrapper manuell anlegen. Dann `./gradlew :train-core:test` — muss grün sein (Smoke-Test).
 - **P0.2 Step 3:** `ROADMAP.md` + `ARCHITECTURE.md` Stubs mit Header-Card, One-Liner in `docs/INDEX.md`.
 - **P0.2 Step 4:** Log-Konventionen (slf4j, nicht System.out) + Testmatrix (Kategorie A/B) in
   `docs/CONVENTIONS.md` ergänzen.
@@ -147,24 +156,18 @@ korrigieren, nicht umgehen. Diese Momente sind Messpunkte.
   in 26.2, jqwik-Unterstützung unter Gradle 9.5.1.
 
 ### Open questions / blockers
-- **⚠ BLOCKER: Java 21 nicht installiert.** Siehe "Next" oben. Ohne Java kein `gradle test`, kein
-  P0.2-Abschluss, kein P0.4-Spike. Das ist Infrastruktur (zählt nicht gegen H1, Plan §6), aber es
-  blockiert die Ausführung.
-- **⚠ Widerspruch: Session-stopped-Block vs. Permission-Sperre — GELÖST durch Operator.** Plan §11
-  sagt "Commit ⇒ Note-Update: Statuszeile + `## Session stopped` im selben Commit" und "genau ein
-  `## Session stopped`-Block pro Phasen-`CLAUDE.md`". Die Permission-Config sperrte `edit: docs/plans/**`
-  für den Executor (Preregistration §5: beabsichtigt, damit der Executor Pläne nicht umschreibt).
-  PHASE0_PLAN.md liegt in `docs/plans/`. **Ich konnte den Session-stopped-Block dort nicht schreiben.**
-  Übergangslösung: Block in `CLAUDE.md` (Root), das ich editieren darf.
-  **Operator-Entscheidung (2026-07-14):** Permissions für `docs/plans/**` (sowie `M1_*.md`,
-  `TRAKTION_OVERALL_PLAN.md`, `m1/**`) wurden von `deny` auf `ask` gestellt. Die Regeln treten erst
-  nach OpenCode-Neustart in Kraft. **Ab der nächsten Session** können Session-stopped-Blöcke wie vom
-  Plan verlangt direkt in `docs/plans/PHASE<N>_PLAN.md` geschrieben werden (mit Operator-Freigabe
-  pro Edit). Dieser Block in `CLAUDE.md` war die Übergangslösung für diese Session.
+- **⚠ BLOCKER: Java 21 nicht installiert.** Siehe "Next" oben. `sudo` braucht Passwort — Agent
+  kann es nicht non-interaktiv lösen. Operator muss installieren.
+- **⚠ Konventions-Unklarheit: Wo lebt der Session-stopped-Block?** Plan §11 sagt "genau ein
+  `## Session stopped`-Block pro Phasen-`CLAUDE.md`". AGENTS.md/CLAUDE.md Lesereihenfolge
+  erwähnt `phase<N>/CLAUDE.md` — aber `phase0/` existiert nicht. PHASE0_PLAN.md hat seinen eigenen
+  Block (vom 2026-07-13). Dieser Block hier in Root-CLAUDE.md war die Übergangslösung wegen der
+  Permission-Sperre. **Frage an Nikinger:** Soll der Block künftig nach `docs/plans/PHASE0_PLAN.md`
+  (wo er jetzt erlaubt ist) oder in ein neu anzulegendes `phase0/CLAUDE.md`? Ich habe nichts
+  migriert, weil ich keine neue Konvention erfinden will.
 - **Yarn mappings Version [VERIFY]:** `train-mc/build.gradle.kts` verwendet `yarn:26.2+build.4:v2`.
-  Die Build-Nummer `build.4` ist eine Annahme — muss gegen maven.fabricmc.net verifiziert werden, sobald
-  Java läuft und `gradle :train-mc:build` ausgeführt wird.
-- **jqwik [VERIFY]:** Auskommentiert in `train-core/build.gradle.kts`. P0.4 klärt, ob es unter Gradle
-  9.5.1 läuft. Fallback: JUnit 5 + eigene Generatoren.
-- **Gradle-Wrapper fehlt:** `gradlew` + `gradle/wrapper/` müssen noch generiert werden (nach Java-Installation).
-- **Tool-Calls:** Diese Session benutzte ~24 Tool-Calls.
+  Build-Nummer `build.4` ist Annahme — verifizieren gegen maven.fabricmc.net, sobald Java läuft.
+- **jqwik [VERIFY]:** Auskommentiert in `train-core/build.gradle.kts`. P0.4 klärt, ob es unter
+  Gradle 9.5.1 läuft. Fallback: JUnit 5 + eigene Generatoren.
+- **Gradle-Wrapper fehlt:** `gradlew` + `gradle/wrapper/` müssen noch generiert werden.
+- **Tool-Calls:** Diese Session benutzte ~16 Tool-Calls (Verifizierung, kein Code-Bau).
