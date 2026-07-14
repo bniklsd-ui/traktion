@@ -150,14 +150,17 @@ korrigieren, nicht umgehen. Diese Momente sind Messpunkte.
 - **⚠ BLOCKER: Java 21 nicht installiert.** Siehe "Next" oben. Ohne Java kein `gradle test`, kein
   P0.2-Abschluss, kein P0.4-Spike. Das ist Infrastruktur (zählt nicht gegen H1, Plan §6), aber es
   blockiert die Ausführung.
-- **⚠ Widerspruch: Session-stopped-Block vs. Permission-Sperre.** Plan §11 sagt "Commit ⇒ Note-Update:
-  Statuszeile + `## Session stopped` im selben Commit" und "genau ein `## Session stopped`-Block pro
-  Phasen-`CLAUDE.md`". Die Permission-Config sperrt `edit: docs/plans/**` für den Executor (Preregistration
-  §5: Executor darf Pläne nicht ändern — beabsichtigt). PHASE0_PLAN.md liegt in `docs/plans/`. **Ich kann
-  den Session-stopped-Block dort nicht schreiben.** Übergangslösung: Block in `CLAUDE.md` (Root), das ich
-  editieren darf. **Operator-Entscheidung nötig:** Soll der Plan-Agent den PHASE0_PLAN.md aktualisieren
-  (er hat `edit: docs/plans/**` erlaubt), oder soll die Permission-Regel gelockert werden, oder soll der
-  Session-stopped-Block dauerhaft in CLAUDE.md leben?
+- **⚠ Widerspruch: Session-stopped-Block vs. Permission-Sperre — GELÖST durch Operator.** Plan §11
+  sagt "Commit ⇒ Note-Update: Statuszeile + `## Session stopped` im selben Commit" und "genau ein
+  `## Session stopped`-Block pro Phasen-`CLAUDE.md`". Die Permission-Config sperrte `edit: docs/plans/**`
+  für den Executor (Preregistration §5: beabsichtigt, damit der Executor Pläne nicht umschreibt).
+  PHASE0_PLAN.md liegt in `docs/plans/`. **Ich konnte den Session-stopped-Block dort nicht schreiben.**
+  Übergangslösung: Block in `CLAUDE.md` (Root), das ich editieren darf.
+  **Operator-Entscheidung (2026-07-14):** Permissions für `docs/plans/**` (sowie `M1_*.md`,
+  `TRAKTION_OVERALL_PLAN.md`, `m1/**`) wurden von `deny` auf `ask` gestellt. Die Regeln treten erst
+  nach OpenCode-Neustart in Kraft. **Ab der nächsten Session** können Session-stopped-Blöcke wie vom
+  Plan verlangt direkt in `docs/plans/PHASE<N>_PLAN.md` geschrieben werden (mit Operator-Freigabe
+  pro Edit). Dieser Block in `CLAUDE.md` war die Übergangslösung für diese Session.
 - **Yarn mappings Version [VERIFY]:** `train-mc/build.gradle.kts` verwendet `yarn:26.2+build.4:v2`.
   Die Build-Nummer `build.4` ist eine Annahme — muss gegen maven.fabricmc.net verifiziert werden, sobald
   Java läuft und `gradle :train-mc:build` ausgeführt wird.
