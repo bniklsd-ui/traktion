@@ -49,7 +49,7 @@ train-mc/     dünner Adapter. Blöcke, Entities, Rendering, Packets, Persistenz
 
 | Phase | Inhalt | Status |
 |---|---|---|
-| **P0** | Fundament, Konventions-Import, Skelett, Vorregistrierung, MC-Spike | ⏳ P0.2 Step 1 (diese Session) |
+| **P0** | Fundament, Konventions-Import, Skelett, Vorregistrierung, MC-Spike | ⏳ P0.2 Step 2 (Skelett geschrieben, Test blockiert — Java fehlt) |
 | P1 | `train-core`: Durchstich (Z1–Z4) | ⏳ |
 | P2 | Verschleiß + Ports (Z6, Z7) | ⏳ |
 | P3 | Planer (Z5 — Kern-Orakel) | ⏳ |
@@ -57,8 +57,8 @@ train-mc/     dünner Adapter. Blöcke, Entities, Rendering, Packets, Persistenz
 | P5 | Fahrplan + Lokführer (Z8) | ⏳ |
 | P6 | Auswertung M1-Strang | ⏳ |
 
-**Aktueller Schritt:** P0.2 Step 1 — Root-`CLAUDE.md` · `docs/INDEX.md` · `AGENTS.md` (dieser Commit).
-Siehe `docs/plans/PHASE0_PLAN.md` für die vollständige Schritt-Sequenz.
+**Aktueller Schritt:** P0.2 Step 2 — Gradle-Skelett geschrieben (c11ab63), `gradle :train-core:test`
+**blockiert** durch fehlendes Java 21. Siehe `## Session stopped` unten und `docs/plans/PHASE0_PLAN.md`.
 
 ---
 
@@ -113,3 +113,55 @@ Referenzierte Dateien werden **nicht** automatisch geladen. Öffne sie on-need-t
 
 Stößt du auf eines — auch im eigenen Entwurf: **anhalten, benennen, fragen.** Nicht stillschweigend
 korrigieren, nicht umgehen. Diese Momente sind Messpunkte.
+
+---
+
+## Session stopped — 2026-07-14
+
+### Completed
+- **P0.2 Step 1** (Commit 780c0cd): Root-`CLAUDE.md` · `docs/INDEX.md` · vollständiges `AGENTS.md`
+  erstellt. Alle drei im selben Commit. `docs/INDEX.md` listet alle bisherigen .md-Dateien mit
+  Glyph + read-when-Hook. Header-Cards ≤15 Zeilen (CLAUDE.md: 12, INDEX.md: 7).
+- **P0.2 Step 2 — Skelett geschrieben** (Commit c11ab63): `settings.gradle.kts` (inkludiert
+  `train-core` + `train-mc`), `build.gradle.kts` (Root, gemeinsame Java-21-Toolchain + Repos),
+  `gradle.properties` (alle T-D12-Versionen gepinnt), `train-core/build.gradle.kts` (plain Java,
+  JUnit 5, NULL weitere Abhängigkeiten, jqwik auskommentiert als [VERIFY]), `train-mc/build.gradle.kts`
+  (Fabric Loom 1.17, MC 26.2, Yarn mappings, fabric-api), `train-core` Package-Root + Smoke-Test,
+  `train-mc` Package-Root + `fabric.mod.json`-Stub.
+- **Anti-Pattern-Check:** `grep net.minecraft train-core/src/` → nur Kommentar in `package-info.java`
+  ("Kein Fabric, kein net.minecraft.*..."). Kein Import. Kein Verstoß.
+
+### Next
+- **BLOCKER — Java 21 fehlt:** `java`/`javac` sind nicht installiert (`command not found`).
+  Kein JDK-Package, kein `/usr/lib/jvm`, kein sdkman/asdf. Node 24 ist da (via nvm).
+  → `gradle :train-core:test` kann nicht laufen. Akzeptanzkriterium "grün" ist **blockiert**.
+  **Operator muss Java 21 installieren** (z.B. `sdkman install java 21-tem` oder
+  `apt install openjdk-21-jdk`). Danach: `./gradlew :train-core:test` ausführen.
+  Gradle-Wrapper (`gradlew`) muss noch generiert werden (oder `gradle` direkt, falls installiert).
+- **P0.2 Step 2 — Rest:** Gradle-Wrapper (`gradlew` + `gradle/wrapper/`) fehlt noch. Nach
+  Java-Installation: `gradle wrapper --gradle-version 9.5.1` ausführen, dann `./gradlew :train-core:test`.
+- **P0.2 Step 3:** `ROADMAP.md` + `ARCHITECTURE.md` Stubs mit Header-Card, One-Liner in `docs/INDEX.md`.
+- **P0.2 Step 4:** Log-Konventionen (slf4j, nicht System.out) + Testmatrix (Kategorie A/B) in
+  `docs/CONVENTIONS.md` ergänzen.
+- **P0.4:** MC-Spike auf eigenem Branch `p0.4-mc-spike`. [VERIFY]: Java-Mod-Target, PersistentState-API-Name
+  in 26.2, jqwik-Unterstützung unter Gradle 9.5.1.
+
+### Open questions / blockers
+- **⚠ BLOCKER: Java 21 nicht installiert.** Siehe "Next" oben. Ohne Java kein `gradle test`, kein
+  P0.2-Abschluss, kein P0.4-Spike. Das ist Infrastruktur (zählt nicht gegen H1, Plan §6), aber es
+  blockiert die Ausführung.
+- **⚠ Widerspruch: Session-stopped-Block vs. Permission-Sperre.** Plan §11 sagt "Commit ⇒ Note-Update:
+  Statuszeile + `## Session stopped` im selben Commit" und "genau ein `## Session stopped`-Block pro
+  Phasen-`CLAUDE.md`". Die Permission-Config sperrt `edit: docs/plans/**` für den Executor (Preregistration
+  §5: Executor darf Pläne nicht ändern — beabsichtigt). PHASE0_PLAN.md liegt in `docs/plans/`. **Ich kann
+  den Session-stopped-Block dort nicht schreiben.** Übergangslösung: Block in `CLAUDE.md` (Root), das ich
+  editieren darf. **Operator-Entscheidung nötig:** Soll der Plan-Agent den PHASE0_PLAN.md aktualisieren
+  (er hat `edit: docs/plans/**` erlaubt), oder soll die Permission-Regel gelockert werden, oder soll der
+  Session-stopped-Block dauerhaft in CLAUDE.md leben?
+- **Yarn mappings Version [VERIFY]:** `train-mc/build.gradle.kts` verwendet `yarn:26.2+build.4:v2`.
+  Die Build-Nummer `build.4` ist eine Annahme — muss gegen maven.fabricmc.net verifiziert werden, sobald
+  Java läuft und `gradle :train-mc:build` ausgeführt wird.
+- **jqwik [VERIFY]:** Auskommentiert in `train-core/build.gradle.kts`. P0.4 klärt, ob es unter Gradle
+  9.5.1 läuft. Fallback: JUnit 5 + eigene Generatoren.
+- **Gradle-Wrapper fehlt:** `gradlew` + `gradle/wrapper/` müssen noch generiert werden (nach Java-Installation).
+- **Tool-Calls:** Diese Session benutzte ~24 Tool-Calls.
