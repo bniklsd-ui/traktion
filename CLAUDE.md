@@ -5,10 +5,12 @@ read-when: Session-Start; vor jeder Architektur-Entscheidung; bei Zweifel, was W
 detail: L1
 up: (root)
 down:
-  - ./TRAKTION_OVERALL_PLAN.md   # Wahrheit — Mission, Locks, Hard Rules, Phasen, Ziele
-  - ./docs/INDEX.md              # Karte — eine Zeile pro Doku
-  - ./docs/CONVENTIONS.md        # übernommene/verworfene Konventionen
-  - ./docs/plans/PHASE0_PLAN.md  # aktueller Phasenplan
+  - ./TRAKTION_OVERALL_PLAN.md        # Wahrheit — Mission, Locks, Hard Rules, Phasen, Ziele
+  - ./docs/INDEX.md                   # Karte — eine Zeile pro Doku
+  - ./docs/CONVENTIONS.md             # übernommene/verworfene Konventionen
+  - ./docs/DOC_LAYERS_CONVENTION.md   # generische Spec des Doc-Layers-Systems
+  - ./phase0/CLAUDE.md                # Phasen-Kopf P0 — Build-Log + aktueller Session-stopped-Block
+  - ./docs/plans/PHASE0_PLAN.md       # Konzept/Plan, aus dem P0 gebaut wird
 updated: 2026-07-14
 ---
 
@@ -67,8 +69,9 @@ train-mc/     dünner Adapter. Blöcke, Entities, Rendering, Packets, Persistenz
 1. `AGENTS.md` — harness-neutraler Einstieg
 2. `docs/INDEX.md` — Karte. Navigation über up/down-Links, nicht per Verzeichnissuche.
 3. `CLAUDE.md` — diese Datei (Single Source of Truth)
-4. `docs/plans/PHASE<N>_PLAN.md` — aktueller Phasenplan, insbesondere `## Session stopped`
-5. `TRAKTION_OVERALL_PLAN.md` — §2 (Locks), §3 (Hard Rules), §4 (Ziele), §9 (Anti-Patterns)
+4. `phase<N>/CLAUDE.md` — Phasen-Kopf, insbesondere `## Session stopped` (aktuell: `phase0/CLAUDE.md`)
+5. `docs/plans/PHASE<N>_PLAN.md` — Konzept/Plan, aus dem die Phase gebaut wird
+6. `TRAKTION_OVERALL_PLAN.md` — §2 (Locks), §3 (Hard Rules), §4 (Ziele), §9 (Anti-Patterns)
 
 Referenzierte Dateien werden **nicht** automatisch geladen. Öffne sie on-need-to-know selbst.
 
@@ -116,58 +119,8 @@ korrigieren, nicht umgehen. Diese Momente sind Messpunkte.
 
 ---
 
-## Session stopped — 2026-07-14 (Verifizierungs-Session)
+## Session stopped
 
-### Completed (diese Session)
-- **Stand verifiziert, kein Code gebaut.** Lesereihenfolge komplett durchlaufen: AGENTS.md →
-  docs/INDEX.md → CLAUDE.md → PHASE0_PLAN.md → TRAKTION_OVERALL_PLAN.md §2/§3/§4/§9.
-- **Skelett gegen Doku abgeglichen** — alle Dateien aus P0.2 Step 2 (Commit c11ab63) physisch
-  vorhanden und gelesen: `settings.gradle.kts`, `build.gradle.kts`, `gradle.properties`,
-  `train-core/build.gradle.kts`, `train-mc/build.gradle.kts`, `train-core/src/.../package-info.java`,
-  `train-core/src/test/.../SmokeTest.java`, `train-mc/src/.../package-info.java`,
-  `train-mc/src/main/resources/fabric.mod.json`. Skelett ist sauber.
-- **Anti-Pattern-Check wiederholt:** `grep net.minecraft train-core/src/` → nur Kommentar in
-  `package-info.java`. Kein Import. Kein Verstoß. ✅
-- **Java-21-Blocker bestätigt:** `java`/`javac` nicht installiert. Kein `/usr/lib/jvm`, kein
-  sdkman, kein asdf. `openjdk-21-jdk-headless` ist im apt-cache verfügbar, User `traktion` ist in
-  `sudo`-Gruppe, aber `sudo` braucht Passwort (non-interaktiv nicht lösbar). **Operator-Action nötig.**
-- **Permission-Änderung verifiziert:** `.opencode/agents/build-traktion.md` hat uncommitted Diff
-  (deny→ask für `docs/plans/**`, `M1_*.md`, `TRAKTION_OVERALL_PLAN.md`, `m1/**`). Operator hat das
-  gemacht, ich lasse es unangetastet.
-
-### Completed (vorherige Sessions, zusammengefasst)
-- **P0.1** (c2d132b): Konventions-Import. `docs/CONVENTIONS.md` mit "Übernommen" (17) + "Verworfen" (13).
-- **P0.3** (a40e818): `M1_PREREGISTRATION.md` FROZEN. Entspricht Plan §6 vollständig. Nicht berührt.
-- **P0.2 Step 1** (780c0cd): Root-`CLAUDE.md` · `docs/INDEX.md` · `AGENTS.md` im selben Commit.
-- **P0.2 Step 2** (c11ab63): Gradle-Multi-Modul-Skelett geschrieben. Akzeptanz "grün" blockiert.
-
-### Next
-- **⚠ BLOCKER — Java 21 installieren (Operator):** `sudo apt-get install -y openjdk-21-jdk-headless`
-  (Passwort nötig) ODER sdkman User-space-Installation. Ohne Java kein `gradle test`, kein P0.2-Abschluss,
-  kein P0.4-Spike. Alternative: sdkman ist User-space (kein sudo), aber das ist eine
-  Infrastruktur-Entscheidung, die den Operator betrifft — nicht stillschweigend vom Agenten gewählt.
-- **P0.2 Step 2 — Rest nach Java:** Gradle-Wrapper (`gradlew` + `gradle/wrapper/`) fehlt. Nach
-  Java-Installation: `gradle wrapper --gradle-version 9.5.1` (braucht `gradle` auf PATH) ODER
-  Wrapper manuell anlegen. Dann `./gradlew :train-core:test` — muss grün sein (Smoke-Test).
-- **P0.2 Step 3:** `ROADMAP.md` + `ARCHITECTURE.md` Stubs mit Header-Card, One-Liner in `docs/INDEX.md`.
-- **P0.2 Step 4:** Log-Konventionen (slf4j, nicht System.out) + Testmatrix (Kategorie A/B) in
-  `docs/CONVENTIONS.md` ergänzen.
-- **P0.4:** MC-Spike auf eigenem Branch `p0.4-mc-spike`. [VERIFY]: Java-Mod-Target, PersistentState-API-Name
-  in 26.2, jqwik-Unterstützung unter Gradle 9.5.1.
-
-### Open questions / blockers
-- **⚠ BLOCKER: Java 21 nicht installiert.** Siehe "Next" oben. `sudo` braucht Passwort — Agent
-  kann es nicht non-interaktiv lösen. Operator muss installieren.
-- **⚠ Konventions-Unklarheit: Wo lebt der Session-stopped-Block?** Plan §11 sagt "genau ein
-  `## Session stopped`-Block pro Phasen-`CLAUDE.md`". AGENTS.md/CLAUDE.md Lesereihenfolge
-  erwähnt `phase<N>/CLAUDE.md` — aber `phase0/` existiert nicht. PHASE0_PLAN.md hat seinen eigenen
-  Block (vom 2026-07-13). Dieser Block hier in Root-CLAUDE.md war die Übergangslösung wegen der
-  Permission-Sperre. **Frage an Nikinger:** Soll der Block künftig nach `docs/plans/PHASE0_PLAN.md`
-  (wo er jetzt erlaubt ist) oder in ein neu anzulegendes `phase0/CLAUDE.md`? Ich habe nichts
-  migriert, weil ich keine neue Konvention erfinden will.
-- **Yarn mappings Version [VERIFY]:** `train-mc/build.gradle.kts` verwendet `yarn:26.2+build.4:v2`.
-  Build-Nummer `build.4` ist Annahme — verifizieren gegen maven.fabricmc.net, sobald Java läuft.
-- **jqwik [VERIFY]:** Auskommentiert in `train-core/build.gradle.kts`. P0.4 klärt, ob es unter
-  Gradle 9.5.1 läuft. Fallback: JUnit 5 + eigene Generatoren.
-- **Gradle-Wrapper fehlt:** `gradlew` + `gradle/wrapper/` müssen noch generiert werden.
-- **Tool-Calls:** Diese Session benutzte ~16 Tool-Calls (Verifizierung, kein Code-Bau).
+> Der aktuelle `## Session stopped`-Block lebt in `phase0/CLAUDE.md` (Doc-Layers-Konvention).
+> Root-CLAUDE.md ist schlank und enthält keinen Session-stopped-Block.
+> Alte Blöcke: `phase0/SESSIONS_ARCHIVE.md`.

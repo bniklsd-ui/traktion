@@ -8,9 +8,11 @@ Referenzierte Dateien werden nicht automatisch geladen.
 1. **`docs/INDEX.md`** — L0-Karte. Eine Zeile pro Doku, Navigation über up/down-Links in den
    Header-Cards. **Keine Verzeichnissuche.**
 2. **`CLAUDE.md`** — Single Source of Truth. Projekt-Identität, Phasenstatus, harte Grenzen.
-3. **`docs/plans/PHASE<N>_PLAN.md`** — aktueller Phasenplan. Lies zuerst den
-   `## Session stopped`-Block — er sagt dir, wo die letzte Session endete.
-4. **`TRAKTION_OVERALL_PLAN.md`** — §2 (Locks), §3 (Hard Rules), §4 (Ziele), §9 (Anti-Patterns).
+3. **`phase<N>/CLAUDE.md`** — Phasen-Kopf. Lies zuerst den `## Session stopped`-Block — er sagt
+   dir, wo die letzte Session endete. (Aktuell: `phase0/CLAUDE.md`.)
+4. **`docs/plans/PHASE<N>_PLAN.md`** — Konzept/Plan, aus dem die Phase gebaut wird. Schritt-Sequenz,
+   Akzeptanzkriterien. (Aktuell: `docs/plans/PHASE0_PLAN.md`.)
+5. **`TRAKTION_OVERALL_PLAN.md`** — §2 (Locks), §3 (Hard Rules), §4 (Ziele), §9 (Anti-Patterns).
 
 ## On-Need-to-Know
 

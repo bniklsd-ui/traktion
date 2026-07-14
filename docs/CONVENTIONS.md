@@ -5,8 +5,8 @@ read-when: Session-Start; vor jeder neuen .md; vor jedem Commit; bei Zweifel, ob
 detail: L2
 up: ./CLAUDE.md
 down:
-  - ./docs/DOC_LAYERS_CONVENTION.md   # [VERIFY — in P0.2 zu erstellen] Header-Card-Format, Layer-Modell
-updated: 2026-07-13
+  - ./docs/DOC_LAYERS_CONVENTION.md   # generische Spec des Doc-Layers-Systems (Header-Card, Layer, Rotation)
+updated: 2026-07-14
 ---
 
 # Traktion — Konventionen
@@ -153,9 +153,10 @@ updated: 2026-07-13
   Die Übernahme steht oben; die Python-spezifische Formulierung fällt weg.
 
 - **`SESSIONS_ARCHIVE.md`-Rotation** — das Referenzprojekt rotiert Session-Blöcke in ein Archiv.
-  Verworfen in dieser Form: Traktion hat pro Phase ein `CLAUDE.md` mit genau einem
-  `## Session stopped`-Block. Ob eine separate Archivdatei nötig wird, entscheidet sich in P1,
-  wenn die erste Phase abgeschlossen wird. Vorläufig: ein Block pro Phasen-`CLAUDE.md`.
+  ~~Verworfen in dieser Form~~ **Revision 2026-07-14:** Die Verwurfung war voreilig — sie beruhte
+  darauf, dass `phase0/` nicht existierte und die generische Spec fehlte. Jetzt gilt die
+  Rotation wie im Referenzprojekt: aktueller Block in `phase_N/CLAUDE.md`, alte Blöcke verbatim
+  in `phase_N/SESSIONS_ARCHIVE.md`, newest-first. Siehe `docs/DOC_LAYERS_CONVENTION.md`.
 
 - **FastAPI/Web-UI** — das Referenzprojekt hat ein read-mostly Dashboard.
   Verworfen: Traktion hat keinen Web-Server. Der Leitstand (Z11) ist ein Minecraft-Block, kein
@@ -172,7 +173,6 @@ updated: 2026-07-13
 
 ## Meta
 
-Diese Datei wird in P0.2 um `docs/DOC_LAYERS_CONVENTION.md` ergänzt (die generische Spec der
-Doc-Layers-Konvention, aus dem Referenzprojekt übernommen aber projekt-agnostisch). Die
-Header-Card dieser Datei zeigt dann dorthin. Bis dahin gilt der Header-Card-Standard wie hier
-praktiziert.
+`docs/DOC_LAYERS_CONVENTION.md` wurde in P0.2 erstellt (2026-07-14) — die generische Spec der
+Doc-Layers-Konvention, aus dem Referenzprojekt übernommen aber projekt-agnostisch. Die Header-Card
+dieser Datei zeigt dorthin (down-Link).
