@@ -17,6 +17,8 @@ updated: 2026-07-14
 >
 > **Code ist Wahrheit** über Konzept-Dokument über Status-Prosa. [VERIFY] bleibt stehen,
 > bis jemand tatsächlich verifiziert hat.
+>
+> **P0.2 Step 4 (2026-07-14):** Logging- und Testmatrix-Abschnitte festgeschrieben (Plan §7).
 
 ---
 
@@ -168,6 +170,51 @@ updated: 2026-07-14
 - **"Never test against real money first"** — das Referenzprojekt tradet reales Geld.
   Verworfen: Traktion hat kein Geld, kein Live-System, keine Demo. Die "Hard Rule" hier ist:
   kein `net.minecraft.*` in `train-core` (Plan §3 Regel 1).
+
+---
+
+## Logging (Plan §7)
+
+> **Festgeschrieben in P0.2 Step 4.** Gilt für allen Code ab P1.
+
+- **`slf4j` in `train-mc`, nie `System.out`.** Plan §7: "Code-Logging: `slf4j`, nie `System.out`."
+  Fabric bringt slf4j mit; `train-mc` nutzt den Fabric-Logger (`LoggerFactory.getLogger(...)`).
+- **`train-core` hat kein Logging-Framework.** Der Kern ist plain Java, null externe Abhängigkeiten
+  außer Test-Bibliotheken (Plan §1, §3 Regel 1). Fehler im Kern werden über Exceptions und
+  Test-Failures sichtbar, nicht über Log-Zeilen. Braucht ein Kern-Test Logging, ist der Test falsch.
+- **[VERIFY] Fabric-Logging-Konvention in 26.2:** `LoggerFactory.getLogger(ModInitializer.class)`
+  ist das etablierte Muster aus 1.21.x. Ob sich in 26.2 etwas geändert hat, ist ungeprüft.
+  Die [VERIFY]-Marke bleibt stehen, bis P0.4 oder P4 echte 26.2-Quellen prüft.
+- **Kein `System.out` / `System.err` im Produktivcode.** Ausnahme: `train-core`-Test-Code darf
+  `System.out` für Debug-Ausgaben nutzen, die nicht in die Produktion gehen. Aber: besser
+  `System.err` für Fehler, oder gar nichts und stattdessen eine Assertion.
+
+---
+
+## Testmatrix (Plan §7)
+
+> **Festgeschrieben in P0.2 Step 4.** Gilt für die gesamte M1-Messung (Plan §6).
+
+| Kategorie | Ort | Grün heißt | Metriken |
+|---|---|---|---|
+| **A** | `train-core` | `gradle :train-core:test` grün, Z-Ziel erfüllt | Iterationen bis grün · Diff-Zeilen · Regressionen · Property-Fälle bestanden · **Regel-2-Verstoß ja/nein** · **Z5-Tautologie ja/nein** |
+| **B** | `train-mc` | manueller Smoke im Client + Z9/Z10 | Iterationen bis lauffähig · halluzinierte API-Aufrufe · Recherche-Schritte (Quellen gelesen?) · manuelle Eingriffe des Operators |
+
+**Prinzipien:**
+
+- **Kein Trial ohne vorher notierte Erwartung.** Wer erst nach dem Ergebnis weiß, was er erwartet
+  hat, hat nichts gemessen (Plan §7).
+- **A und B werden getrennt ausgewertet.** Wer A und B zu einer Zahl mittelt, löscht das einzige
+  interessante Ergebnis der ganzen Studie (Plan §6). Kategorie A misst klassische Informatik
+  (Graphen, Zustandsautomaten, numerische Bilanzen); Kategorie B misst 26.2-Spezifikum, das kein
+  Modell im Training gesehen hat.
+- **`m1/trials.jsonl` wird vom Operator geführt, nicht vom Agenten.** Plan §7: "Kein Agent schreibt
+  in `trials.jsonl`. Die Messung gehört nicht dem Gemessenen." Felder siehe Plan §7.
+- **Kategorie A ist deterministisch.** Fixed dt, geordnete Iteration, gesäter Zufall (Regel 8).
+  Zwei Läufe mit gleichem Seed liefern bitgleiche Ergebnisse — das ist testbar als Invariante.
+- **Kategorie B ist nicht deterministisch.** Client-Start, Rendering, Chunk-Load — das ist
+  manueller Smoke, kein Unit-Test. Die Metriken erfassen deshalb auch *Recherche-Schritte* und
+  *halluzinierte API-Aufrufe*, weil 26.2 hinter dem Trainingsschnitt liegt (Plan §6).
 
 ---
 
