@@ -1,5 +1,6 @@
 // train-mc — dünner Adapter. Fabric Loom, Minecraft 26.2.
 // Übersetzt Weltzustand in Zahlen und Zahlen zurück in Weltzustand. (Plan §1)
+// Contributors: Build-Agent (z-ai/glm-5.2), 2026-07-15. · Nikinger (Operator).
 
 // MC 26.x ist unobfuskiert (seit 26.1 "Tiny Takeover"). Yarn/Mojmap sind obsolet.
 // Non-remap Plugin-ID net.fabricmc.fabric-loom statt fabric-loom (remap).

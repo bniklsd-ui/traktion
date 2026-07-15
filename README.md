@@ -11,6 +11,8 @@ updated: 2026-07-15
 # Traktion
 
 > Ein Zugnetz ist kein Fahrzeug, sondern ein Betrieb.
+>
+> **Contributors:** Build-Agent (z-ai/glm-5.2), 2026-07-15. · Nikinger (Operator).
 
 Traktion ist ein Fabric-Mod für Minecraft 26.2, der ein elektrifiziertes Schienennetz simuliert,
 das der Spieler plant, baut und am Leben hält. Züge sind Verbraucher an einem Netz, das der

@@ -1,3 +1,6 @@
+// Traktion — Gradle Settings. Multi-Modul: train-core + train-mc.
+// Contributors: Build-Agent (z-ai/glm-5.2), 2026-07-15. · Nikinger (Operator).
+
 pluginManagement {
     // Loom veröffentlicht keinen Gradle-Plugin-Marker-Artifact (fabric-loom.gradle.plugin).
     // Daher muss die Plugin-ID hier auf die echte Koordinate gemappt werden.
