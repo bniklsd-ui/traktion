@@ -20,6 +20,7 @@ updated: 2026-07-14
 |---|---|---|
 | 🧭 `CLAUDE.md` | L1 | Session-Start; Single Source of Truth |
 | 🧭 `AGENTS.md` | L1 | Session-Start; harness-neutraler Einstieg |
+| 📗 `README.md` | L1 | Repo-Besuch über GitHub; vor Setup einer Entwicklungsmaschine |
 | 📜 `TRAKTION_OVERALL_PLAN.md` | L2 | vor jeder Architektur-Entscheidung; §2/§3/§4/§9 |
 | 📗 `ROADMAP.md` | L1 | vor Phasen-Übergang; für schnellen Projekt-Überblick (P0–P6) |
 | 📗 `ARCHITECTURE.md` | L1 | vor jeder Architektur-Entscheidung; bei der Frage "wo lebt dieser Code" |

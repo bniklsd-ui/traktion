@@ -209,7 +209,7 @@ Antwort "nein" ist ein wertvolles Ergebnis, kein Misserfolg. Sofort melden, kein
 
 **Branch:** `p0.4-mc-spike` (eigener Branch, wird NIE gemerged)
 
-**Dateien (im Spike-Branch, nicht in master):**
+**Dateien (im Spike-Branch, nicht in main):**
 - `train-mc/src/main/java/de/traktion/spike/PathEntity.java` — Entity, die einem hartkodierten Pfad folgt
 - `train-mc/src/main/java/de/traktion/spike/SpikeModInitializer.java` — Registrierung
 - `train-mc/src/main/resources/fabric.mod.json` — angepasst für Spike
