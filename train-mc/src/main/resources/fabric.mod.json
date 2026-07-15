@@ -2,15 +2,18 @@
   "schemaVersion": 1,
   "id": "traktion",
   "version": "${version}",
-  "name": "Traktion",
-  "description": "Ein Zugnetz ist kein Fahrzeug, sondern ein Betrieb.",
+  "name": "Traktion Spike",
+  "description": "P0.4 MC-Spike: Entity faehrt hartkodierten Pfad, despawnt, rekonstruiert zustandserhaltend.",
   "authors": ["Traktion Project"],
   "license": "MIT",
   "environment": "*",
+  "entrypoints": {
+    "main": ["de.traktion.spike.SpikeModInitializer"]
+  },
   "depends": {
     "fabricloader": ">=0.19.3",
     "minecraft": "~26.2",
     "fabric-api": "*",
-    "java": ">=21"
+    "java": ">=25"
   }
 }

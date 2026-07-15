@@ -39,6 +39,7 @@ updated: 2026-07-14
 | 🔄 `phase0/CLAUDE.md` | L1 | Session-Start in P0; Build-Log + aktueller Session-stopped-Block |
 | 📦 `phase0/SESSIONS_ARCHIVE.md` | L3 | bei Bedarf an historische Session-Details |
 | 📕 `phase0/Fabric_Loom_Mappings_Fix_01.md` | L2 | bei Build-Fehlern mit Mappings/Remapping für 26.x; vor P0.4-Spike |
+| 📕 `phase0/MC26_API_NOTES.md` | L2 | vor P0.4-Spike-Code; bei Fragen zur 26.2 Entity- oder Persistenz-API |
 
 ## Phasenpläne
 
