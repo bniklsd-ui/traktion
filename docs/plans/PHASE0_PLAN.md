@@ -23,24 +23,26 @@ updated: 2026-07-14
 
 | # | Thema | Lock | Status |
 |---|---|---|---|
-| **T-D12** | Zielversion + Pinning | Minecraft 26.2, Fabric. Gepinnt: fabric-api 0.154.0+26.2 · loader 0.19.3 · loom 1.17 · gradle 9.5.1 · Java 21 (Build-Toolchain). Kein Update-Chasing während M1. | ✅ verifiziert 2026-07-13 |
-| **T-D17** | Build-Toolchain Java | Java 21 für Gradle/Loom (Loom 1.11+ erfordert Java 21). Mod-Target-Java [VERIFY in P0.4] — MC 26.2 erfordert vermutlich 21+. | ✅ Build-Java gelöst · Mod-Java offen |
+| **T-D12** | Zielversion + Pinning | Minecraft 26.2, Fabric. Gepinnt: fabric-api 0.154.0+26.2 · loader 0.19.3 · loom 1.16.3 (1.17 hat keine Maven-Artefakte) · gradle 9.5.1 · Java 21 (Build) / 25 (Mod-Target). Non-remap Plugin-ID `net.fabricmc.fabric-loom` (26.x unobfuskiert). Kein Update-Chasing während M1. | ✅ verifiziert 2026-07-15 (siehe phase0/Fabric_Loom_Mappings_Fix_01.md) |
+| **T-D17** | Build-Toolchain Java | Java 21 für Gradle (Build-Toolchain). Mod-Target-Java = 25 (verifiziert: MC 26.2 erfordert Java 25, Loom 1.16.3 Fehlermeldung). | ✅ gelöst 2026-07-15 |
 | **T-D18** | Modul-Layout | Gradle-Multi-Modul: `train-core` (plain Java, null Abhängigkeiten außer Test-Libs) + `train-mc` (Fabric Loom). Root-`settings.gradle.kts` inkludiert beide. | gelockt |
 | **T-D19** | Property-Testing | jqwik [VERIFY in P0.4 — läuft unter Gradle 9.5.1?]. Fallback: JUnit 5 + eigene Generatoren. Entscheidung in P0.4. | offen |
 
 ---
 
-## Verifizierte Versionen (Stand 2026-07-13)
+## Verifizierte Versionen (Stand 2026-07-15)
 
 | Komponente | Wert | Verifiziert gegen |
 |---|---|---|
 | Minecraft | 26.2 (stable) | meta.fabricmc.net/v2/versions/game |
 | fabric-api | 0.154.0+26.2 | maven.fabricmc.net maven-metadata (existiert, neuere 0.154.x+26.2 verfügbar — Pin bleibt) |
 | fabric-loader | 0.19.3 (stable) | meta.fabricmc.net/v2/versions/loader |
-| fabric-loom | 1.17 (latest) | github.com/FabricMC/fabric-loom/releases |
-| gradle | 9.5.1 | Loom 1.17 changelog: "Update to Gradle 9.5" |
+| fabric-loom | 1.16.3 | maven.fabricmc.net (1.17 hat keine POM/Artefakte, 404 verifiziert) |
+| loom plugin-id | net.fabricmc.fabric-loom (non-remap) | phase0/Fabric_Loom_Mappings_Fix_01.md — 26.x unobfuskiert |
+| gradle | 9.5.1 | Loom 1.16 changelog: "minimum Gradle 9.4" |
 | java (build) | 21 | Loom 1.11+ requires Java 21 |
-| java (mod target) | [VERIFY] | offen — P0.4 klärt es |
+| java (mod target) | 25 | Loom 1.16.3: "Minecraft 26.2 requires Java 25" |
+| yarn/mojmap | entfällt | 26.x unobfuskiert, Yarn eingestellt nach 1.21.11, Mojmap nicht mehr im Manifest |
 
 ---
 
