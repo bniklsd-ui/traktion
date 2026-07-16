@@ -8,7 +8,8 @@
   "license": "MIT",
   "environment": "*",
   "entrypoints": {
-    "main": ["de.traktion.spike.SpikeModInitializer"]
+    "main": ["de.traktion.spike.SpikeModInitializer"],
+    "client": ["de.traktion.spike.SpikeClientInitializer"]
   },
   "depends": {
     "fabricloader": ">=0.19.3",

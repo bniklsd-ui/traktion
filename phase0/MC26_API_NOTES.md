@@ -156,6 +156,46 @@ ServerLifecycleEvents.SERVER_STARTED.register(server -> {
 **Wichtig:** `onInitialize()` läuft beim Mod-Laden, bevor eine Welt existiert. Spawn-Logik
 muss in `SERVER_STARTED` (oder später) laufen, nicht in `onInitialize()`.
 
+## Entity-Renderer-API (verifiziert 2026-07-16 gegen dekompilierte JARs)
+
+**Problem, das dieser Abschnitt klärt:** Eine Entity ohne registrierten Renderer crasht
+den Client mit NPE: `EntityRenderDispatcher.shouldRender()` → `renderer` ist null.
+Symptom: Client crasht im Render-Frame, sieht aus wie "hängen im Ladebildschirm".
+
+**Verifizierte API (aus dekompilierten JARs):**
+
+```java
+// Client-Entrypoint (fabric.mod.json "client": [...])
+// EntityRendererRegistry.register(EntityType, EntityRendererProvider)
+// Quelle: fabric-rendering-v1-25.3.0 JAR
+EntityRendererRegistry.register(MY_ENTITY, MyRenderer::new);
+
+// Minimaler Renderer (rendert nichts, verhindert NPE):
+public class MyRenderer extends EntityRenderer<MyEntity, EntityRenderState> {
+    public MyRenderer(EntityRendererProvider.Context context) {
+        super(context);
+    }
+    @Override
+    public EntityRenderState createRenderState() {
+        return new EntityRenderState();  // konkrete Klasse, nicht abstrakt
+    }
+    @Override
+    public void extractRenderState(MyEntity e, EntityRenderState s, float partialTick) {
+        super.extractRenderState(e, s, partialTick);
+    }
+    @Override
+    public void submit(EntityRenderState s, PoseStack p, SubmitNodeCollector n, CameraRenderState c) {
+        // leer: nichts rendern
+    }
+}
+```
+
+**Wichtig:**
+- `EntityRenderer<T, S>` ist abstrakt, `createRenderState()` ist die einzige abstrakte Methode.
+- `EntityRenderState` ist eine konkrete Klasse — keine Ableitung nötig für minimale Renderer.
+- `submit()` kann leer bleiben — die Entity wird dann unsichtbar (nur Hitbox über F3+B).
+- Renderer-Registrierung muss im Client-Entrypoint passieren, nicht im Main-Entrypoint.
+
 ## jqwik [VERIFY — noch offen]
 
 Nicht in dieser Recherche geklärt. P0.4 oder P1 muss es testen.
