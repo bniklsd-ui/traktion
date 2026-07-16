@@ -120,6 +120,42 @@ rekonstruiert). Für den Spike muss das manuell getestet werden.
 implementiert, speichert Vanilla sie beim Chunk-Unload und rekonstruiert sie beim
 Chunk-Load mit erhaltenem Zustand. Der Spike muss das bestätigen.
 
+## Entity-Spawn-API (verifiziert 2026-07-16 gegen dekompilierte JARs)
+
+**Problem, das dieser Abschnitt klärt:** Registrierung allein bringt keine Entity in die Welt.
+`onInitialize()` läuft beim Mod-Laden, nicht beim Weltstart. Eine registrierte Entity
+erscheint erst, wenn etwas sie spawned — per `/summon`, per Spawn-Egg, oder per Code.
+
+**Verifizierte API (aus dekompilierten JARs, nicht aus Doku):**
+
+```java
+// ServerLifecycleEvents.SERVER_STARTED feuert, wenn der Server hochgefahren ist.
+// Callback-Signatur: void onServerStarted(MinecraftServer server)
+// Quelle: fabric-lifecycle-events-v1-4.1.3 JAR, dekompiliert mit javap
+ServerLifecycleEvents.SERVER_STARTED.register(server -> {
+    ServerLevel overworld = server.overworld();  // MinecraftServer.overworld() -> ServerLevel
+    BlockPos pos = new BlockPos(0, 1, 0);
+
+    // EntityType.spawn(ServerLevel, BlockPos, EntitySpawnReason) -> T
+    // Quelle: minecraft-merged-deobf-26.2.jar, EntityType.class
+    PathEntity entity = PATH_ENTITY.spawn(overworld, pos, EntitySpawnReason.COMMAND);
+});
+
+// Alternative: ServerLevel.addFreshEntity(Entity) -> boolean
+// Quelle: ServerLevel.class
+```
+
+**EntitySpawnReason-Werte (verifiziert aus EntitySpawnReason.class):**
+`NATURAL` · `CHUNK_GENERATION` · `SPAWNER` · `STRUCTURE` · `BREEDING` · `MOB_SUMMONED` ·
+`JOCKEY` · `EVENT` · `CONVERSION` · `REINFORCEMENT` · `TRIGGERED` · `BUCKET` ·
+`SPAWN_ITEM_USE` · `COMMAND` · `DISPENSER` · `PATROL` · `TRIAL_SPAWNER` · `LOAD` ·
+`DIMENSION_TRAVEL`
+
+**Für den Spike:** `COMMAND` ist der passende Grund (programmatischer Spawn, wie `/summon`).
+
+**Wichtig:** `onInitialize()` läuft beim Mod-Laden, bevor eine Welt existiert. Spawn-Logik
+muss in `SERVER_STARTED` (oder später) laufen, nicht in `onInitialize()`.
+
 ## jqwik [VERIFY — noch offen]
 
 Nicht in dieser Recherche geklärt. P0.4 oder P1 muss es testen.

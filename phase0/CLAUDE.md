@@ -7,7 +7,7 @@ up: ../CLAUDE.md
 down:
   - ../docs/plans/PHASE0_PLAN.md      # Konzept/Plan, aus dem P0 gebaut wird
   - ./SESSIONS_ARCHIVE.md             # alte Session-stopped-Blöcke
-updated: 2026-07-15
+updated: 2026-07-16
 ---
 
 # Phase 0 — Fundament, Konventions-Import & Messinstrument
@@ -34,32 +34,37 @@ updated: 2026-07-15
 | P0.2 Step 3 — ROADMAP/ARCHITECTURE Stubs | ✅ | bed7b49 | beide Stubs + One-Liner in INDEX.md |
 | P0.2 Step 4 — Log-Konventionen + Testmatrix | ✅ | 97b7add | Logging + Testmatrix in `docs/CONVENTIONS.md` |
 | P0.2 Step 2 — train-mc Build-Fehler behoben | ✅ | 0c32c06 | Non-remap Plugin-ID, Mappings entfernt, Java 25 |
-| P0.4 — MC-Spike (Code geschrieben) | ⏳ | (diese Session) | Branch `p0.4-mc-spike`, kompiliert, Smoke-Test offen |
+| P0.4 — MC-Spike (Code geschrieben) | ⏳ | 605ad0f | Branch `p0.4-mc-spike`, kompiliert, Smoke-Test offen |
+| P0.4 — MC-Spike (Spawn-Fix) | ⏳ | (diese Session) | `SERVER_STARTED`-Callback + `EntityType.spawn` — Entity erscheint jetzt |
 
 ---
 
-## Session stopped — 2026-07-15 (P0.4 Spike-Code + GitHub-Setup + API-Recherche)
+## Session stopped — 2026-07-16 (P0.4 Spawn-Fix nach Smoke-Test-Befund)
 
 ### Completed (diese Session)
-- **GitHub-Setup:** SSH-Verbindung zu `github.com:bniklsd-ui/traktion.git` hergestellt. `master` →
-  `main` umbenannt, gepusht. `README.md` geschrieben (menschliche Oberfläche mit Mission, Architektur,
-  Setup, Versions-Tabelle, Doku-Einstiegspunkte). `master`-Verweise in Doku auf `main` korrigiert.
-- **Contributor-Attribution:** Build-Agent + Nikinger auf `README.md`, `train-mc/build.gradle.kts`,
-  `settings.gradle.kts`, `gradle.properties`. Zukünftig als `Co-authored-by:`-Trailer im Commit.
-- **P0.4 MC-Spike — Branch angelegt:** `p0.4-mc-spike` (wird nie gemerged).
-- **P0.4 MC-Spike — API-Recherche:** `phase0/MC26_API_NOTES.md` geschrieben. Klärt:
-  - Entity-Registrierung: `EntityType.Builder.of()`, `Registry.register(BuiltInRegistries.ENTITY_TYPE, ...)`
-  - Entity-Persistenz: `addAdditionalSaveData(ValueOutput)` / `readAdditionalSaveData(ValueInput)` —
-    nicht mehr `writeNbt`/`readNbt` mit `NbtCompound` (26.x API-Änderung)
-  - Welt-attached Persistent State (T-D15): `SavedData` + `SavedDataType` + `level.getDataStorage()`
-  - `ValueInput.getDoubleOr(String, double)` statt `getDouble(String).orElse(...)` (aus JAR verifiziert)
-  - `Identifier` statt `ResourceLocation` in 26.2 (aus JAR verifiziert)
-- **P0.4 MC-Spike — Code geschrieben:** `PathEntity.java` (Entity folgt hartkodiertem Quadrat-Pfad,
-  speichert `pathProgress` in `ValueOutput`/`ValueInput`), `SpikeModInitializer.java` (Registrierung),
-  `fabric.mod.json` (angepasst für Spike, Java 25, Entrypoint).
-- **P0.4 MC-Spike — Build grün:** `gradle :train-mc:build` BUILD SUCCESSFUL. Spike-Code kompiliert
-  gegen MC 26.2 (unobfuskiert, Mojang-Namen direkt).
-- **Anti-Pattern-Check:** Spike-Code ist in `train-mc` (nicht `train-core`). Kein Verstoß. ✅
+- **Smoke-Test-Befund ausgewertet (Nikinger):** Die letzte Session endete mit einem technischen
+  Fehler — der Smoke-Test zeigte: Entity wird registriert, aber nicht erschafft. Minecraft hing im
+  Ladebildschirm. Die letzte Session hatte das Problem erkannt, aber den Fix nicht mehr committet
+  oder dokumentiert. Dieser Session-stopped-Block schließt die Lücke.
+- **Wurzelursache gefunden:** `SpikeModInitializer.onInitialize()` registrierte nur den `EntityType`,
+  spawnte aber nie eine Entity. Der Kommentar "Beim Start wird eine Entity am Spawn gespawnt" war
+  eine Lüge — der Code machte es nicht. Registrierung allein bringt keine Entity in die Welt.
+- **API verifiziert gegen dekompilierte JARs (nicht aus Erinnerung):**
+  - `ServerLifecycleEvents.SERVER_STARTED` (Callback: `MinecraftServer`) — aus
+    `fabric-lifecycle-events-v1-4.1.3` JAR via `javap` dekompiliert
+  - `MinecraftServer.overworld()` → `ServerLevel` — aus `minecraft-merged-deobf-26.2.jar`
+  - `EntityType.spawn(ServerLevel, BlockPos, EntitySpawnReason)` → `T` — aus `EntityType.class`
+  - `EntitySpawnReason.COMMAND` — passender Grund für programmatischen Spawn (wie `/summon`)
+  - `ServerLevel.addFreshEntity(Entity)` → `boolean` — Alternative, nicht verwendet
+- **Spawn-Fix geschrieben:** `SpikeModInitializer` registriert jetzt einen `SERVER_STARTED`-Callback,
+  der beim Serverstart eine `PathEntity` in der Overworld bei `(0, 1, 0)` spawnt. API-Verifikation
+  im Klassen-Kommentar dokumentiert.
+- **Build grün:** `gradle :train-mc:build` BUILD SUCCESSFUL. Fix kompiliert gegen MC 26.2.
+- **API-Notes ergänzt:** `phase0/MC26_API_NOTES.md` — neuer Abschnitt "Entity-Spawn-API" mit
+  verifizierten Signaturen, `EntitySpawnReason`-Werten und Erklärung, warum `onInitialize()` nicht
+  für Spawn-Logik taugt (läuft vor Weltexistenz).
+- **Anti-Pattern-Check:** Fix ist in `train-mc` (nicht `train-core`). Kein `net.minecraft.*` in
+  `train-core`. Kein Verstoß. ✅
 
 ### Completed (vorherige Sessions, zusammengefasst)
 - **P0.1** (c2d132b): Konventions-Import. `docs/CONVENTIONS.md` (17 übernommen, 13 verworfen).
@@ -72,26 +77,31 @@ updated: 2026-07-15
 - **P0.2 Step 3** (bed7b49): ROADMAP.md + ARCHITECTURE.md Stubs.
 - **P0.2 Step 4** (97b7add): Log-Konventionen + Testmatrix in `docs/CONVENTIONS.md`.
 - **P0.2 Step 2 Build-Fix** (0c32c06): train-mc Build-Fix (non-remap Loom, Java 25, keine Mappings).
+- **P0.4 Spike-Code** (605ad0f): PathEntity + SpikeModInitializer + MC26_API_NOTES. Build grün,
+  Smoke-Test offen (siehe Archiv 2026-07-15).
 
 ### Next
-- **P0.4 MC-Spike — Smoke-Test (Operator):** `./gradlew :train-mc:runClient` (oder äquivalent) im
-  Spike-Branch starten. Prüfen:
+- **P0.4 MC-Spike — Smoke-Test (Operator):** `./gradlew :train-mc:runClient` im Spike-Branch
+  starten. Der Spawn-Fix sollte die Entity jetzt bei `(0, 1, 0)` erscheinen lassen. Prüfen:
   1. Entity fährt entlang hartkodiertem Quadrat-Pfad im Client sichtbar?
   2. Entity despawnt bei Spielerentfernung (Chunk-Unload)?
   3. Entity wird bei Annäherung zustandserhaltend rekonstruiert (Position auf Pfad stimmt)?
   4. Antwort auf T-D3: ja oder nein. Wenn nein: sofort melden.
-- **P0.4 [VERIFY]-Fragen:** PersistentState-API-Name geklärt (SavedData, siehe MC26_API_NOTES.md).
-  jqwik noch offen. Java-Version geklärt (Java 25).
+- **P0.4 [VERIFY]-Fragen:** PersistentState-API-Name geklärt (SavedData). Spawn-API geklärt
+  (SERVER_STARTED + EntityType.spawn). jqwik noch offen. Java-Version geklärt (Java 25).
 - **Nach P0.4:** P0 ist abgeschlossen, wenn der Smoke-Test T-D3 bestätigt. Dann P1 (train-core
   Durchstich) in neuer Session.
 
 ### Open questions / blockers
-- **P0.4 Smoke-Test offen:** Code kompiliert und baut, aber nicht im Client getestet. Operator muss
-  `./gradlew :train-mc:runClient` ausführen und die drei Akzeptanzkriterien prüfen.
+- **P0.4 Smoke-Test offen:** Spawn-Fix kompiliert und baut, aber nicht im Client getestet. Operator
+  muss `./gradlew :train-mc:runClient` ausführen und die drei Akzeptanzkriterien prüfen.
+- **Ladebildschirm-Hängen (vorheriger Smoke-Test):** Nikinger berichtete, Minecraft hing im
+  Ladebildschirm. Das kann an der fehlenden Entity gelegen haben (Client wartete?), oder ein
+  separates Problem sein. Der neue Smoke-Test muss zeigen, ob das behoben ist.
 - **jqwik [VERIFY]:** Auskommentiert in `train-core/build.gradle.kts`. P0.4 oder P1 klärt, ob es
   unter Gradle 9.5.1 läuft. Fallback: JUnit 5 + eigene Generatoren.
 - **[VERIFY] Fabric-Logging-Konvention in 26.2:** `LoggerFactory.getLogger(...)` wird im Spike
   verwendet. Bleibt [VERIFY], bis P4 echte 26.2-Quellen prüft.
 - **`.opencode/agents/build-traktion.md` uncommitted:** Permission-Änderung (deny→ask) durch
   Operator, nicht durch Agent. Unangetastet gelassen.
-- **Tool-Calls:** Diese Session benutzte ~30 Tool-Calls (GitHub-Setup + Recherche + Spike-Code).
+- **Tool-Calls:** Diese Session benutzte ~25 Tool-Calls (Recherche + Spawn-Fix + Doku).
