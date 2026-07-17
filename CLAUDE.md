@@ -51,17 +51,17 @@ train-mc/     dünner Adapter. Blöcke, Entities, Rendering, Packets, Persistenz
 
 | Phase | Inhalt | Status |
 |---|---|---|
-| **P0** | Fundament, Konventions-Import, Skelett, Vorregistrierung, MC-Spike | ⏳ P0.2 Steps 1–4 ✅ · train-mc Build-Fehler offen · P0.4 ⏳ |
-| P1 | `train-core`: Durchstich (Z1–Z4) | ⏳ |
+| **P0** | Fundament, Konventions-Import, Skelett, Vorregistrierung, MC-Spike | ✅ T-D3 bestätigt |
+| P1 | `train-core`: Durchstich (Z1–Z4) | ⏳ nächster Schritt |
 | P2 | Verschleiß + Ports (Z6, Z7) | ⏳ |
 | P3 | Planer (Z5 — Kern-Orakel) | ⏳ |
 | P4 | `train-mc`: erste spielbare Version (Z9–Z11) | ⏳ |
 | P5 | Fahrplan + Lokführer (Z8) | ⏳ |
 | P6 | Auswertung M1-Strang | ⏳ |
 
-**Aktueller Schritt:** P0.2 Steps 1–4 ✅ (train-core grün, ROADMAP/ARCHITECTURE/Log/Testmatrix
-geschrieben). `train-mc` Build-Fehler offen (`property()` im plugins-Block). Nächster Schritt:
-P0.4 MC-Spike. Siehe `phase0/CLAUDE.md` Session-stopped-Block.
+**Aktueller Schritt:** P0 abgeschlossen — T-D3 technisch bewiesen (P0.4 Smoke-Test bestätigt:
+Entity fährt Pfad, despawnt, rekonstruiert zustandserhaltend an Chunk-Grenze). Nächster Schritt:
+P1 (train-core Durchstich) in neuer Session. Siehe `phase0/CLAUDE.md` Session-stopped-Block.
 
 ---
 
