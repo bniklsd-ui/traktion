@@ -6,7 +6,7 @@ detail: L2
 up: ./CLAUDE.md
 down:
   - ./docs/DOC_LAYERS_CONVENTION.md   # generische Spec des Doc-Layers-Systems (Header-Card, Layer, Rotation)
-updated: 2026-07-14
+updated: 2026-07-16
 ---
 
 # Traktion — Konventionen
@@ -215,6 +215,43 @@ updated: 2026-07-14
 - **Kategorie B ist nicht deterministisch.** Client-Start, Rendering, Chunk-Load — das ist
   manueller Smoke, kein Unit-Test. Die Metriken erfassen deshalb auch *Recherche-Schritte* und
   *halluzinierte API-Aufrufe*, weil 26.2 hinter dem Trainingsschnitt liegt (Plan §6).
+
+---
+
+## Root-Layout
+
+> **Festgeschrieben 2026-07-16.** Das Projekt-Root bleibt flach — Gradle und die Einstiegs-Doku
+> erzwingen das. Aber es gibt eine Ordnung: jede Datei hat eine Kategorie und einen Verbleibgrund.
+
+### Kategorien
+
+| Kategorie | Dateien | Verbleibgrund |
+|---|---|---|
+| **Einstieg** | `AGENTS.md`, `CLAUDE.md`, `README.md` | Harness-neutraler Einstieg, Single Source of Truth, GitHub-Oberfläche |
+| **Wahrheit** | `TRAKTION_OVERALL_PLAN.md`, `ROADMAP.md`, `ARCHITECTURE.md` | Mission, Phasen, Schnitt — verweisen aufeinander |
+| **Messung** | `M1_PREREGISTRATION.md` | FROZEN (Plan §6), muss im Root bleiben — Git-History ist der Beweis |
+| **Gradle-Build** | `build.gradle.kts`, `settings.gradle.kts`, `gradle.properties` | Gradle erwartet diese im Root |
+| **Gradle-Wrapper** | `gradlew`, `gradlew.bat`, `gradle/` | Standard-Gradle-Wrapper — `gradlew.bat` bleibt (Windows-Contributor-kompatibel) |
+| **Harness** | `opencode.json` | Projekt-spezifische opencode-Konfiguration (Permissions, Agent-Referenz) |
+| **Git** | `.gitignore` | Git |
+
+### Was nicht ins Root gehört
+
+- **Build-Artefakte:** `.gradle/`, `build/`, `train-core/build/`, `train-mc/build/`, `train-mc/.gradle/`
+  — ignoriert via `.gitignore`.
+- **Loom Dev-Run:** `train-mc/run/`, `train-mc/logs/` — ignoriert. Ausnahme: archivierte Crash-Logs
+  können tracked bleiben (als historischer Beweis), aber neue Logs werden nicht committed.
+- **Operator-Infrastruktur:** `example_project/`, `.opencode/auth.json`, `.opencode/node_modules/`,
+  `skills-lock.json` — ignoriert.
+- **Phasen-Doku:** `phase<N>/` — eigene Verzeichnisse, nicht im Root.
+- **Konzept-Doku:** `docs/` — eigenes Verzeichnis.
+
+### Regel
+
+- **Keine neuen Dateien im Root ohne Kategorie.** Wenn eine Datei nicht in eine der obigen Kategorien
+  passt, gehört sie nicht ins Root — sie gehört nach `docs/`, `phase<N>/` oder wird gar nicht committed.
+- **Root bleibt flach.** Keine Unterverzeichnisse außer den Modul-Verzeichnissen (`train-core/`,
+  `train-mc/`), `docs/`, `phase<N>/`, `m1/`, `gradle/`.
 
 ---
 

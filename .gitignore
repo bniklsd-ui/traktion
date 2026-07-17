@@ -1,7 +1,16 @@
-example_project/
+# Build-Artefakte (Gradle)
 .gradle/
 build/
-run/
+train-core/build/
+train-mc/build/
+train-mc/.gradle/
+
+# Loom Dev-Run (Welt-Saves, Logs)
+train-mc/run/
+train-mc/logs/
+
+# Operator-Infrastruktur
+example_project/
 .opencode/auth.json
 .opencode/node_modules/
 .opencode/package.json
