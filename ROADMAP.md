@@ -22,8 +22,8 @@ updated: 2026-07-14
 
 | Phase | Inhalt | Status | Kategorie |
 |---|---|---|---|
-| **P0** | Fundament, Konventions-Import, Skelett, Vorregistrierung, MC-Spike | ⏳ P0.2 ✅ · P0.4 ⏳ | — |
-| **P1** | `train-core`: Durchstich — Graph, Physik, Energie, Simulator, Blockabschnitte (Z1–Z4) | ⏳ | A |
+| **P0** | Fundament, Konventions-Import, Skelett, Vorregistrierung, MC-Spike | ✅ T-D3 bestätigt | — |
+| **P1** | `train-core`: Durchstich — Graph, Physik, Energie, Simulator, Blockabschnitte (Z1–Z4) | ⏳ nächster Schritt | A |
 | **P2** | Verschleiß + Ports — `condition`, `wear`, `PowerSupply`/`MaintenanceSupply` (Z6, Z7) | ⏳ | A |
 | **P3** | Planer — grobe Auflösung, dieselbe Physikfunktion, Z5 property-based (Z5) | ⏳ | A |
 | **P4** | `train-mc`: erste spielbare Version — Gleiseditor, Persistenz, Token⇄Entity, Leitstand (Z9–Z11) | ⏳ | B |

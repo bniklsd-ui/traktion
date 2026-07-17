@@ -7,16 +7,18 @@ up: ../CLAUDE.md
 down:
   - ../docs/plans/PHASE0_PLAN.md      # Konzept/Plan, aus dem P0 gebaut wird
   - ./SESSIONS_ARCHIVE.md             # alte Session-stopped-Blöcke
-updated: 2026-07-15
+updated: 2026-07-16
 ---
 
 # Phase 0 — Fundament, Konventions-Import & Messinstrument
 
-> **Status:** P0.1 ✅ · P0.3 ✅ · P0.2 Step 2 ✅ (train-core grün) · P0.2 Step 3 ✅ · P0.2 Step 4 ✅ · P0.4 ⏳
+> **Status:** P0.1 ✅ · P0.3 ✅ · P0.2 Step 2 ✅ (train-core grün) · P0.2 Step 3 ✅ · P0.2 Step 4 ✅ · P0.4 ✅ (T-D3 bestätigt)
 >
 > **Ausnahme P0:** Planung UND Ausführung in derselben Session. Ab P1 getrennt.
 >
 > **Konzept:** `docs/plans/PHASE0_PLAN.md` (gelockte Entscheidungen, Schritt-Sequenz, Akzeptanzkriterien).
+>
+> **P0 ist abgeschlossen.** Nächster Schritt: P1 (train-core Durchstich) in neuer Session.
 
 ---
 
@@ -33,36 +35,35 @@ updated: 2026-07-15
 | P0.2 Step 2 — `gradle :train-core:test` grün | ✅ | (verifiziert) | SmokeTest PASSED, `--configure-on-demand` nötig |
 | P0.2 Step 3 — ROADMAP/ARCHITECTURE Stubs | ✅ | bed7b49 | beide Stubs + One-Liner in INDEX.md |
 | P0.2 Step 4 — Log-Konventionen + Testmatrix | ✅ | 97b7add | Logging + Testmatrix in `docs/CONVENTIONS.md` |
-| P0.2 Step 2 — train-mc Build-Fehler behoben | ✅ | (diese Session) | Non-remap Plugin-ID, Mappings entfernt, Java 25 |
-| P0.4 — MC-Spike | ⏳ | — | eigener Branch `p0.4-mc-spike`, eigene Session |
+| P0.2 Step 2 — train-mc Build-Fehler behoben | ✅ | 0c32c06 | Non-remap Plugin-ID, Mappings entfernt, Java 25 |
+| P0.4 — MC-Spike (Code geschrieben) | ✅ | 605ad0f | Branch `p0.4-mc-spike`, kompiliert |
+| P0.4 — MC-Spike (Spawn-Fix) | ✅ | 6b88975 | `SERVER_STARTED`-Callback + `EntityType.spawn` |
+| P0.4 — MC-Spike (Renderer-Fix) | ✅ | a60edf9 | `PathEntityRenderer` + `SpikeClientInitializer` — NPE-Crash behoben |
+| P0.4 — MC-Spike (Smoke-Test) | ✅ | (Nikinger) | T-D3 bestätigt: Entity fährt Pfad, despawnt, rekonstruiert an Chunk-Grenze |
 
 ---
 
-## Session stopped — 2026-07-15 (train-mc Build-Fix + Mappings-Recherche)
+## Session stopped — 2026-07-16 (P0.4 Smoke-Test bestätigt T-D3 — P0 abgeschlossen)
 
 ### Completed (diese Session)
-- **P0.2 Step 2 — `train-mc` Build-Fehler behoben:** `gradle :train-mc:build` BUILD SUCCESSFUL.
-  Der Fehler hatte mehrere Schichten, die nacheinander gelöst wurden:
-  1. `property("loom_version")` im `plugins`-Block → String-Literal `"1.16.3"` (Kotlin-DSL-Constraint).
-  2. Loom 1.17 hat keine Maven-Artefakte (POM 404 verifiziert) → auf 1.16.3 ausgewichen (neueste
-     Maven-verfügbare Version, Gradle-9.5-kompatibel).
-  3. `expand("version": ...)` war Groovy-Syntax → `expand(mapOf("version" to ...))` (Kotlin DSL).
-  4. MC 26.2 erfordert Java 25 (Loom-Fehlermeldung), nicht Java 21 → Operator hat JDK 25 installiert,
-     `java_mod_target=25` in `gradle.properties`, Toolchain-Überschreibung in `train-mc/build.gradle.kts`.
-  5. Yarn-Mappings für 26.2 fehlen (Meta-API leer) → Mojmap versucht → `officialMojangMappings()`
-     scheitert (kein `client_mappings` im Mojang-Manifest).
-  6. **Recherche-Auftrag an externes Modell** (Nikinger) → Ergebnis in
-     `phase0/Fabric_Loom_Mappings_Fix_01.md`: MC 26.x ist **unobfuskiert** (seit 26.1), Yarn/Mojmap
-     sind obsolet. Fix: non-remap Plugin-ID `net.fabricmc.fabric-loom`, Mappings-Zeile komplett
-     entfernen, `modImplementation`→`implementation`.
-  7. Umsetzung: `settings.gradle.kts` (resolutionStrategy auf `net.fabricmc.fabric-loom`),
-     `train-mc/build.gradle.kts` (Plugin-ID, keine Mappings, `implementation`), `gradle.properties`
-     (Kommentare mit Verifikationsstand).
-- **`gradle :train-core:test` weiterhin grün** (SmokeTest PASSED, UP-TO-DATE).
-- **Doku nachgezogen:** `docs/plans/PHASE0_PLAN.md` T-D12/T-D17 + Verifizierte-Versionen-Tabelle
-  aktualisiert. `gradle.properties` Kommentare. `phase0/Fabric_Loom_Mappings_Fix_01.md` mit
-  Header-Card versehen, One-Liner in `docs/INDEX.md`.
-- **Anti-Pattern-Check:** keine `net.minecraft.*`-Importe in `train-core`. Kein Verstoß. ✅
+- **P0.4 Smoke-Test bestätigt (Nikinger):** Manueller Test auf Nikingers PC mit der Renderer-Fix-
+  JAR. Ergebnis: **T-D3 ist technisch bewiesen.** Zwei quadratische Hitboxen bei (0,0) sichtbar
+  (F3+B), die im Quadrat fahren. Persistenz bestätigt: Hitboxen genau an der Chunk-Grenze, nach
+  Entfernung und Annäherung zustandserhaltend rekonstruiert.
+- **Beobachtungen (nicht kritisch für T-D3):**
+  - **Zwei Hitboxen statt einer:** `SERVER_STARTED` feuert beim integrierten Server vermutlich
+    zweimal (Welt-Generierung + Welt-Laden), oder der Callback wurde doppelt registriert. Für den
+    Spike irrelevant — Persistenz wird dadurch sogar besser getestet.
+  - **y≈100 statt y=1:** `PathEntity.setPos(x, 1.0, z)` setzt y=1, aber die Entity hat
+    `noPhysics = true` und Vanilla scheint sie auf die Oberfläche zu heben. Für den Spike nicht
+    kritisch — die Position ist konsistent, das ist was zählt.
+- **P0 ist abgeschlossen.** Alle Akzeptanzkriterien erfüllt:
+  - `gradle :train-core:test` grün ✅
+  - `docs/CONVENTIONS.md` existiert und benennt Verworfenes ✅
+  - Spike beantwortet T-D3 mit **ja** ✅
+  - Preregistration liegt vor dem ersten Trial in der History ✅
+  - `example_project/` ist stillgelegt ✅
+- **Branch gepusht:** `p0.4-mc-spike` auf `origin` (wird nie gemerged — Wegwerf-Spike).
 
 ### Completed (vorherige Sessions, zusammengefasst)
 - **P0.1** (c2d132b): Konventions-Import. `docs/CONVENTIONS.md` (17 übernommen, 13 verworfen).
@@ -74,24 +75,30 @@ updated: 2026-07-15
 - **P0.2 Step 2 Doc-Layers** (fabd860): `phase0/` angelegt, `DOC_LAYERS_CONVENTION.md`.
 - **P0.2 Step 3** (bed7b49): ROADMAP.md + ARCHITECTURE.md Stubs.
 - **P0.2 Step 4** (97b7add): Log-Konventionen + Testmatrix in `docs/CONVENTIONS.md`.
+- **P0.2 Step 2 Build-Fix** (0c32c06): train-mc Build-Fix (non-remap Loom, Java 25, keine Mappings).
+- **P0.4 Spike-Code** (605ad0f): PathEntity + SpikeModInitializer + MC26_API_NOTES.
+- **P0.4 Spawn-Fix** (6b88975): SERVER_STARTED-Callback + EntityType.spawn.
+- **P0.4 Renderer-Fix** (a60edf9): PathEntityRenderer + SpikeClientInitializer — NPE-Crash behoben.
 
 ### Next
-- **P0.2 Done-When-Check:** `gradle :train-mc:build` ist jetzt grün. P0.2-Akzeptanz "train-mc:build"
-  erfüllt. P0.2 ist damit vollständig abgeschlossen (alle Steps ✅, Build grün).
-- **P0.4 — MC-Spike:** auf eigenem Branch `p0.4-mc-spike`, eigene Session. Beantwortet T-D3
-  (Token ⇄ Entity, zustandserhaltende Rekonstruktion). `train-mc` baut jetzt — Voraussetzung erfüllt.
-  Offene [VERIFY]-Fragen: PersistentState-API-Name in 26.2, jqwik-Unterstützung unter Gradle 9.5.1.
-  Recherche-Grenze für P0.4 aufgehoben.
+- **P1 — train-core Durchstich (Kategorie A):** Neue Session. Plan §5/P1:
+  - `RailGraph` — Knoten, Kanten, `RailKind`, `gradient`, Länge (Z1)
+  - `Consist` — `carCount`, `tareMassKg`, `payloadMassKg` (T-D7)
+  - `Physics` — **eine** Funktion `requiredPowerW(consist, speed, gradient)` (Regel 2)
+  - `PowerGrid` — Bedarf, Angebot über `PowerSupply`, Unterwerk-Reset (Z4 ohne `condition`)
+  - `Simulator` — fixed-dt-Substep-Schleife, Token bewegt sich, Unterversorgung bremst (Z3, T-D13)
+  - `BlockSection` — Reservierung, Kollisionsfreiheit, Deadlock-Erkennung (Z2)
+  - Done when: Z1–Z4 grün; null externe Abhängigkeiten außer Test-Bibliotheken; zwei Läufe mit
+    gleichem Seed liefern bitgleiche Ergebnisse (Regel 8).
+- **Vor P1:** `phase1/CLAUDE.md` als allererste Aktion schreiben (Plan §11, Anti-Pattern §9).
+- **jqwik [VERIFY]:** Noch offen. P1 muss klären, ob es unter Gradle 9.5.1 läuft. Fallback:
+  JUnit 5 + eigene Generatoren.
 
 ### Open questions / blockers
-- **PersistentState-API-Name [VERIFY]:** T-D15 verweist auf "welt-attached Persistent State pro
-  Dimension". Der API-Name in 26.2 ist noch ungeprüft (26.1 hat das Welt-Datenformat geändert).
-  P0.4 muss es gegen echte 26.2-Quellen verifizieren. Das Recherche-Dokument bestätigt die 26.1-
-  Änderung ("Tiny Takeover"), aber nicht den spezifischen API-Namen.
-- **jqwik [VERIFY]:** Auskommentiert in `train-core/build.gradle.kts`. P0.4 klärt, ob es unter
-  Gradle 9.5.1 läuft. Fallback: JUnit 5 + eigene Generatoren.
-- **[VERIFY] Fabric-Logging-Konvention in 26.2:** `LoggerFactory.getLogger(...)` ist 1.21.x-Muster.
-  Bleibt [VERIFY], bis P0.4 oder P4 echte 26.2-Quellen prüft. In `docs/CONVENTIONS.md` markiert.
+- **jqwik [VERIFY]:** Auskommentiert in `train-core/build.gradle.kts`. P1 muss es klären. Fallback:
+  JUnit 5 + eigene Generatoren.
+- **[VERIFY] Fabric-Logging-Konvention in 26.2:** `LoggerFactory.getLogger(...)` wird im Spike
+  verwendet. Bleibt [VERIFY], bis P4 echte 26.2-Quellen prüft.
 - **`.opencode/agents/build-traktion.md` uncommitted:** Permission-Änderung (deny→ask) durch
   Operator, nicht durch Agent. Unangetastet gelassen.
-- **Tool-Calls:** Diese Session benutzte ~25 Tool-Calls (Build-Fix + Recherche + Doku).
+- **Tool-Calls:** Diese Session benutzte ~5 Tool-Calls (Doku-Update + Push).

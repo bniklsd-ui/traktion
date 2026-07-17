@@ -4,7 +4,7 @@ purpose: L0-Karte des Doku-Systems. Eine Zeile pro Doku, Glyph + Größe + read-
 read-when: Session-Start; vor der Suche nach einer Doku; bevor eine neue .md erstellt wird (One-Liner hier ergänzen, im selben Commit)
 detail: L0
 up: ./CLAUDE.md
-updated: 2026-07-14
+updated: 2026-07-16
 ---
 
 # Traktion — Doku-Index
@@ -39,6 +39,7 @@ updated: 2026-07-14
 | 🔄 `phase0/CLAUDE.md` | L1 | Session-Start in P0; Build-Log + aktueller Session-stopped-Block |
 | 📦 `phase0/SESSIONS_ARCHIVE.md` | L3 | bei Bedarf an historische Session-Details |
 | 📕 `phase0/Fabric_Loom_Mappings_Fix_01.md` | L2 | bei Build-Fehlern mit Mappings/Remapping für 26.x; vor P0.4-Spike |
+| 📕 `phase0/MC26_API_NOTES.md` | L2 | vor P4-Code (Entity/Renderer/Persistenz-API in 26.2); bei Fragen zur 26.2 API |
 
 ## Phasenpläne
 

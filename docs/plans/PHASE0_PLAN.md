@@ -240,11 +240,15 @@ Wegwerf-Spike ist und die eigentliche Kategorie-B-Messung erst in P4 beginnt.
 
 ## Done-When (Plan §5/P0)
 
-- [ ] `gradle :train-core:test` grün (leerer Smoke-Test)
-- [ ] `docs/CONVENTIONS.md` existiert und benennt Verworfenes ✅ (P0.1, c2d132b)
-- [ ] Spike beantwortet T-D3 mit ja/nein ⏳
-- [ ] Preregistration liegt vor dem ersten Trial in der History ✅ (P0.3, a40e818)
-- [ ] `example_project/` ist stillgelegt ✅ (vom Operator in Operator-Bereich verschoben, `.gitignore` Zeile 1 bleibt)
+- [x] `gradle :train-core:test` grün (leerer Smoke-Test) ✅
+- [x] `docs/CONVENTIONS.md` existiert und benennt Verworfenes ✅ (P0.1, c2d132b)
+- [x] Spike beantwortet T-D3 mit **ja** ✅ (P0.4 Smoke-Test, 2026-07-16 — Entity fährt Pfad,
+      despawnt, rekonstruiert zustandserhaltend an Chunk-Grenze)
+- [x] Preregistration liegt vor dem ersten Trial in der History ✅ (P0.3, a40e818)
+- [x] `example_project/` ist stillgelegt ✅ (vom Operator in Operator-Bereich verschoben,
+      `.gitignore` Zeile 1 bleibt)
+
+**P0 ist abgeschlossen.** Nächster Schritt: P1 (train-core Durchstich) in neuer Session.
 
 ---
 
