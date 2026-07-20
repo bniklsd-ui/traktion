@@ -9,10 +9,10 @@ permission:
     "example_project/**": allow
   edit:
     "*": allow
-    "m1/**": deny
-    "M1_*.md": deny
-    "docs/plans/**": deny
-    "TRAKTION_OVERALL_PLAN.md": deny
+    "m1/**": ask
+    "M1_*.md": ask
+    "docs/plans/**": ask
+    "TRAKTION_OVERALL_PLAN.md": ask
   webfetch: allow
 ---
 
