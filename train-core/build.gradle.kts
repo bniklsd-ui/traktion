@@ -16,8 +16,9 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 
-    // jqwik [VERIFY in P0.4 — läuft unter Gradle 9.5.1?]
-    // testImplementation("net.jqwik:jqwik:${property("jqwik_version")}")
+    // jqwik 1.9.0 (T-D20) — neueste 1.9.x ohne Anti-AI-Klausel.
+    // Verifiziert in P1 Step 1: läuft unter Gradle 9.5.1 mit JUnit 5.12.2.
+    testImplementation("net.jqwik:jqwik:${property("jqwik_version")}")
 }
 
 tasks.test {

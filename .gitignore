@@ -5,6 +5,9 @@ train-core/build/
 train-mc/build/
 train-mc/.gradle/
 
+# jqwik lokaler Cache (Property-Shrinking-Datenbank) — wird pro Lauf neu erzeugt
+train-core/.jqwik-database
+
 # Loom Dev-Run (Welt-Saves, Logs)
 train-mc/run/
 train-mc/logs/
