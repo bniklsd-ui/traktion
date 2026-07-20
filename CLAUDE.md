@@ -9,9 +9,11 @@ down:
   - ./docs/INDEX.md                   # Karte — eine Zeile pro Doku
   - ./docs/CONVENTIONS.md             # übernommene/verworfene Konventionen
   - ./docs/DOC_LAYERS_CONVENTION.md   # generische Spec des Doc-Layers-Systems
-  - ./phase0/CLAUDE.md                # Phasen-Kopf P0 — Build-Log + aktueller Session-stopped-Block
-  - ./docs/plans/PHASE0_PLAN.md       # Konzept/Plan, aus dem P0 gebaut wird
-updated: 2026-07-14
+  - ./phase1/CLAUDE.md                # Phasen-Kopf P1 — Build-Log + aktueller Session-stopped-Block
+  - ./phase0/CLAUDE.md                # Phasen-Kopf P0 — Build-Log + letzter P0-Session-stopped-Block
+  - ./docs/plans/PHASE1_PLAN.md       # Konzept/Plan, aus dem P1 gebaut wird
+  - ./docs/plans/PHASE0_PLAN.md       # Konzept/Plan, aus dem P0 gebaut wurde
+updated: 2026-07-20
 ---
 
 # Traktion — Single Source of Truth
@@ -52,16 +54,16 @@ train-mc/     dünner Adapter. Blöcke, Entities, Rendering, Packets, Persistenz
 | Phase | Inhalt | Status |
 |---|---|---|
 | **P0** | Fundament, Konventions-Import, Skelett, Vorregistrierung, MC-Spike | ✅ T-D3 bestätigt |
-| P1 | `train-core`: Durchstich (Z1–Z4) | ⏳ nächster Schritt |
+| **P1** | `train-core`: Durchstich (Z1–Z4) | 🔄 aktiv (Step 0–2 ✅, Step 3 als Nächstes) |
 | P2 | Verschleiß + Ports (Z6, Z7) | ⏳ |
 | P3 | Planer (Z5 — Kern-Orakel) | ⏳ |
 | P4 | `train-mc`: erste spielbare Version (Z9–Z11) | ⏳ |
 | P5 | Fahrplan + Lokführer (Z8) | ⏳ |
 | P6 | Auswertung M1-Strang | ⏳ |
 
-**Aktueller Schritt:** P0 abgeschlossen — T-D3 technisch bewiesen (P0.4 Smoke-Test bestätigt:
-Entity fährt Pfad, despawnt, rekonstruiert zustandserhaltend an Chunk-Grenze). Nächster Schritt:
-P1 (train-core Durchstich) in neuer Session. Siehe `phase0/CLAUDE.md` Session-stopped-Block.
+**Aktueller Schritt:** P1 läuft — Step 0 (Altlasten) ✅, Step 0b (Doc-Drift) ✅, Step 1 (jqwik
+1.9.0, T-D20, [VERIFY] aufgelöst) ✅, Step 2 (Phasen-Kopf) ✅. Nächster Schritt: Step 3
+(RailGraph, Z1). Siehe `phase1/CLAUDE.md` Session-stopped-Block.
 
 ---
 
@@ -70,8 +72,8 @@ P1 (train-core Durchstich) in neuer Session. Siehe `phase0/CLAUDE.md` Session-st
 1. `AGENTS.md` — harness-neutraler Einstieg
 2. `docs/INDEX.md` — Karte. Navigation über up/down-Links, nicht per Verzeichnissuche.
 3. `CLAUDE.md` — diese Datei (Single Source of Truth)
-4. `phase<N>/CLAUDE.md` — Phasen-Kopf, insbesondere `## Session stopped` (aktuell: `phase0/CLAUDE.md`)
-5. `docs/plans/PHASE<N>_PLAN.md` — Konzept/Plan, aus dem die Phase gebaut wird
+4. `phase<N>/CLAUDE.md` — Phasen-Kopf, insbesondere `## Session stopped` (aktuell: `phase1/CLAUDE.md`)
+5. `docs/plans/PHASE<N>_PLAN.md` — Konzept/Plan, aus dem die Phase gebaut wird (aktuell: `docs/plans/PHASE1_PLAN.md`)
 6. `TRAKTION_OVERALL_PLAN.md` — §2 (Locks), §3 (Hard Rules), §4 (Ziele), §9 (Anti-Patterns)
 
 Referenzierte Dateien werden **nicht** automatisch geladen. Öffne sie on-need-to-know selbst.
@@ -122,6 +124,6 @@ korrigieren, nicht umgehen. Diese Momente sind Messpunkte.
 
 ## Session stopped
 
-> Der aktuelle `## Session stopped`-Block lebt in `phase0/CLAUDE.md` (Doc-Layers-Konvention).
+> Der aktuelle `## Session stopped`-Block lebt in `phase1/CLAUDE.md` (Doc-Layers-Konvention).
 > Root-CLAUDE.md ist schlank und enthält keinen Session-stopped-Block.
-> Alte Blöcke: `phase0/SESSIONS_ARCHIVE.md`.
+> Alte Blöcke: `phase1/SESSIONS_ARCHIVE.md` (P1) und `phase0/SESSIONS_ARCHIVE.md` (P0).
