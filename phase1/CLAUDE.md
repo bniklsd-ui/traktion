@@ -29,7 +29,7 @@ updated: 2026-07-20
 |---|---|---|---|
 | Step 0.1 — build-traktion.md committen (deny→ask) | ✅ | d4916c9 | Permission-Änderung committet |
 | Step 0.2 — fabric.mod.json Java 21→25 | ✅ | 188bea2 | Manifest an Code-Wahrheit angeglichen |
-| Step 0.3 — P0-Trials Rohdaten an Nikinger | ⏳ | — | Rohdaten übergeben, warte auf Bestätigung |
+| Step 0.3 — P0-Trials Rohdaten an Nikinger | ✅ | (dieser Commit) | Rohdaten bestätigt, 4 Zeilen in trials.jsonl eingetragen |
 | Step 0b — Doc-Drift prüfen | ✅ | — | Keine Drift gefunden (leer, wie vom Plan erwartet) |
 | Step 1 — jqwik 1.9.0 einkommentieren (T-D20) | ✅ | 560b178 | [VERIFY] aufgelöst: jqwik läuft unter Gradle 9.5.1 |
 | Step 2 — phase1/CLAUDE.md + SESSIONS_ARCHIVE + README | ✅ | (dieser Commit) | Phasen-Kopf erstellt |
@@ -62,9 +62,14 @@ updated: 2026-07-20
   (`Math.abs(i) >= 0`) scheiterte am `Integer.MIN_VALUE`-Overflow — genau der Edge-Case, den
   ein handgeschriebener Test oft übersieht. Korrigiert auf `unaryMinusIsTotal` (echte Invariante).
   `.jqwik-database` zur `.gitignore` hinzugefügt (Build-Artefakt).
-- **Step 2** (dieser Commit): `phase1/CLAUDE.md` + `phase1/SESSIONS_ARCHIVE.md` +
+- **Step 2** (fa5a3b3): `phase1/CLAUDE.md` + `phase1/SESSIONS_ARCHIVE.md` +
   `phase1/README.md` erstellt. `docs/INDEX.md` One-Liner ergänzt. Root-`CLAUDE.md`
   Phasenstatus: P1 = 🔄 aktiv, down-Link auf `phase1/CLAUDE.md`.
+- **Step 0.3** (dieser Commit): P0-Trials nachgetragen. Nikinger hat die vier JSONL-Zeilen
+  (P0.1, P0.2, P0.3, P0.4) bestätigt. Eingetragen in `m1/trials.jsonl` (4 Zeilen, gültiges
+  JSON, je eine pro P0-Sub-Schritt). `diff_lines` = Insertions pro Sub-Schritt;
+  `recherche_schritte` sind Schätzungen aus dem Handover. Commit-Message wie vom Plan
+  vorgegeben.
 
 ### Beobachtungen / Messpunkte
 - **jqwik Anti-AI-Klausel (Confound §4.3):** Bei der Recherche/Installation auf jqwik 1.10.x
@@ -80,17 +85,12 @@ updated: 2026-07-20
   mehr deckt als handgeschriebene Tests — relevant für Z5 (P3, property-based).
 
 ### Next
-- **Step 0.3 — P0-Trials:** Rohdaten an Nikinger übergeben (vier JSONL-Zeilen für P0.1, P0.2,
-  P0.3, P0.4). Warte auf Bestätigung. Dann Eintrag in `m1/trials.jsonl` (mit `ask`-Permission)
-  und Commit `m1: backfill P0 trials (operator-confirmed entries)`.
 - **Step 3 — RailGraph (Z1):** `RailGraph`, `Node`, `Edge`, `RailKind` (fünf Werte, T-D21).
   TDD: Invarianten (kein verwaister Knoten, keine Kante ohne zwei Endpunkte, `RailKind` gesetzt,
   `gradient`/Länge endlich). Optional jqwik-Property-Test für Invarianten unter beliebigen
   Mutations-Sequenzen.
 
 ### Open questions / blockers
-- **Step 0.3 blockiert auf Nikingers Bestätigung** der vier JSONL-Zeilen. Siehe Chat-Output
-  dieser Session. `diff_lines`-Definition (nur Insertions vs. Insertions+Deletions) und
-  `recherche_schritte`-Zählungen sind Schätzungen — Nikinger kann anpassen.
 - **[VERIFY] Fabric-Logging-Konvention in 26.2:** bleibt bis P4 (nicht P1-relevant).
-- **Tool-Calls:** Diese Session benutzte ~22 Tool-Calls (Lese-Kontext + Step 0–2 + jqwik-Verify).
+- **Tool-Calls:** Diese Session benutzte ~26 Tool-Calls (Lese-Kontext + Step 0–2 + jqwik-Verify +
+  Step 0.3 trials-Eintrag).
