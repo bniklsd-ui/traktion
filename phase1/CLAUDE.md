@@ -13,7 +13,8 @@ updated: 2026-07-20
 # Phase 1 — `train-core`: Durchstich
 
 > **Status:** P1 läuft. Step 0 (Altlasten) ✅ · Step 0b (Doc-Drift) ✅ · Step 1 (jqwik) ✅ ·
-> Step 2 (Phasen-Kopf) ✅ · Step 3 (RailGraph, Z1) ✅. Nächster Schritt: Step 4 (Consist, T-D7).
+> Step 2 (Phasen-Kopf) ✅ · Step 3 (RailGraph, Z1) ✅ · Step 4 (Consist, T-D7) ✅.
+> Nächster Schritt: Step 5 (Physics.requiredPowerW, Regel 2, Z3 prep).
 >
 > **Konzept:** `docs/plans/PHASE1_PLAN.md` (gelockte Entscheidungen T-D20–T-D24, Schritt-Sequenz,
 > Akzeptanzkriterien).
@@ -34,7 +35,7 @@ updated: 2026-07-20
 | Step 1 — jqwik 1.9.0 einkommentieren (T-D20) | ✅ | 560b178 | [VERIFY] aufgelöst: jqwik läuft unter Gradle 9.5.1 |
 | Step 2 — phase1/CLAUDE.md + SESSIONS_ARCHIVE + README | ✅ | (dieser Commit) | Phasen-Kopf erstellt |
 | Step 3 — RailGraph (Z1) | ✅ | (dieser Commit) | Node, Edge, RailKind (5 Werte), RailGraph mit Invarianten; 17 Tests grün |
-| Step 4 — Consist (T-D7) | ⏳ | — | |
+| Step 4 — Consist (T-D7) | ✅ | (dieser Commit) | Record mit carCount/tareMassKg/payloadMassKg, totalMassKg(); 10 Tests grün |
 | Step 5 — Physics.requiredPowerW (Regel 2, Z3 prep) | ⏳ | — | |
 | Step 6 — PowerGrid + PowerSupply (Z4 ohne condition, T-D22) | ⏳ | — | |
 | Step 7 — Simulator (Z3, T-D13, T-D24) | ⏳ | — | |
@@ -44,14 +45,17 @@ updated: 2026-07-20
 
 ---
 
-## Session stopped — 2026-07-20 (P1 Step 3: RailGraph, Z1)
+## Session stopped — 2026-07-20 (P1 Step 3–4: RailGraph Z1, Consist T-D7)
 
 ### Completed (diese Session)
 - **Step 3 — RailGraph (Z1):** `RailKind` (Enum, 5 Werte, T-D21), `Node` (Record, `long id`),
   `Edge` (Record, `from`/`to`/`railKind`/`gradient`/`lengthMeters`, kompakter Constructor für
   Z1-Invarianten), `RailGraph` (Knoten/Kanten-Mutationen, Invarianten-Durchsetzung).
-  `RailGraphTest` mit 17 Tests — alle grün. `gradle :train-core:test` grün (19 Tests gesamt
-  inkl. SmokeTest + JqwikSmokeTest).
+  `RailGraphTest` mit 17 Tests — alle grün.
+- **Step 4 — Consist (T-D7):** `Consist` (Record, `carCount`/`tareMassKg`/`payloadMassKg`,
+  kompakter Constructor für Invarianten: `carCount >= 1`, Massen ≥ 0 und endlich).
+  `totalMassKg() = tareMassKg + payloadMassKg`. `ConsistTest` mit 10 Tests — alle grün.
+  `gradle :train-core:test` grün (29 Tests gesamt).
 
 ### Design-Entscheidungen
 - **Records für `Node`/`Edge`:** unveränderlich, keine Boilerplate, passt zur "Graph ist
@@ -81,9 +85,10 @@ updated: 2026-07-20
   `HashMap`/`HashSet`.
 
 ### Next
-- **Step 4 — Consist (T-D7):** `Consist` mit `carCount`, `tareMassKg`, `payloadMassKg`.
-  Gesamtmasse = `tareMassKg + payloadMassKg`. Invarianten: Masse ≥ 0, `carCount` ≥ 1. Kein
-  `ItemStack`, kein Item-Typ — nur `double`/`int` (Regel 7). Optional jqwik-Property-Test.
+- **Step 5 — Physics.requiredPowerW (Regel 2, Z3 prep):** die EINE Physikfunktion.
+  `requiredPowerW(consist, speed, gradient)`. Nutzt `Consist` (Masse), `speed`, `gradient`.
+  Rekuperation bei Gefälle (Leistung kann negativ — Z3). P3-Watchpunkt: genau eine Funktion,
+  kein zweiter Formel-Körper (Regel 2). Optional jqwik-Property-Test für Endlichkeit/Monotonie.
 
 ### Open questions / blockers
 - **[VERIFY] Fabric-Logging-Konvention in 26.2:** bleibt bis P4 (nicht P1-relevant).
