@@ -14,8 +14,8 @@ updated: 2026-07-20
 
 > **Status:** P1 läuft. Step 0 (Altlasten) ✅ · Step 0b (Doc-Drift) ✅ · Step 1 (jqwik) ✅ ·
 > Step 2 (Phasen-Kopf) ✅ · Step 3 (RailGraph, Z1) ✅ · Step 4 (Consist, T-D7) ✅ ·
-> Step 5 (Physics.requiredPowerW, Regel 2) ✅ · Step 6 (PowerGrid + PowerSupply, Z4) ✅.
-> Nächster Schritt: Step 7 (Simulator, Z3, T-D13, T-D24).
+> Step 5 (Physics.requiredPowerW, Regel 2) ✅ · Step 6 (PowerGrid + PowerSupply, Z4) ✅ ·
+> Step 7 (Simulator, Z3, T-D13, T-D24) ✅. Nächster Schritt: Step 8 (BlockSection, Z2, T-D23).
 >
 > **Konzept:** `docs/plans/PHASE1_PLAN.md` (gelockte Entscheidungen T-D20–T-D24, Schritt-Sequenz,
 > Akzeptanzkriterien).
@@ -39,7 +39,7 @@ updated: 2026-07-20
 | Step 4 — Consist (T-D7) | ✅ | (dieser Commit) | Record mit carCount/tareMassKg/payloadMassKg, totalMassKg(); 10 Tests grün |
 | Step 5 — Physics.requiredPowerW (Regel 2, Z3 prep) | ✅ | (dieser Commit) | EINE Funktion, Rekuperation bei Gefälle; 14 Tests grün |
 | Step 6 — PowerGrid + PowerSupply (Z4 ohne condition, T-D22) | ✅ | (dieser Commit) | Port + FixedSupply (Test), linearer Spannungsabfall, Reset; 15 Tests grün |
-| Step 7 — Simulator (Z3, T-D13, T-D24) | ⏳ | — | |
+| Step 7 — Simulator (Z3, T-D13, T-D24) | ✅ | (dieser Commit) | Fixed-dt-Substep, semi-implizites Euler, ruft Physics auf; 16 Tests grün, Determinismus grün |
 | Step 8 — BlockSection (Z2, T-D23) | ⏳ | — | |
 | Step 9 — Integration (A→B, Stromknappheit, Z2+Z3) | ⏳ | — | |
 | Step 10 — Done-When-Verifikation + Phasen-Abschluss | ⏳ | — | |
@@ -71,6 +71,16 @@ updated: 2026-07-20
   1 - distance/maxReach)` (Z4 ohne condition — P2 ergänzt condition), Unterwerk-Reset
   (in P1 No-Op, zustandslos — P2 macht echtes Zustandsmanagement). `PowerGridTest` mit 15
   Tests — alle grün. `gradle :train-core:test` grün (58 Tests gesamt).
+- **Step 7 — Simulator (Z3, T-D13, T-D24):** `Token` (veränderlich: Position, Geschwindigkeit,
+  `maxPowerW`-Budget) und `Simulator` (fixed-dt-Substep, `dt = TICK_SECONDS / N_SUBSTEPS`,
+  Default 4, semi-implizites Euler). Physik-Modell: `reqW = Physics.requiredPowerW(...)`
+  (Regel 2 — Aufruf, kein Duplikat), `availW = powerGrid.availableW(maxPowerW, distance, dt)`,
+  `excessW = availW - reqW`, `a = excessW / (mass * max(v, EPS_V))`, `v = max(0, v+a*dt)`,
+  `x += v*dt`. Geordnete Iteration (`ArrayList`, nicht `HashSet` — §9), gesäter Zufall
+  (`Random(seed)`, keine Wall-Clock). **Determinismus-Test (T-D24) grün:** zwei Läufe mit
+  gleichem Seed → gleicher Endzustand. `SimulatorTest` mit 16 Tests — alle grün.
+  `gradle :train-core:test` grün (74 Tests gesamt). **Regel 2 intakt:** `grep` bestätigt
+  genau eine `requiredPowerW`-Definition in `train-core/src/main/`, ein Aufruf im Simulator.
 
 ### Design-Entscheidungen
 - **Records für `Node`/`Edge`:** unveränderlich, keine Boilerplate, passt zur "Graph ist
@@ -100,11 +110,9 @@ updated: 2026-07-20
   `HashMap`/`HashSet`.
 
 ### Next
-- **Step 7 — Simulator (Z3, T-D13, T-D24):** fixed-dt-Substep-Schleife, semi-implizites Euler.
-  `Token` (Position, Geschwindigkeit). Simulator ruft `Physics.requiredPowerW` auf (Regel 2 —
-  kein Formel-Duplikat). Token bewegt sich A→B (Z3), Unterversorgung bremst. Determinismus-Test
-  (T-D24: zwei Läufe, gleich Seed → gleich Endzustand). Geordnete Collections, gesäter Zufall,
-  keine Wall-Clock, kein HashSet in der Physikschleife (Regel 8).
+- **Step 8 — BlockSection (Z2, T-D23):** Blockabschnitte aus Topologie abgeleitet (T-D9).
+  Reservierung, Kollisionsfreiheit (zwei Züge nie im selben Abschnitt, Z2), triviale
+  Deadlock-Erkennung (Zyklus im Reservierungsgraphen, nicht aufgelöst — T-D23, Auflösung P5).
 
 ### Open questions / blockers
 - **[VERIFY] Fabric-Logging-Konvention in 26.2:** bleibt bis P4 (nicht P1-relevant).
