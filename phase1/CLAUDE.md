@@ -14,7 +14,8 @@ updated: 2026-07-20
 
 > **Status:** P1 läuft. Step 0 (Altlasten) ✅ · Step 0b (Doc-Drift) ✅ · Step 1 (jqwik) ✅ ·
 > Step 2 (Phasen-Kopf) ✅ · Step 3 (RailGraph, Z1) ✅ · Step 4 (Consist, T-D7) ✅ ·
-> Step 5 (Physics.requiredPowerW, Regel 2) ✅. Nächster Schritt: Step 6 (PowerGrid + PowerSupply, Z4).
+> Step 5 (Physics.requiredPowerW, Regel 2) ✅ · Step 6 (PowerGrid + PowerSupply, Z4) ✅.
+> Nächster Schritt: Step 7 (Simulator, Z3, T-D13, T-D24).
 >
 > **Konzept:** `docs/plans/PHASE1_PLAN.md` (gelockte Entscheidungen T-D20–T-D24, Schritt-Sequenz,
 > Akzeptanzkriterien).
@@ -37,7 +38,7 @@ updated: 2026-07-20
 | Step 3 — RailGraph (Z1) | ✅ | (dieser Commit) | Node, Edge, RailKind (5 Werte), RailGraph mit Invarianten; 17 Tests grün |
 | Step 4 — Consist (T-D7) | ✅ | (dieser Commit) | Record mit carCount/tareMassKg/payloadMassKg, totalMassKg(); 10 Tests grün |
 | Step 5 — Physics.requiredPowerW (Regel 2, Z3 prep) | ✅ | (dieser Commit) | EINE Funktion, Rekuperation bei Gefälle; 14 Tests grün |
-| Step 6 — PowerGrid + PowerSupply (Z4 ohne condition, T-D22) | ⏳ | — | |
+| Step 6 — PowerGrid + PowerSupply (Z4 ohne condition, T-D22) | ✅ | (dieser Commit) | Port + FixedSupply (Test), linearer Spannungsabfall, Reset; 15 Tests grün |
 | Step 7 — Simulator (Z3, T-D13, T-D24) | ⏳ | — | |
 | Step 8 — BlockSection (Z2, T-D23) | ⏳ | — | |
 | Step 9 — Integration (A→B, Stromknappheit, Z2+Z3) | ⏳ | — | |
@@ -63,6 +64,13 @@ updated: 2026-07-20
   Masse=0. `PhysicsTest` mit 14 Tests — alle grün. `gradle :train-core:test` grün (43 Tests
   gesamt). **Regel 2 intakt:** `grep` bestätigt genau eine `requiredPowerW` in
   `train-core/src/main/`. P3-Watchpunkt verankert.
+- **Step 6 — PowerGrid + PowerSupply (Z4 ohne condition, T-D22):** Port `PowerSupply`
+  (Interface, Plan §3.2) mit `FixedSupply` (Test-Package) als erster Implementierung,
+  `ManualGenerator` (P2) als zweiter benennbarer (Regel 3 erfüllt, T-D22). `PowerGrid`
+  modelliert Bedarf/Angebot, linearer Spannungsabfall `deliveredW = requestedW * max(0,
+  1 - distance/maxReach)` (Z4 ohne condition — P2 ergänzt condition), Unterwerk-Reset
+  (in P1 No-Op, zustandslos — P2 macht echtes Zustandsmanagement). `PowerGridTest` mit 15
+  Tests — alle grün. `gradle :train-core:test` grün (58 Tests gesamt).
 
 ### Design-Entscheidungen
 - **Records für `Node`/`Edge`:** unveränderlich, keine Boilerplate, passt zur "Graph ist
@@ -92,10 +100,11 @@ updated: 2026-07-20
   `HashMap`/`HashSet`.
 
 ### Next
-- **Step 6 — PowerGrid + PowerSupply (Z4 ohne condition, T-D22):** Port `PowerSupply`
-  (Interface, Plan §3.2) mit `FixedSupply` (Test-Implementierung) als erster Implementierung,
-  `ManualGenerator` (P2) als zweite benennbare (Regel 3). `PowerGrid` modelliert Bedarf/Angebot,
-  Spannungsabfall = f(Distanz) (ohne condition — P2 ergänzt), Unterwerk-Reset (Z4).
+- **Step 7 — Simulator (Z3, T-D13, T-D24):** fixed-dt-Substep-Schleife, semi-implizites Euler.
+  `Token` (Position, Geschwindigkeit). Simulator ruft `Physics.requiredPowerW` auf (Regel 2 —
+  kein Formel-Duplikat). Token bewegt sich A→B (Z3), Unterversorgung bremst. Determinismus-Test
+  (T-D24: zwei Läufe, gleich Seed → gleich Endzustand). Geordnete Collections, gesäter Zufall,
+  keine Wall-Clock, kein HashSet in der Physikschleife (Regel 8).
 
 ### Open questions / blockers
 - **[VERIFY] Fabric-Logging-Konvention in 26.2:** bleibt bis P4 (nicht P1-relevant).
