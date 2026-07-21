@@ -13,8 +13,8 @@ updated: 2026-07-20
 # Phase 1 — `train-core`: Durchstich
 
 > **Status:** P1 läuft. Step 0 (Altlasten) ✅ · Step 0b (Doc-Drift) ✅ · Step 1 (jqwik) ✅ ·
-> Step 2 (Phasen-Kopf) ✅ · Step 3 (RailGraph, Z1) ✅ · Step 4 (Consist, T-D7) ✅.
-> Nächster Schritt: Step 5 (Physics.requiredPowerW, Regel 2, Z3 prep).
+> Step 2 (Phasen-Kopf) ✅ · Step 3 (RailGraph, Z1) ✅ · Step 4 (Consist, T-D7) ✅ ·
+> Step 5 (Physics.requiredPowerW, Regel 2) ✅. Nächster Schritt: Step 6 (PowerGrid + PowerSupply, Z4).
 >
 > **Konzept:** `docs/plans/PHASE1_PLAN.md` (gelockte Entscheidungen T-D20–T-D24, Schritt-Sequenz,
 > Akzeptanzkriterien).
@@ -36,7 +36,7 @@ updated: 2026-07-20
 | Step 2 — phase1/CLAUDE.md + SESSIONS_ARCHIVE + README | ✅ | (dieser Commit) | Phasen-Kopf erstellt |
 | Step 3 — RailGraph (Z1) | ✅ | (dieser Commit) | Node, Edge, RailKind (5 Werte), RailGraph mit Invarianten; 17 Tests grün |
 | Step 4 — Consist (T-D7) | ✅ | (dieser Commit) | Record mit carCount/tareMassKg/payloadMassKg, totalMassKg(); 10 Tests grün |
-| Step 5 — Physics.requiredPowerW (Regel 2, Z3 prep) | ⏳ | — | |
+| Step 5 — Physics.requiredPowerW (Regel 2, Z3 prep) | ✅ | (dieser Commit) | EINE Funktion, Rekuperation bei Gefälle; 14 Tests grün |
 | Step 6 — PowerGrid + PowerSupply (Z4 ohne condition, T-D22) | ⏳ | — | |
 | Step 7 — Simulator (Z3, T-D13, T-D24) | ⏳ | — | |
 | Step 8 — BlockSection (Z2, T-D23) | ⏳ | — | |
@@ -56,6 +56,13 @@ updated: 2026-07-20
   kompakter Constructor für Invarianten: `carCount >= 1`, Massen ≥ 0 und endlich).
   `totalMassKg() = tareMassKg + payloadMassKg`. `ConsistTest` mit 10 Tests — alle grün.
   `gradle :train-core:test` grün (29 Tests gesamt).
+- **Step 5 — Physics.requiredPowerW (Regel 2, Z3 prep):** die EINE Physikfunktion.
+  `P = (F_roll + F_grade + F_air) * v` mit `F_roll = c_roll*m*g`, `F_grade = m*g*gradient`,
+  `F_air = AIR_DRAG_COEFF*v^2`. Konstanten `static final` in `Physics` (sichtbar, nicht
+  dupliziert). Rekuperation bei Gefälle (gradient < 0 → P negativ, Z3). `P = 0` bei v=0 oder
+  Masse=0. `PhysicsTest` mit 14 Tests — alle grün. `gradle :train-core:test` grün (43 Tests
+  gesamt). **Regel 2 intakt:** `grep` bestätigt genau eine `requiredPowerW` in
+  `train-core/src/main/`. P3-Watchpunkt verankert.
 
 ### Design-Entscheidungen
 - **Records für `Node`/`Edge`:** unveränderlich, keine Boilerplate, passt zur "Graph ist
@@ -85,10 +92,10 @@ updated: 2026-07-20
   `HashMap`/`HashSet`.
 
 ### Next
-- **Step 5 — Physics.requiredPowerW (Regel 2, Z3 prep):** die EINE Physikfunktion.
-  `requiredPowerW(consist, speed, gradient)`. Nutzt `Consist` (Masse), `speed`, `gradient`.
-  Rekuperation bei Gefälle (Leistung kann negativ — Z3). P3-Watchpunkt: genau eine Funktion,
-  kein zweiter Formel-Körper (Regel 2). Optional jqwik-Property-Test für Endlichkeit/Monotonie.
+- **Step 6 — PowerGrid + PowerSupply (Z4 ohne condition, T-D22):** Port `PowerSupply`
+  (Interface, Plan §3.2) mit `FixedSupply` (Test-Implementierung) als erster Implementierung,
+  `ManualGenerator` (P2) als zweite benennbare (Regel 3). `PowerGrid` modelliert Bedarf/Angebot,
+  Spannungsabfall = f(Distanz) (ohne condition — P2 ergänzt), Unterwerk-Reset (Z4).
 
 ### Open questions / blockers
 - **[VERIFY] Fabric-Logging-Konvention in 26.2:** bleibt bis P4 (nicht P1-relevant).
