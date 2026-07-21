@@ -15,8 +15,8 @@ updated: 2026-07-20
 > **Status:** P1 läuft. Step 0 (Altlasten) ✅ · Step 0b (Doc-Drift) ✅ · Step 1 (jqwik) ✅ ·
 > Step 2 (Phasen-Kopf) ✅ · Step 3 (RailGraph, Z1) ✅ · Step 4 (Consist, T-D7) ✅ ·
 > Step 5 (Physics.requiredPowerW, Regel 2) ✅ · Step 6 (PowerGrid + PowerSupply, Z4) ✅ ·
-> Step 7 (Simulator, Z3, T-D13, T-D24) ✅ · Step 8 (BlockSection, Z2, T-D23) ✅.
-> Nächster Schritt: Step 9 (Integration, Z2+Z3).
+> Step 7 (Simulator, Z3, T-D13, T-D24) ✅ · Step 8 (BlockSection, Z2, T-D23) ✅ ·
+> Step 9 (Integration, Z2+Z3) ✅. Nächster Schritt: Step 10 (Done-When, Phasen-Abschluss).
 >
 > **Konzept:** `docs/plans/PHASE1_PLAN.md` (gelockte Entscheidungen T-D20–T-D24, Schritt-Sequenz,
 > Akzeptanzkriterien).
@@ -42,7 +42,7 @@ updated: 2026-07-20
 | Step 6 — PowerGrid + PowerSupply (Z4 ohne condition, T-D22) | ✅ | (dieser Commit) | Port + FixedSupply (Test), linearer Spannungsabfall, Reset; 15 Tests grün |
 | Step 7 — Simulator (Z3, T-D13, T-D24) | ✅ | (dieser Commit) | Fixed-dt-Substep, semi-implizites Euler, ruft Physics auf; 16 Tests grün, Determinismus grün |
 | Step 8 — BlockSection (Z2, T-D23) | ✅ | (dieser Commit) | BlockSystem.fromGraph, Reservierung, Deadlock-Erkennung; 18 Tests grün |
-| Step 9 — Integration (A→B, Stromknappheit, Z2+Z3) | ⏳ | — | |
+| Step 9 — Integration (A→B, Stromknappheit, Z2+Z3) | ✅ | (dieser Commit) | Durchstich-Beweis: alle Komponenten zusammen; 6 Tests grün |
 | Step 10 — Done-When-Verifikation + Phasen-Abschluss | ⏳ | — | |
 
 ---
@@ -89,6 +89,13 @@ updated: 2026-07-20
   (T-D23):** Zyklus im Wartegraphen (A hält X, will Y; B hält Y, will X → Zyklus → Deadlock).
   Erkannt, **nicht aufgelöst** (Auflösung kommt P5). `BlockSectionTest` mit 18 Tests — alle
   grün (inkl. Drei-Token-Zyklus). `gradle :train-core:test` grün (92 Tests gesamt).
+- **Step 9 — Integration (Z2+Z3):** Durchstich-Beweis, dass RailGraph + Consist + Physics +
+  PowerGrid + Simulator + BlockSection zusammenarbeiten. `IntegrationTest` mit 6 Tests —
+  alle grün: (1) Zug fährt A→B mit ausreichend Strom (Z3), (2) Zug wird bei Stromknappheit
+  langsamer (Z3), (3) zwei Züge kollidieren nicht (BlockSection, Z2), (4) zwei Züge auf
+  verschiedenen Abschnitten beide reservieren, (5) Determinismus (T-D24: zwei Läufe, gleich
+  Seed → gleich Endzustand), (6) vollständiger Durchstich mit allen Komponenten.
+  `gradle :train-core:test` grün (101 Tests gesamt).
 
 ### Design-Entscheidungen
 - **Records für `Node`/`Edge`:** unveränderlich, keine Boilerplate, passt zur "Graph ist
@@ -118,10 +125,11 @@ updated: 2026-07-20
   `HashMap`/`HashSet`.
 
 ### Next
-- **Step 9 — Integration (A→B, Stromknappheit, Z2+Z3):** Durchstich-Beweis, dass RailGraph +
-  Consist + Physics + PowerGrid + Simulator + BlockSection zusammenarbeiten. Integration-Test:
-  Zug fährt A→B mit ausreichend Strom, wird bei Stromknappheit langsamer, zwei Züge kollidieren
-  nicht (BlockSection), Determinismus (T-D24).
+- **Step 10 — Done-When-Verifikation + Phasen-Abschluss:** `gradle :train-core:test` grün
+  (alle Tests), Abhängigkeits-Check (nur Test-Libs), Anti-Pattern-Check (§9: kein
+  net.minecraft/NBT/ItemStack, kein HashSet in Physikschleife, keine Wall-Clock, genau eine
+  requiredPowerW), Determinismus bestätigt (T-D24), Build-Log vollständig, Session-stopped
+  (P1 abgeschlossen), Root-CLAUDE Phasenstatus: P1 ✅, P2 ⏳.
 
 ### Open questions / blockers
 - **[VERIFY] Fabric-Logging-Konvention in 26.2:** bleibt bis P4 (nicht P1-relevant).
