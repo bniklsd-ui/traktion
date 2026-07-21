@@ -15,7 +15,8 @@ updated: 2026-07-20
 > **Status:** P1 läuft. Step 0 (Altlasten) ✅ · Step 0b (Doc-Drift) ✅ · Step 1 (jqwik) ✅ ·
 > Step 2 (Phasen-Kopf) ✅ · Step 3 (RailGraph, Z1) ✅ · Step 4 (Consist, T-D7) ✅ ·
 > Step 5 (Physics.requiredPowerW, Regel 2) ✅ · Step 6 (PowerGrid + PowerSupply, Z4) ✅ ·
-> Step 7 (Simulator, Z3, T-D13, T-D24) ✅. Nächster Schritt: Step 8 (BlockSection, Z2, T-D23).
+> Step 7 (Simulator, Z3, T-D13, T-D24) ✅ · Step 8 (BlockSection, Z2, T-D23) ✅.
+> Nächster Schritt: Step 9 (Integration, Z2+Z3).
 >
 > **Konzept:** `docs/plans/PHASE1_PLAN.md` (gelockte Entscheidungen T-D20–T-D24, Schritt-Sequenz,
 > Akzeptanzkriterien).
@@ -40,7 +41,7 @@ updated: 2026-07-20
 | Step 5 — Physics.requiredPowerW (Regel 2, Z3 prep) | ✅ | (dieser Commit) | EINE Funktion, Rekuperation bei Gefälle; 14 Tests grün |
 | Step 6 — PowerGrid + PowerSupply (Z4 ohne condition, T-D22) | ✅ | (dieser Commit) | Port + FixedSupply (Test), linearer Spannungsabfall, Reset; 15 Tests grün |
 | Step 7 — Simulator (Z3, T-D13, T-D24) | ✅ | (dieser Commit) | Fixed-dt-Substep, semi-implizites Euler, ruft Physics auf; 16 Tests grün, Determinismus grün |
-| Step 8 — BlockSection (Z2, T-D23) | ⏳ | — | |
+| Step 8 — BlockSection (Z2, T-D23) | ✅ | (dieser Commit) | BlockSystem.fromGraph, Reservierung, Deadlock-Erkennung; 18 Tests grün |
 | Step 9 — Integration (A→B, Stromknappheit, Z2+Z3) | ⏳ | — | |
 | Step 10 — Done-When-Verifikation + Phasen-Abschluss | ⏳ | — | |
 
@@ -81,6 +82,13 @@ updated: 2026-07-20
   gleichem Seed → gleicher Endzustand. `SimulatorTest` mit 16 Tests — alle grün.
   `gradle :train-core:test` grün (74 Tests gesamt). **Regel 2 intakt:** `grep` bestätigt
   genau eine `requiredPowerW`-Definition in `train-core/src/main/`, ein Aufruf im Simulator.
+- **Step 8 — BlockSection (Z2, T-D23):** `BlockSection` (ein Abschnitt, exklusiver `owner`)
+  und `BlockSystem` (verwaltet alle Abschnitte). `BlockSystem.fromGraph(graph)` leitet
+  Abschnitte aus der Topologie ab (T-D9: jede Kante ist ein Abschnitt in P1). Reservierung
+  exklusiv (Z2: zwei Züge nie im selben Abschnitt), Freigabe. **Triviale Deadlock-Erkennung
+  (T-D23):** Zyklus im Wartegraphen (A hält X, will Y; B hält Y, will X → Zyklus → Deadlock).
+  Erkannt, **nicht aufgelöst** (Auflösung kommt P5). `BlockSectionTest` mit 18 Tests — alle
+  grün (inkl. Drei-Token-Zyklus). `gradle :train-core:test` grün (92 Tests gesamt).
 
 ### Design-Entscheidungen
 - **Records für `Node`/`Edge`:** unveränderlich, keine Boilerplate, passt zur "Graph ist
@@ -110,9 +118,10 @@ updated: 2026-07-20
   `HashMap`/`HashSet`.
 
 ### Next
-- **Step 8 — BlockSection (Z2, T-D23):** Blockabschnitte aus Topologie abgeleitet (T-D9).
-  Reservierung, Kollisionsfreiheit (zwei Züge nie im selben Abschnitt, Z2), triviale
-  Deadlock-Erkennung (Zyklus im Reservierungsgraphen, nicht aufgelöst — T-D23, Auflösung P5).
+- **Step 9 — Integration (A→B, Stromknappheit, Z2+Z3):** Durchstich-Beweis, dass RailGraph +
+  Consist + Physics + PowerGrid + Simulator + BlockSection zusammenarbeiten. Integration-Test:
+  Zug fährt A→B mit ausreichend Strom, wird bei Stromknappheit langsamer, zwei Züge kollidieren
+  nicht (BlockSection), Determinismus (T-D24).
 
 ### Open questions / blockers
 - **[VERIFY] Fabric-Logging-Konvention in 26.2:** bleibt bis P4 (nicht P1-relevant).
