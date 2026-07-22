@@ -5,7 +5,7 @@ read-when: vor Phasen-Übergang; bei der Frage "welche Phase kommt als nächste"
 detail: L1
 up: ./CLAUDE.md
 down:
-updated: 2026-07-14
+updated: 2026-07-22
 ---
 
 # Traktion — Roadmap
@@ -23,8 +23,8 @@ updated: 2026-07-14
 | Phase | Inhalt | Status | Kategorie |
 |---|---|---|---|
 | **P0** | Fundament, Konventions-Import, Skelett, Vorregistrierung, MC-Spike | ✅ T-D3 bestätigt | — |
-| **P1** | `train-core`: Durchstich — Graph, Physik, Energie, Simulator, Blockabschnitte (Z1–Z4) | ⏳ nächster Schritt | A |
-| **P2** | Verschleiß + Ports — `condition`, `wear`, `PowerSupply`/`MaintenanceSupply` (Z6, Z7) | ⏳ | A |
+| **P1** | `train-core`: Durchstich — Graph, Physik, Energie, Simulator, Blockabschnitte (Z1–Z4) | ✅ abgeschlossen (101 Tests, Z1–Z4 grün, Determinismus bestätigt) | A |
+| **P2** | Verschleiß + Ports — `condition`, `wear`, `PowerSupply`/`MaintenanceSupply` (Z6, Z7) | ⏳ nächster Schritt | A |
 | **P3** | Planer — grobe Auflösung, dieselbe Physikfunktion, Z5 property-based (Z5) | ⏳ | A |
 | **P4** | `train-mc`: erste spielbare Version — Gleiseditor, Persistenz, Token⇄Entity, Leitstand (Z9–Z11) | ⏳ | B |
 | **P5** | Fahrplan + Lokführer — `Schedule`, `ManualOverride`, Z5-Vertragsgrenze (Z8) | ⏳ | A + B |
@@ -52,5 +52,6 @@ updated: 2026-07-14
 
 - `TRAKTION_OVERALL_PLAN.md` §5 — vollständige Phasenordnung mit Done-When-Kriterien
 - `TRAKTION_OVERALL_PLAN.md` §4 — Ziele Z1–Z11 mit Zuordnung zu Phasen
-- `phase0/CLAUDE.md` — aktueller Phasen-Kopf mit Build-Log und Session-stopped-Block
+- `phase1/CLAUDE.md` — Phasen-Kopf P1 (abgeschlossen) mit Build-Log und Session-stopped-Block
+- `phase0/CLAUDE.md` — Phasen-Kopf P0 (historisch, abgeschlossen)
 - `ARCHITECTURE.md` — Architektur-Schnitt (train-core / train-mc)

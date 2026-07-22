@@ -4,7 +4,7 @@ purpose: L0-Karte des Doku-Systems. Eine Zeile pro Doku, Glyph + Größe + read-
 read-when: Session-Start; vor der Suche nach einer Doku; bevor eine neue .md erstellt wird (One-Liner hier ergänzen, im selben Commit)
 detail: L0
 up: ./CLAUDE.md
-updated: 2026-07-20
+updated: 2026-07-22
 ---
 
 # Traktion — Doku-Index
@@ -36,7 +36,7 @@ updated: 2026-07-20
 
 | Doku | Größe | Wann lesen |
 |---|---|---|
-| 🔄 `phase1/CLAUDE.md` | L1 | Session-Start in P1; Build-Log + aktueller Session-stopped-Block |
+| 📕 `phase1/CLAUDE.md` | L1 | historisch — P1-Build-Log + letzter P1-Session-stopped-Block (P1 abgeschlossen) |
 | 📦 `phase1/SESSIONS_ARCHIVE.md` | L3 | bei Bedarf an historische P1-Session-Details |
 | 📗 `phase1/README.md` | L1 | Repo-Besuch; schneller P1-Überblick ohne Phasen-Kopf |
 | 📕 `phase0/CLAUDE.md` | L1 | historisch — P0-Build-Log + letzter P0-Session-stopped-Block |

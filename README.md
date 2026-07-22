@@ -5,7 +5,7 @@ read-when: Repo-Besuch über GitHub; vor dem Setup einer Entwicklungsmaschine
 detail: L1
 up: ./CLAUDE.md
 down:
-updated: 2026-07-15
+updated: 2026-07-22
 ---
 
 # Traktion
@@ -37,8 +37,10 @@ der Weltzustand in Zahlen übersetzt und zurück.
 
 ## Status
 
-Phase 0 (Fundament) ist weitgehend abgeschlossen. Die Mod ist noch nicht spielbar — das erste
-spielbare Milestone ist Phase 4. Siehe `ROADMAP.md` für die Phasenübersicht P0–P6.
+Phase 0 (Fundament) ✅ und Phase 1 (`train-core`-Durchstich, Z1–Z4) ✅ sind abgeschlossen.
+`train-core` hat 101 grüne Tests, null externe Runtime-Abhängigkeiten, Determinismus bestätigt
+(Regel 8). Die Mod ist noch nicht spielbar — das erste spielbare Milestone ist Phase 4.
+Siehe `ROADMAP.md` für die Phasenübersicht P0–P6 und `phase1/CLAUDE.md` für den P1-Abschluss.
 
 ## Setup (Entwicklungsmaschine)
 
@@ -79,7 +81,8 @@ Dieses Repo verwendet ein Layer-basiertes Doku-System. Einstiegspunkte:
 - `TRAKTION_OVERALL_PLAN.md` — Mission, Locks, Hard Rules, Phasen, Ziele
 - `ROADMAP.md` — Phasenübersicht P0–P6
 - `ARCHITECTURE.md` — Architektur-Schnitt und Ports
-- `phase0/CLAUDE.md` — Phasen-Kopf P0 mit Build-Log und Session-stopped-Block
+- `phase1/CLAUDE.md` — Phasen-Kopf P1 (abgeschlossen) mit Build-Log und Session-stopped-Block
+- `phase0/CLAUDE.md` — Phasen-Kopf P0 (historisch, abgeschlossen)
 
 Jede Session liest `AGENTS.md` → `docs/INDEX.md` → `CLAUDE.md` → `phase<N>/CLAUDE.md` →
 `docs/plans/PHASE<N>_PLAN.md` → `TRAKTION_OVERALL_PLAN.md` (§2/§3/§4/§9).

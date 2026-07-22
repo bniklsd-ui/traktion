@@ -6,7 +6,7 @@ detail: L1
 up: ../README.md
 down:
   - ./CLAUDE.md   # Phasen-Kopf mit Build-Log + Session-stopped
-updated: 2026-07-20
+updated: 2026-07-22
 ---
 
 # Phase 1 — `train-core`: Durchstich
@@ -34,5 +34,7 @@ zwei Läufe mit gleichem Seed liefern bitgleiche Ergebnisse (Regel 8).
 
 ## Status
 
-Siehe `phase1/CLAUDE.md` Build-Log. Aktueller Stand: Step 0–2 ✅, Step 3 (RailGraph) ist der
-nächste Schritt.
+**P1 ist abgeschlossen.** Alle Steps ✅. Z1–Z4 grün in `train-core` (101 Tests), null externe
+Runtime-Abhängigkeiten außer Test-Bibliotheken (JUnit, jqwik), Determinismus bestätigt (Regel 8,
+T-D24), Regel 2 intakt (genau eine `requiredPowerW`-Definition). Siehe `phase1/CLAUDE.md` Build-Log
+für die Schritt-für-Schritt-Übersicht. Nächster Schritt: P2 (Verschleiß + Ports) in neuer Session.
