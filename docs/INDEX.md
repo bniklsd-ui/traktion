@@ -51,6 +51,7 @@ updated: 2026-07-22
 | 📜 `docs/plans/PHASE0_PLAN.md` | L2 | Ausführung von P0; Konzept/Plan, aus dem P0 gebaut wird |
 | 📕 `docs/plans/PHASE0_HANDOVER.md` | L2 | vor P1-Plan-Entwurf; P0-Abschlussanalyse, Aufräum-Schritt, trials-Rohdaten |
 | 📜 `docs/plans/PHASE1_PLAN.md` | L2 | Ausführung von P1; train-core Durchstich (Z1–Z4), Schritt-Sequenz, Akzeptanzkriterien |
+| 📕 `docs/plans/PHASE1_HANDOVER.md` | L2 | vor P2-Plan-Entwurf; P1-Abschlussanalyse, §9-Check leer, trials-Rohdaten |
 
 ## Messung (M1-Strang)
 
