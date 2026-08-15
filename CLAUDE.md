@@ -9,11 +9,13 @@ down:
   - ./docs/INDEX.md                   # Karte — eine Zeile pro Doku
   - ./docs/CONVENTIONS.md             # übernommene/verworfene Konventionen
   - ./docs/DOC_LAYERS_CONVENTION.md   # generische Spec des Doc-Layers-Systems
-  - ./phase1/CLAUDE.md                # Phasen-Kopf P1 — Build-Log + aktueller Session-stopped-Block
+  - ./phase2/CLAUDE.md                # Phasen-Kopf P2 — Build-Log + aktueller Session-stopped-Block
+  - ./phase1/CLAUDE.md                # Phasen-Kopf P1 — Build-Log + letzter P1-Session-stopped-Block
   - ./phase0/CLAUDE.md                # Phasen-Kopf P0 — Build-Log + letzter P0-Session-stopped-Block
+  - ./docs/plans/PHASE2_PLAN.md       # Konzept/Plan, aus dem P2 gebaut wird
   - ./docs/plans/PHASE1_PLAN.md       # Konzept/Plan, aus dem P1 gebaut wird
   - ./docs/plans/PHASE0_PLAN.md       # Konzept/Plan, aus dem P0 gebaut wurde
-updated: 2026-07-23
+updated: 2026-08-15
 ---
 
 # Traktion — Single Source of Truth
@@ -55,16 +57,15 @@ train-mc/     dünner Adapter. Blöcke, Entities, Rendering, Packets, Persistenz
 |---|---|---|
 | **P0** | Fundament, Konventions-Import, Skelett, Vorregistrierung, MC-Spike | ✅ T-D3 bestätigt |
 | **P1** | `train-core`: Durchstich (Z1–Z4) | ✅ abgeschlossen (101 Tests, Z1–Z4 grün, Determinismus bestätigt) |
-| **P2** | Verschleiß + Ports (Z6, Z7) | ⏳ nächster Schritt |
+| **P2** | Verschleiß + Ports (Z6, Z7) | 🔄 aktiv (Step 1) |
 | P3 | Planer (Z5 — Kern-Orakel) | ⏳ |
 | P4 | `train-mc`: erste spielbare Version (Z9–Z11) | ⏳ |
 | P5 | Fahrplan + Lokführer (Z8) | ⏳ |
 | P6 | Auswertung M1-Strang | ⏳ |
 
-**Aktueller Schritt:** P1 abgeschlossen — Z1–Z4 grün in `train-core` (101 Tests), Determinismus
-bestätigt (T-D24), Regel 2 intakt (genau eine `requiredPowerW`), null externe Runtime-
-Abhängigkeiten. Nächster Schritt: P2 (Verschleiß + Ports) in neuer Session. Siehe
-`phase1/CLAUDE.md` Session-stopped-Block.
+**Aktueller Schritt:** P2 gestartet — Steps 0.1, 0.2, 0b erledigt, Step 1 (Phase-Kopf)
+erledigt. Nächster Schritt: Step 2 (Edge um Verschleiß-Zustand erweitern, Z6). Siehe
+`phase2/CLAUDE.md` Session-stopped-Block.
 
 ---
 
