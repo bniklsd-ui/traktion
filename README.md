@@ -12,7 +12,7 @@ updated: 2026-08-15
 
 > Ein Zugnetz ist kein Fahrzeug, sondern ein Betrieb.
 >
-> **Contributors:** Build-Agent (z-ai/glm-5.2), 2026-07-15. · Nikinger (Operator).
+> **Contributors:** Build-Agent (`minimax-coding-plan/MiniMax-M2.7`, seit P1) · Plan-Agent (`minimax-coding-plan/MiniMax-M3`, seit P2 — Plans + Handover) · Nikinger (Operator). Vorher: `z-ai/glm-5.2` (P0–P1, abgelöst, siehe `AGENTS.md` Modell-Politik).
 
 Traktion ist ein Fabric-Mod für Minecraft 26.2, der ein elektrifiziertes Schienennetz simuliert,
 das der Spieler plant, baut und am Leben hält. Züge sind Verbraucher an einem Netz, das der
@@ -47,9 +47,11 @@ der Weltzustand in Zahlen übersetzt und zurück.
 | P5 | Fahrplan + Lokführer (Z8) | ⏳ |
 | P6 | Auswertung M1-Strang | ⏳ |
 
-**P1 ist abgeschlossen:** ein Zug fährt in einem Unit-Test von A nach B und wird bei
-Stromknappheit langsamer. Der Durchstich-Beweis ist erbracht. Die Mod ist noch nicht spielbar —
-das erste spielbare Milestone ist P4. Siehe `ROADMAP.md` für die Phasenübersicht P0–P6.
+**P2 ist abgeschlossen:** Verschleiß entsteht aus Nutzung, beide Ports (`ManualGenerator`,
+`PlayerLabor`) sind produktiv, die Bootstrap-Invariante (Regel 4) ist property-based bewiesen.
+Ein Zug fährt in einem Unit-Test von A nach B und wird bei Stromknappheit und Verschleiß
+langsamer. Die Mod ist noch nicht spielbar — das erste spielbare Milestone ist P4.
+Siehe `ROADMAP.md` für die Phasenübersicht P0–P6.
 
 ## Setup (Entwicklungsmaschine)
 
@@ -92,6 +94,7 @@ Dieses Repo verwendet ein Layer-basiertes Doku-System. Einstiegspunkte:
 - `TRAKTION_OVERALL_PLAN.md` — Mission, Locks, Hard Rules, Phasen, Ziele
 - `ROADMAP.md` — Phasenübersicht P0–P6
 - `ARCHITECTURE.md` — Architektur-Schnitt und Ports
+- `phase2/CLAUDE.md` — Phasen-Kopf P2 (abgeschlossen) mit Build-Log und Session-stopped-Block
 - `phase1/CLAUDE.md` — Phasen-Kopf P1 (abgeschlossen) mit Build-Log und Session-stopped-Block
 - `phase0/CLAUDE.md` — Phasen-Kopf P0 (historisch, abgeschlossen)
 

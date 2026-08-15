@@ -52,7 +52,7 @@ updated: 2026-08-15
 
 - `TRAKTION_OVERALL_PLAN.md` §5 — vollständige Phasenordnung mit Done-When-Kriterien
 - `TRAKTION_OVERALL_PLAN.md` §4 — Ziele Z1–Z11 mit Zuordnung zu Phasen
-- `phase2/CLAUDE.md` — Phasen-Kopf P2 (aktiv) mit Build-Log und Session-stopped-Block
+- `phase2/CLAUDE.md` — Phasen-Kopf P2 (abgeschlossen) mit Build-Log und Session-stopped-Block
 - `phase1/CLAUDE.md` — Phasen-Kopf P1 (abgeschlossen) mit Build-Log und Session-stopped-Block
 - `phase0/CLAUDE.md` — Phasen-Kopf P0 (historisch, abgeschlossen)
 - `ARCHITECTURE.md` — Architektur-Schnitt (train-core / train-mc)

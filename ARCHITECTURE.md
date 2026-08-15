@@ -5,7 +5,7 @@ read-when: vor jeder Architektur-Entscheidung; bei der Frage "wo lebt dieser Cod
 detail: L1
 up: ./CLAUDE.md
 down:
-updated: 2026-07-23
+updated: 2026-08-15
 ---
 
 # Traktion — Architektur

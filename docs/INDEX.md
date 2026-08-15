@@ -36,9 +36,9 @@ updated: 2026-08-15
 
 | Doku | Größe | Wann lesen |
 |---|---|---|
-| 🔄 `phase2/CLAUDE.md` | L1 | Session-Start in P2; vor jedem P2-Schritt; bei Rotation des Session-stopped-Blocks |
-| 🔄 `phase2/SESSIONS_ARCHIVE.md` | L3 | bei Bedarf an historische P2-Session-Details |
-| 🔄 `phase2/README.md` | L1 | Repo-Besuch; schneller P2-Überblick ohne Phasen-Kopf |
+| 📕 `phase2/CLAUDE.md` | L1 | historisch — P2-Build-Log + letzter P2-Session-stopped-Block (P2 abgeschlossen) |
+| 📦 `phase2/SESSIONS_ARCHIVE.md` | L3 | bei Bedarf an historische P2-Session-Details |
+| 📗 `phase2/README.md` | L1 | Repo-Besuch; schneller P2-Überblick ohne Phasen-Kopf |
 | 📕 `phase1/CLAUDE.md` | L1 | historisch — P1-Build-Log + letzter P1-Session-stopped-Block (P1 abgeschlossen) |
 | 📦 `phase1/SESSIONS_ARCHIVE.md` | L3 | bei Bedarf an historische P1-Session-Details |
 | 📗 `phase1/README.md` | L1 | Repo-Besuch; schneller P1-Überblick ohne Phasen-Kopf |

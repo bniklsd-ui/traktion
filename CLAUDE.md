@@ -73,8 +73,8 @@ Siehe `phase2/CLAUDE.md` Session-stopped-Block und `docs/plans/PHASE2_HANDOVER.m
 1. `AGENTS.md` — harness-neutraler Einstieg
 2. `docs/INDEX.md` — Karte. Navigation über up/down-Links, nicht per Verzeichnissuche.
 3. `CLAUDE.md` — diese Datei (Single Source of Truth)
-4. `phase<N>/CLAUDE.md` — Phasen-Kopf, insbesondere `## Session stopped` (aktuell: `phase1/CLAUDE.md` — P1 abgeschlossen, P2 folgt)
-5. `docs/plans/PHASE<N>_PLAN.md` — Konzept/Plan, aus dem die Phase gebaut wird (aktuell: `docs/plans/PHASE1_PLAN.md` — P2-Plan noch zu entwerfen)
+4. `phase<N>/CLAUDE.md` — Phasen-Kopf, insbesondere `## Session stopped` (aktuell: `phase2/CLAUDE.md` — P2 abgeschlossen, P3 folgt)
+5. `docs/plans/PHASE<N>_PLAN.md` — Konzept/Plan, aus dem die Phase gebaut wird (aktuell: `docs/plans/PHASE2_PLAN.md` — P3-Plan liegt vor, `PHASE3_PLAN.md` ist im P3-Setup commitet)
 6. `TRAKTION_OVERALL_PLAN.md` — §2 (Locks), §3 (Hard Rules), §4 (Ziele), §9 (Anti-Patterns)
 
 Referenzierte Dateien werden **nicht** automatisch geladen. Öffne sie on-need-to-know selbst.
@@ -125,8 +125,9 @@ korrigieren, nicht umgehen. Diese Momente sind Messpunkte.
 
 ## Session stopped
 
-> Der aktuelle `## Session stopped`-Block lebt in `phase1/CLAUDE.md` (Doc-Layers-Konvention) —
-> P1 ist abgeschlossen, der Block dokumentiert den Phasen-Abschluss. P2 beginnt in einer neuen
-> Session mit `phase2/CLAUDE.md` als erster Aktion.
+> Der aktuelle `## Session stopped`-Block lebt in `phase2/CLAUDE.md` (Doc-Layers-Konvention) —
+> P2 ist abgeschlossen, der Block dokumentiert den Phasen-Abschluss. P3 beginnt in einer neuen
+> Session mit `phase3/CLAUDE.md` als erster Aktion.
 > Root-CLAUDE.md ist schlank und enthält keinen Session-stopped-Block.
-> Alte Blöcke: `phase1/SESSIONS_ARCHIVE.md` (P1) und `phase0/SESSIONS_ARCHIVE.md` (P0).
+> Alte Blöcke: `phase2/SESSIONS_ARCHIVE.md` (P2), `phase1/SESSIONS_ARCHIVE.md` (P1)
+> und `phase0/SESSIONS_ARCHIVE.md` (P0).
