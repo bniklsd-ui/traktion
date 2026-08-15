@@ -83,7 +83,7 @@ updated: 2026-08-15
 - [x] Step 0.1 — Drift-Commits sync
 - [x] Step 0.2 — P1-Trials Rohdaten an Nikinger
 - [x] Step 0b — Doc-Drift prüfen
-- [x] Step 1 — phase2/CLAUDE.md erstellen
+- [x] Step 1 — `phase2/CLAUDE.md` erstellen
 - [x] Step 2 — `Edge` um Verschleiß-Zustand erweitern (Z6, T-D25, T-D26)
 - [x] Step 3 — `Wear` + Integration in Simulator (Z6, T-D31, Regel 5)
 - [x] Step 4 — `PowerGrid` nutzt `condition` für Spannungsabfall (Z4 vollständig, T-D5, T-D27)
@@ -91,7 +91,7 @@ updated: 2026-08-15
 - [x] Step 6 — `ManualGenerator` (Port 1, zweite Produktions-Implementierung, T-D30)
 - [x] Step 7 — Z7-Bootstrap-Invariante (Property-based Test, T-D32)
 - [x] Step 8 — Z6-Langlauf-Sim (10.000 Ticks, T-D33)
-- [ ] Step 9 — Done-When-Verifikation + Phasen-Abschluss
+- [x] Step 9 — Done-When-Verifikation + Phasen-Abschluss
 
 ### Nächster Schritt
 **P2 abgeschlossen.** Nächste Phase: P3 (Planer, Z5 — das Kern-Orakel). Siehe `docs/plans/PHASE2_HANDOVER.md`.
@@ -107,7 +107,9 @@ updated: 2026-08-15
 - [x] `train-core` null externe Runtime-Dependencies (nur JUnit + jqwik)
 
 ### Open questions / blocker
-- **Keine.** P2 ist Category A (reines Java), keine 26.2-API-Kontakte.s
-- **Keine** — P2 ist Category A (reines Java), keine 26.2-API-Kontakte.
+- **Keine.** P2 ist Kategorie A (reines Java), keine 26.2-API-Kontakte.
 - **Wear-Koeffizient k=1e-10:** ✅ k=1e-10 ist messbar (Step 8 bestätigt — keine Erhöhung nötig).
+- **Multi-Edge-Regel-5-Invariante:** keine explizite Testabdeckung (kein Verstoß — Wear läuft
+  nur auf aktueller Edge; Coverage-Lücke ist im `docs/plans/PHASE2_HANDOVER.md` als Hinweis
+  für P3/P4 dokumentiert).
 - **Tool-Calls:** diese Session bisher ~20 Tool-Calls (nach Session-Stop).

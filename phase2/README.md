@@ -36,6 +36,8 @@ grün in `train-core`, 10.000-Ticks-Langlauf degradiert messbar, Bootstrap-Invar
 
 ## Status
 
-**P2 ist gestartet.** Steps 0.1, 0.2, 0b erledigt. Step 1 (Phase-Kopf erstellt) läuft.
-Nächster Schritt: Step 2 (Edge um Verschleiß-Zustand erweitern). Siehe `phase2/CLAUDE.md` Build-Log
-für die Schritt-für-Schritt-Übersicht.
+**P2 ist abgeschlossen.** Steps 0.1–9 erledigt. Z4 vollständig (condition → Spannungsabfall),
+Z6 + Z7 grün (208 Tests, beide Ports produktiv, Regel 3 erfüllt für `PowerSupply` und
+`MaintenanceSupply`, Determinismus bestätigt).
+Nächste Phase: P3 (Planer, Z5 — das Kern-Orakel). Siehe `phase2/CLAUDE.md` Build-Log für
+die Schritt-für-Schritt-Übersicht und `docs/plans/PHASE2_HANDOVER.md` für die Abschlussanalyse.

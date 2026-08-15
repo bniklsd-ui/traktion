@@ -56,6 +56,7 @@ updated: 2026-08-15
 | 📜 `docs/plans/PHASE1_PLAN.md` | L2 | Ausführung von P1; train-core Durchstich (Z1–Z4), Schritt-Sequenz, Akzeptanzkriterien |
 | 📕 `docs/plans/PHASE1_HANDOVER.md` | L2 | vor P2-Plan-Entwurf; P1-Abschlussanalyse, §9-Check leer, trials-Rohdaten |
 | 📜 `docs/plans/PHASE2_PLAN.md` | L2 | Ausführung von P2; Verschleiß + Ports (Z4-Abschluss, Z6, Z7), T-D25–T-D34, Schritt-Sequenz, Akzeptanzkriterien |
+| 📕 `docs/plans/PHASE2_HANDOVER.md` | L2 | vor P3-Plan-Entwurf; P2-Abschlussanalyse, Z4+Z6+Z7 grün, Ports produktiv, Multi-Edge-Test-Lücke, trials-Rohdaten |
 
 ## Messung (M1-Strang)
 
