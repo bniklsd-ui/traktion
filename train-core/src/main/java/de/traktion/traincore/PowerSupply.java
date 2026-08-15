@@ -7,7 +7,7 @@ package de.traktion.traincore;
  * <ul>
  *   <li><b>FixedSupply</b> (heute, Test-Package) — liefert {@code requestedW} immer. Für Tests,
  *       nicht Produktion.</li>
- *   <li><b>ManualGenerator</b> (P2, Plan §3.2) — fester Output, Brennstoff von Hand. Die
+ *   <li><b>ManualGenerator</b> (heute, P2) — fester Output, Brennstoff von Hand. Die
  *       dauerhafte Rückfallebene (Regel 4).</li>
  * </ul>
  *
