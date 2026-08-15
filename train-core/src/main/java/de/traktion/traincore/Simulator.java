@@ -163,5 +163,10 @@ public final class Simulator {
 
         token.setSpeedMps(newV);
         token.setProgressMeters(newX);
+
+        // Verschleiß: Wear.accumulate pro Substep (T-D31, Regel 5)
+        // Nur wenn der Token fährt (mass>0 bereits geprüft, speed>0 hier)
+        // Nutzt den gesäten rng → deterministisch (Regel 8)
+        Wear.accumulate(edge, mass, newV, dt, rng);
     }
 }
