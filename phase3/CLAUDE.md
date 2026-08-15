@@ -32,7 +32,7 @@ updated: 2026-08-15
 | Step 0.2 — P2-Trials verifizieren | ✅ | — | 6 Zeilen vorhanden, kein Eingriff nötig |
 | Step 0b — Doc-Drift prüfen | ✅ | — | Kein Drift gefunden (leer) |
 | Step 1 — phase3/CLAUDE.md + SESSIONS_ARCHIVE + README erstellen | ✅ | — | Phasen-Kopf erstellt, P3 = 🔄 |
-| Step 2 — RouteForecast + Bottleneck Records (Z11, T-D38/T-D39) | ⏳ | — | — |
+| Step 2 — RouteForecast + Bottleneck Records (Z11, T-D38/T-D39) | ✅ | — | 229 Tests grün (BottleneckTest + RouteForecastTest + alle P1/P2) |
 | Step 3 — Planner.predict() Grundgerüst (T-D35–T-D37/T-D44/T-D45) | ⏳ | — | — |
 | Step 4 — Soll/Ist-Vergleich (Z11-Kern, T-D38) | ⏳ | — | — |
 | Step 5 — Bottleneck-Klassifikation (T-D39/T-D43) | ⏳ | — | — |
