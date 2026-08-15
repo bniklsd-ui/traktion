@@ -12,8 +12,8 @@ updated: 2026-08-15
 
 # Phase 2 — Verschleiß + Ports
 
-> **Status:** P2 gestartet. Steps 0.1–6 erledigt. Nächster Schritt:
-> Step 7 (Z7-Bootstrap-Invariante, T-D32).
+> **Status:** P2 gestartet. Steps 0.1–7 erledigt. Nächster Schritt:
+> Step 8 (Z6-Langlauf-Sim, 10.000 Ticks, T-D33).
 >
 > **Konzept:** `docs/plans/PHASE2_PLAN.md` (gelockte Entscheidungen T-D25–T-D34, Schritt-Sequenz,
 > Akzeptanzkriterien).
@@ -37,10 +37,11 @@ updated: 2026-08-15
 | Step 4 — PowerGrid nutzt condition für Spannungsabfall (Z4 vollständig, T-D5, T-D27) | ✅ | d37c0af | availableW(condition), Simulator leitet min(rail,overhead) durch, P1-Signatur-Bruch migriert, 134 Tests grün |
 | Step 5 — MaintenanceSupply Port + PlayerLabor (Z7-Infrastruktur, T-D28, T-D29) | ✅ | fcddcdc | MaintenanceSupply.java (Interface, Port 2), PlayerLabor.java (Zeit-Akkumulator: rate=5/s, maxWork=20), 28 Tests grün, 163 Tests gesamt |
 | Step 6 — ManualGenerator (Port 1, zweite Produktions-Implementierung, T-D30) | ✅ | 872bfe9 | ManualGenerator.java (100kW, 1000MJ Brennstoff, fuelMj in MJ), ManualGeneratorTest.java (32 Tests), IntegrationTest mit PowerGrid, 195 Tests gesamt |
+| Step 7 — Z7-Bootstrap-Invariante (Property-based Test, T-D32) | ✅ | 19183a4 | SoftlockInvariantTest.java (3 jqwik Property-Tests + 4 JUnit-Tests), repairLoopTerminates, slowLaborStillTerminates, repairNeverWorsensCondition, 202 Tests gesamt |
 
 ---
 
-## Session stopped — 2026-08-15 (P2 Step 6: ManualGenerator)
+## Session stopped — 2026-08-15 (P2 Step 7: Z7-Bootstrap-Invariante)
 
 ### Completed (diese Session)
 - **Step 0.1 — Drift-Commits:** fünf Dateien committed (6db2cfe).
@@ -66,6 +67,10 @@ updated: 2026-08-15
   Brennstoff-Vorrat (fuelMj in MJ, 1000 MJ Default ≈ 278 kWh), maxOutputW=100kW Default,
   supply(reqW,dt) liefert min(reqW,maxOutputW,fuel*1e6/dt), refuel(amountMJ) als Test-Hook.
   32 ManualGenerator-Tests grün. 195 Tests gesamt. Regel 3 erfüllt für Port 1 (FixedSupply + ManualGenerator).
+- **Step 7 — Z7-Bootstrap-Invariante:** SoftlockInvariantTest.java mit 3 jqwik Property-Tests
+  (repairLoopTerminates, slowLaborStillTerminates, repairNeverWorsensCondition) + 4 JUnit-Tests
+  (worstCaseFromNearZeroTerminates, sumWearMonotonicallyDecreases, repairWithoutTimeDoesNothing,
+  largeNetworkFromNearZeroTerminates). 202 Tests gesamt. Z7 vollständig grün.
 
 ### P2 Steps (Plan §5/P2)
 
@@ -78,17 +83,18 @@ updated: 2026-08-15
 - [x] Step 4 — `PowerGrid` nutzt `condition` für Spannungsabfall (Z4 vollständig, T-D5, T-D27)
 - [x] Step 5 — `MaintenanceSupply` Port + `PlayerLabor` (Z7-Infrastruktur, T-D28, T-D29)
 - [x] Step 6 — `ManualGenerator` (Port 1, zweite Produktions-Implementierung, T-D30)
-- [ ] Step 7 — Z7-Bootstrap-Invariante (Property-based Test, T-D32)
+- [x] Step 7 — Z7-Bootstrap-Invariante (Property-based Test, T-D32)
 - [ ] Step 8 — Z6-Langlauf-Sim (10.000 Ticks, T-D33)
 - [ ] Step 9 — Done-When-Verifikation + Phasen-Abschluss
 
 ### Nächster Schritt
-**Step 7 — Z7-Bootstrap-Invariante** (T-D32). Property-based Test mit jqwik: Generator erzeugt
-zufällige Verfallszustände, der Reparatur-Loop reduziert Summe(1 - condition) monoton, terminiert.
-Beweist: Spieler hat immer einen Ausweg (Regel 4).
+**Step 8 — Z6-Langlauf-Sim** (T-D33, T-D5). 10.000 Ticks Dauerbetrieb: Token fährt auf Netz,
+am Ende ist `condition < 1.0` messbar (degradiert), aber `speedMps > 0` immer noch (nicht
+total blockiert). Deterministisch (gleicher Seed → gleiche End-conditions).
 
 ### Done-When P2 (Plan §5/P2)
-- [ ] Z6 + Z7 grün in `train-core`
+- [x] Z7 grün in `train-core` (Bootstrap-Invariante bewiesen, Regel 4 erfüllt)
+- [ ] Z6 grün in `train-core` (Langlauf-Sim ausstehend)
 - [ ] Langlauf degradiert messbar, blockiert nie total
 - [ ] Beide Ports produktiv (`ManualGenerator`, `PlayerLabor`), Regel 3 erfüllt
 
@@ -96,4 +102,4 @@ Beweist: Spieler hat immer einen Ausweg (Regel 4).
 - **Keine** — P2 ist Category A (reines Java), keine 26.2-API-Kontakte.
 - **Wear-Koeffizient k=1e-10:** Kalibriert auf T-D33 (10.000 Ticks Degradation messbar). Wenn der
   Langlauf-Test in Step 8 keine messbare Degradation zeigt, muss k erhöht werden.
-- **Tool-Calls:** diese Session bisher ~15 Tool-Calls (nach Session-Stop).
+- **Tool-Calls:** diese Session bisher ~25 Tool-Calls (nach Session-Stop).
