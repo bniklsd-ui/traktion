@@ -5,7 +5,7 @@ read-when: Repo-Besuch über GitHub; vor dem Setup einer Entwicklungsmaschine
 detail: L1
 up: ./CLAUDE.md
 down:
-updated: 2026-07-22
+updated: 2026-07-23
 ---
 
 # Traktion
@@ -37,10 +37,19 @@ der Weltzustand in Zahlen übersetzt und zurück.
 
 ## Status
 
-Phase 0 (Fundament) ✅ und Phase 1 (`train-core`-Durchstich, Z1–Z4) ✅ sind abgeschlossen.
-`train-core` hat 101 grüne Tests, null externe Runtime-Abhängigkeiten, Determinismus bestätigt
-(Regel 8). Die Mod ist noch nicht spielbar — das erste spielbare Milestone ist Phase 4.
-Siehe `ROADMAP.md` für die Phasenübersicht P0–P6 und `phase1/CLAUDE.md` für den P1-Abschluss.
+| Phase | Inhalt | Status |
+|---|---|---|
+| **P0** | Fundament, Konventions-Import, Skelett, Vorregistrierung, MC-Spike | ✅ T-D3 bestätigt |
+| **P1** | `train-core`: Durchstich (Z1–Z4) | ✅ abgeschlossen (101 Tests, Z1–Z4 grün, Determinismus bestätigt) |
+| **P2** | Verschleiß + Ports (Z6, Z7) | ⏳ nächster Schritt |
+| P3 | Planer (Z5 — Kern-Orakel) | ⏳ |
+| P4 | `train-mc`: erste spielbare Version (Z9–Z11) | ⏳ |
+| P5 | Fahrplan + Lokführer (Z8) | ⏳ |
+| P6 | Auswertung M1-Strang | ⏳ |
+
+**P1 ist abgeschlossen:** ein Zug fährt in einem Unit-Test von A nach B und wird bei
+Stromknappheit langsamer. Der Durchstich-Beweis ist erbracht. Die Mod ist noch nicht spielbar —
+das erste spielbare Milestone ist P4. Siehe `ROADMAP.md` für die Phasenübersicht P0–P6.
 
 ## Setup (Entwicklungsmaschine)
 
@@ -51,13 +60,13 @@ Siehe `ROADMAP.md` für die Phasenübersicht P0–P6 und `phase1/CLAUDE.md` für
 
 **Build:**
 ```bash
-./gradlew :train-core:test          # Unit-Tests (Kategorie A, Sekunden)
+./gradlew :train-core:test          # Unit-Tests (Kategorie A, Sekunden, 101 Tests)
 ./gradlew :train-mc:build           # Mod-Build (Kategorie B, lädt MC 26.2)
 ```
 
 `train-core:test` braucht `--configure-on-demand`, solange `train-mc` nicht konfiguriert ist.
 
-## Versions-Pinning (Stand 2026-07-15)
+## Versions-Pinning (Stand 2026-07-23)
 
 | Komponente | Wert |
 |---|---|
@@ -68,6 +77,8 @@ Siehe `ROADMAP.md` für die Phasenübersicht P0–P6 und `phase1/CLAUDE.md` für
 | Gradle | 9.5.1 |
 | Java (Build) | 21 |
 | Java (Mod-Target) | 25 |
+| jqwik | 1.9.0 (Property-Testing, T-D20) |
+| JUnit | 5.12.2 |
 
 MC 26.x ist unobfuskiert (seit 26.1). Yarn/Mojmap sind obsolet; die non-remap Loom-Plugin-ID
 `net.fabricmc.fabric-loom` wird verwendet. Siehe `phase0/Fabric_Loom_Mappings_Fix_01.md`.

@@ -7,7 +7,7 @@ up: ../CLAUDE.md
 down:
   - ../docs/plans/PHASE1_PLAN.md      # Konzept/Plan, aus dem P1 gebaut wird
   - ./SESSIONS_ARCHIVE.md             # alte Session-stopped-Blöcke
-updated: 2026-07-21
+updated: 2026-07-23
 ---
 
 # Phase 1 — `train-core`: Durchstich

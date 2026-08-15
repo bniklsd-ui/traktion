@@ -5,7 +5,7 @@ read-when: bei Bedarf an historische Session-Details von P1
 detail: L3
 up: ./CLAUDE.md
 down:
-updated: 2026-07-21
+updated: 2026-07-23
 ---
 
 # Phase 1 — Session-Archiv

@@ -13,7 +13,7 @@ down:
   - ./phase0/CLAUDE.md                # Phasen-Kopf P0 — Build-Log + letzter P0-Session-stopped-Block
   - ./docs/plans/PHASE1_PLAN.md       # Konzept/Plan, aus dem P1 gebaut wird
   - ./docs/plans/PHASE0_PLAN.md       # Konzept/Plan, aus dem P0 gebaut wurde
-updated: 2026-07-21
+updated: 2026-07-23
 ---
 
 # Traktion — Single Source of Truth
