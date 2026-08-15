@@ -24,7 +24,7 @@ updated: 2026-08-15
 |---|---|---|---|
 | **P0** | Fundament, Konventions-Import, Skelett, Vorregistrierung, MC-Spike | ✅ T-D3 bestätigt | — |
 | **P1** | `train-core`: Durchstich — Graph, Physik, Energie, Simulator, Blockabschnitte (Z1–Z4) | ✅ abgeschlossen (101 Tests, Z1–Z4 grün, Determinismus bestätigt) | A |
-| **P2** | Verschleiß + Ports — `condition`, `wear`, `PowerSupply`/`MaintenanceSupply` (Z6, Z7) | 🔄 aktiv | A |
+| **P2** | Verschleiß + Ports — `condition`, `wear`, `PowerSupply`/`MaintenanceSupply` (Z6, Z7) | ✅ abgeschlossen (209 Tests, Z6+Z7 grün, beide Ports produktiv, Determinismus bestätigt) | A |
 | **P3** | Planer — grobe Auflösung, dieselbe Physikfunktion, Z5 property-based (Z5) | ⏳ | A |
 | **P4** | `train-mc`: erste spielbare Version — Gleiseditor, Persistenz, Token⇄Entity, Leitstand (Z9–Z11) | ⏳ | B |
 | **P5** | Fahrplan + Lokführer — `Schedule`, `ManualOverride`, Z5-Vertragsgrenze (Z8) | ⏳ | A + B |

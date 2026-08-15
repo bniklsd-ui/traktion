@@ -57,15 +57,14 @@ train-mc/     dünner Adapter. Blöcke, Entities, Rendering, Packets, Persistenz
 |---|---|---|
 | **P0** | Fundament, Konventions-Import, Skelett, Vorregistrierung, MC-Spike | ✅ T-D3 bestätigt |
 | **P1** | `train-core`: Durchstich (Z1–Z4) | ✅ abgeschlossen (101 Tests, Z1–Z4 grün, Determinismus bestätigt) |
-| **P2** | Verschleiß + Ports (Z6, Z7) | 🔄 aktiv (Step 1) |
+| **P2** | Verschleiß + Ports (Z6, Z7) | ✅ abgeschlossen (209 Tests, Z6+Z7 grün, beide Ports produktiv, Determinismus bestätigt) |
 | P3 | Planer (Z5 — Kern-Orakel) | ⏳ |
 | P4 | `train-mc`: erste spielbare Version (Z9–Z11) | ⏳ |
 | P5 | Fahrplan + Lokführer (Z8) | ⏳ |
 | P6 | Auswertung M1-Strang | ⏳ |
 
-**Aktueller Schritt:** P2 gestartet — Steps 0.1, 0.2, 0b erledigt, Step 1 (Phase-Kopf)
-erledigt. Nächster Schritt: Step 2 (Edge um Verschleiß-Zustand erweitern, Z6). Siehe
-`phase2/CLAUDE.md` Session-stopped-Block.
+**Aktueller Schritt:** P2 abgeschlossen. Nächste Phase: P3 (Planer, Z5 — das Kern-Orakel).
+Siehe `phase2/CLAUDE.md` Session-stopped-Block und `docs/plans/PHASE2_HANDOVER.md`.
 
 ---
 

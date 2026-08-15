@@ -39,10 +39,11 @@ updated: 2026-08-15
 | Step 6 — ManualGenerator (Port 1, zweite Produktions-Implementierung, T-D30) | ✅ | 872bfe9 | ManualGenerator.java (100kW, 1000MJ Brennstoff, fuelMj in MJ), ManualGeneratorTest.java (32 Tests), IntegrationTest mit PowerGrid, 195 Tests gesamt |
 | Step 7 — Z7-Bootstrap-Invariante (Property-based Test, T-D32) | ✅ | 19183a4 | SoftlockInvariantTest.java (3 jqwik Property-Tests + 4 JUnit-Tests), repairLoopTerminates, slowLaborStillTerminates, repairNeverWorsensCondition, 202 Tests gesamt |
 | Step 8 — Z6-Langlauf-Sim (10.000 Ticks, T-D33) | ✅ | 8437eab | WearIntegrationTest.java (7 Tests: 10k-Ticks-Degradation, neverBlocked, determinism_sameSeed, degradedVsFresh, longSingleEdge), k=1e-10 ist messbar, 209 Tests gesamt |
+| Step 9 — Done-When-Verifikation + Phasen-Abschluss | ✅ | 17ade42 | Anti-Pattern-Check §9 leer, gradle test grün (209), Root-CLAUDE.md P2=✅, P3=⏳, ROADMAP/README aktualisiert, Session-Archiv rotiert |
 
 ---
 
-## Session stopped — 2026-08-15 (P2 Step 8: Z6-Langlauf-Sim)
+## Session stopped — 2026-08-15 (P2 Step 9: Done-When + Abschluss)
 
 ### Completed (diese Session)
 - **Step 0.1 — Drift-Commits:** fünf Dateien committed (6db2cfe).
@@ -93,16 +94,20 @@ updated: 2026-08-15
 - [ ] Step 9 — Done-When-Verifikation + Phasen-Abschluss
 
 ### Nächster Schritt
-**Step 9 — Done-When-Verifikation** + Phasen-Abschluss. Anti-Pattern-Check (§9), alle Tests bestätigt,
-PHASE2_HANDOVER.md schreiben, Root-CLAUDE.md aktualisieren, Session-Stop.
+**P2 abgeschlossen.** Nächste Phase: P3 (Planer, Z5 — das Kern-Orakel). Siehe `docs/plans/PHASE2_HANDOVER.md`.
 
-### Done-When P2 (Plan §5/P2)
+### Done-When P2 (Plan §5/P2) — alle erfüllt
 - [x] Z7 grün in `train-core` (Bootstrap-Invariante bewiesen, Regel 4 erfüllt)
 - [x] Z6 grün in `train-core` (Langlauf-Sim 10k Ticks bestanden, k=1e-10 messbar)
 - [x] Langlauf degradiert messbar, blockiert nie total
 - [x] Beide Ports produktiv (`ManualGenerator`, `PlayerLabor`), Regel 3 erfüllt
+- [x] Anti-Pattern-Check §9 leer (alle Checks bestanden)
+- [x] `Physics.requiredPowerW` genau einmal (Regel 2, P3-Watchpunkt intakt)
+- [x] Determinismus bestätigt (T-D24, T-D33)
+- [x] `train-core` null externe Runtime-Dependencies (nur JUnit + jqwik)
 
-### Open questions / blockers
+### Open questions / blocker
+- **Keine.** P2 ist Category A (reines Java), keine 26.2-API-Kontakte.s
 - **Keine** — P2 ist Category A (reines Java), keine 26.2-API-Kontakte.
 - **Wear-Koeffizient k=1e-10:** ✅ k=1e-10 ist messbar (Step 8 bestätigt — keine Erhöhung nötig).
 - **Tool-Calls:** diese Session bisher ~20 Tool-Calls (nach Session-Stop).

@@ -5,7 +5,7 @@ read-when: Repo-Besuch über GitHub; vor dem Setup einer Entwicklungsmaschine
 detail: L1
 up: ./CLAUDE.md
 down:
-updated: 2026-07-23
+updated: 2026-08-15
 ---
 
 # Traktion
@@ -41,7 +41,7 @@ der Weltzustand in Zahlen übersetzt und zurück.
 |---|---|---|
 | **P0** | Fundament, Konventions-Import, Skelett, Vorregistrierung, MC-Spike | ✅ T-D3 bestätigt |
 | **P1** | `train-core`: Durchstich (Z1–Z4) | ✅ abgeschlossen (101 Tests, Z1–Z4 grün, Determinismus bestätigt) |
-| **P2** | Verschleiß + Ports (Z6, Z7) | ⏳ nächster Schritt |
+| **P2** | Verschleiß + Ports (Z6, Z7) | ✅ abgeschlossen (209 Tests, Z6+Z7 grün) |
 | P3 | Planer (Z5 — Kern-Orakel) | ⏳ |
 | P4 | `train-mc`: erste spielbare Version (Z9–Z11) | ⏳ |
 | P5 | Fahrplan + Lokführer (Z8) | ⏳ |
