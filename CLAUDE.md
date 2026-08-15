@@ -8,8 +8,10 @@ down:
   - ./TRAKTION_OVERALL_PLAN.md        # Wahrheit — Mission, Locks, Hard Rules, Phasen, Ziele
   - ./docs/INDEX.md                   # Karte — eine Zeile pro Doku
   - ./docs/CONVENTIONS.md             # übernommene/verworfene Konventionen
-  - ./docs/DOC_LAYERS_CONVENTION.md   # generische Spec des Doc-Layers-Systems
-  - ./phase2/CLAUDE.md                # Phasen-Kopf P2 — Build-Log + aktueller Session-stopped-Block
+  - ./docs/DOC_LAYERS_CONVENTION.md   # generische Spec des Doc-Layer-Systems
+  - ./phase3/CLAUDE.md                # Phasen-Kopf P3 — Build-Log + aktueller Session-stopped-Block
+  - ./docs/plans/PHASE3_PLAN.md       # Konzept/Plan, aus dem P3 gebaut wird
+  - ./phase2/CLAUDE.md                # Phasen-Kopf P2 — Build-Log + letzter P2-Session-stopped-Block
   - ./phase1/CLAUDE.md                # Phasen-Kopf P1 — Build-Log + letzter P1-Session-stopped-Block
   - ./phase0/CLAUDE.md                # Phasen-Kopf P0 — Build-Log + letzter P0-Session-stopped-Block
   - ./docs/plans/PHASE2_PLAN.md       # Konzept/Plan, aus dem P2 gebaut wird
@@ -58,13 +60,14 @@ train-mc/     dünner Adapter. Blöcke, Entities, Rendering, Packets, Persistenz
 | **P0** | Fundament, Konventions-Import, Skelett, Vorregistrierung, MC-Spike | ✅ T-D3 bestätigt |
 | **P1** | `train-core`: Durchstich (Z1–Z4) | ✅ abgeschlossen (101 Tests, Z1–Z4 grün, Determinismus bestätigt) |
 | **P2** | Verschleiß + Ports (Z6, Z7) | ✅ abgeschlossen (209 Tests, Z6+Z7 grün, beide Ports produktiv, Determinismus bestätigt) |
-| P3 | Planer (Z5 — Kern-Orakel) | ⏳ |
+| **P3** | Planer (Z5 — Kern-Orakel) | 🔄 |
 | P4 | `train-mc`: erste spielbare Version (Z9–Z11) | ⏳ |
 | P5 | Fahrplan + Lokführer (Z8) | ⏳ |
 | P6 | Auswertung M1-Strang | ⏳ |
 
-**Aktueller Schritt:** P2 abgeschlossen. Nächste Phase: P3 (Planer, Z5 — das Kern-Orakel).
-Siehe `phase2/CLAUDE.md` Session-stopped-Block und `docs/plans/PHASE2_HANDOVER.md`.
+**Aktueller Schritt:** P3 aktiv. Step 1 (phase3/CLAUDE.md erstellen) abgeschlossen.
+Nächster Schritt: Step 2 (RouteForecast + Bottleneck Records).
+Siehe `phase3/CLAUDE.md` Build-Log und `docs/plans/PHASE3_PLAN.md`.
 
 ---
 
@@ -73,8 +76,8 @@ Siehe `phase2/CLAUDE.md` Session-stopped-Block und `docs/plans/PHASE2_HANDOVER.m
 1. `AGENTS.md` — harness-neutraler Einstieg
 2. `docs/INDEX.md` — Karte. Navigation über up/down-Links, nicht per Verzeichnissuche.
 3. `CLAUDE.md` — diese Datei (Single Source of Truth)
-4. `phase<N>/CLAUDE.md` — Phasen-Kopf, insbesondere `## Session stopped` (aktuell: `phase2/CLAUDE.md` — P2 abgeschlossen, P3 folgt)
-5. `docs/plans/PHASE<N>_PLAN.md` — Konzept/Plan, aus dem die Phase gebaut wird (aktuell: `docs/plans/PHASE2_PLAN.md` — P3-Plan liegt vor, `PHASE3_PLAN.md` ist im P3-Setup commitet)
+4. `phase<N>/CLAUDE.md` — Phasen-Kopf, insbesondere `## Session stopped` (aktuell: `phase3/CLAUDE.md` — P3 aktiv)
+5. `docs/plans/PHASE<N>_PLAN.md` — Konzept/Plan, aus dem die Phase gebaut wird (aktuell: `docs/plans/PHASE3_PLAN.md` — P3-Plan ausführungsreif)
 6. `TRAKTION_OVERALL_PLAN.md` — §2 (Locks), §3 (Hard Rules), §4 (Ziele), §9 (Anti-Patterns)
 
 Referenzierte Dateien werden **nicht** automatisch geladen. Öffne sie on-need-to-know selbst.
@@ -125,9 +128,8 @@ korrigieren, nicht umgehen. Diese Momente sind Messpunkte.
 
 ## Session stopped
 
-> Der aktuelle `## Session stopped`-Block lebt in `phase2/CLAUDE.md` (Doc-Layers-Konvention) —
-> P2 ist abgeschlossen, der Block dokumentiert den Phasen-Abschluss. P3 beginnt in einer neuen
-> Session mit `phase3/CLAUDE.md` als erster Aktion.
+> Der aktuelle `## Session stopped`-Block lebt in `phase3/CLAUDE.md` (Doc-Layers-Konvention) —
+> P3 ist aktiv, der Block dokumentiert den Phasen-Abschluss bei Done-When.
 > Root-CLAUDE.md ist schlank und enthält keinen Session-stopped-Block.
-> Alte Blöcke: `phase2/SESSIONS_ARCHIVE.md` (P2), `phase1/SESSIONS_ARCHIVE.md` (P1)
-> und `phase0/SESSIONS_ARCHIVE.md` (P0).
+> Alte Blöcke: `phase3/SESSIONS_ARCHIVE.md` (P3), `phase2/SESSIONS_ARCHIVE.md` (P2),
+> `phase1/SESSIONS_ARCHIVE.md` (P1) und `phase0/SESSIONS_ARCHIVE.md` (P0).

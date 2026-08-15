@@ -42,7 +42,7 @@ der Weltzustand in Zahlen übersetzt und zurück.
 | **P0** | Fundament, Konventions-Import, Skelett, Vorregistrierung, MC-Spike | ✅ T-D3 bestätigt |
 | **P1** | `train-core`: Durchstich (Z1–Z4) | ✅ abgeschlossen (101 Tests, Z1–Z4 grün, Determinismus bestätigt) |
 | **P2** | Verschleiß + Ports (Z6, Z7) | ✅ abgeschlossen (209 Tests, Z6+Z7 grün) |
-| P3 | Planer (Z5 — Kern-Orakel) | ⏳ |
+| **P3** | Planer (Z5 — Kern-Orakel) | 🔄 |
 | P4 | `train-mc`: erste spielbare Version (Z9–Z11) | ⏳ |
 | P5 | Fahrplan + Lokführer (Z8) | ⏳ |
 | P6 | Auswertung M1-Strang | ⏳ |
@@ -94,6 +94,7 @@ Dieses Repo verwendet ein Layer-basiertes Doku-System. Einstiegspunkte:
 - `TRAKTION_OVERALL_PLAN.md` — Mission, Locks, Hard Rules, Phasen, Ziele
 - `ROADMAP.md` — Phasenübersicht P0–P6
 - `ARCHITECTURE.md` — Architektur-Schnitt und Ports
+- `phase3/CLAUDE.md` — Phasen-Kopf P3 (aktiv) mit Build-Log und Session-stopped-Block
 - `phase2/CLAUDE.md` — Phasen-Kopf P2 (abgeschlossen) mit Build-Log und Session-stopped-Block
 - `phase1/CLAUDE.md` — Phasen-Kopf P1 (abgeschlossen) mit Build-Log und Session-stopped-Block
 - `phase0/CLAUDE.md` — Phasen-Kopf P0 (historisch, abgeschlossen)

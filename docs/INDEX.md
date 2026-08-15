@@ -36,6 +36,9 @@ updated: 2026-08-15
 
 | Doku | Größe | Wann lesen |
 |---|---|---|
+| 📗 `phase3/CLAUDE.md` | L1 | aktive Phase — P3-Build-Log + Session-stopped-Block (Planer, Z5) |
+| 📦 `phase3/SESSIONS_ARCHIVE.md` | L3 | bei Bedarf an historische P3-Session-Details |
+| 📗 `phase3/README.md` | L1 | Repo-Besuch; schneller P3-Überblick ohne Phasen-Kopf |
 | 📕 `phase2/CLAUDE.md` | L1 | historisch — P2-Build-Log + letzter P2-Session-stopped-Block (P2 abgeschlossen) |
 | 📦 `phase2/SESSIONS_ARCHIVE.md` | L3 | bei Bedarf an historische P2-Session-Details |
 | 📗 `phase2/README.md` | L1 | Repo-Besuch; schneller P2-Überblick ohne Phasen-Kopf |
@@ -57,6 +60,7 @@ updated: 2026-08-15
 | 📕 `docs/plans/PHASE1_HANDOVER.md` | L2 | vor P2-Plan-Entwurf; P1-Abschlussanalyse, §9-Check leer, trials-Rohdaten |
 | 📜 `docs/plans/PHASE2_PLAN.md` | L2 | Ausführung von P2; Verschleiß + Ports (Z4-Abschluss, Z6, Z7), T-D25–T-D34, Schritt-Sequenz, Akzeptanzkriterien |
 | 📕 `docs/plans/PHASE2_HANDOVER.md` | L2 | vor P3-Plan-Entwurf; P2-Abschlussanalyse, Z4+Z6+Z7 grün, Ports produktiv, Multi-Edge-Test-Lücke, trials-Rohdaten |
+| 📜 `docs/plans/PHASE3_PLAN.md` | L2 | Ausführung von P3; Planer (Z5, Z11), T-D35–T-D49, Schritt-Sequenz, Akzeptanzkriterien |
 
 ## Messung (M1-Strang)
 
