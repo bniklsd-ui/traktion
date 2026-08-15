@@ -12,8 +12,8 @@ updated: 2026-08-15
 
 # Phase 2 — Verschleiß + Ports
 
-> **Status:** P2 gestartet. Steps 0.1, 0.2, 0b, 1–5 erledigt. Nächster Schritt:
-> Step 6 (`ManualGenerator`, Port 1 zweite Implementierung, T-D30).
+> **Status:** P2 gestartet. Steps 0.1–6 erledigt. Nächster Schritt:
+> Step 7 (Z7-Bootstrap-Invariante, T-D32).
 >
 > **Konzept:** `docs/plans/PHASE2_PLAN.md` (gelockte Entscheidungen T-D25–T-D34, Schritt-Sequenz,
 > Akzeptanzkriterien).
@@ -36,10 +36,11 @@ updated: 2026-08-15
 | Step 3 — Wear + Integration in Simulator (Z6, T-D31, Regel 5) | ✅ | ae5a474 | Wear.java (Utility), Simulator ruft Wear.accumulate pro Substep, 13 WearTests + alle P1-Tests grün (137 total) |
 | Step 4 — PowerGrid nutzt condition für Spannungsabfall (Z4 vollständig, T-D5, T-D27) | ✅ | d37c0af | availableW(condition), Simulator leitet min(rail,overhead) durch, P1-Signatur-Bruch migriert, 134 Tests grün |
 | Step 5 — MaintenanceSupply Port + PlayerLabor (Z7-Infrastruktur, T-D28, T-D29) | ✅ | fcddcdc | MaintenanceSupply.java (Interface, Port 2), PlayerLabor.java (Zeit-Akkumulator: rate=5/s, maxWork=20), 28 Tests grün, 163 Tests gesamt |
+| Step 6 — ManualGenerator (Port 1, zweite Produktions-Implementierung, T-D30) | ✅ | 872bfe9 | ManualGenerator.java (100kW, 1000MJ Brennstoff, fuelMj in MJ), ManualGeneratorTest.java (32 Tests), IntegrationTest mit PowerGrid, 195 Tests gesamt |
 
 ---
 
-## Session stopped — 2026-08-15 (P2 Step 5: MaintenanceSupply Port + PlayerLabor)
+## Session stopped — 2026-08-15 (P2 Step 6: ManualGenerator)
 
 ### Completed (diese Session)
 - **Step 0.1 — Drift-Commits:** fünf Dateien committed (6db2cfe).
@@ -61,6 +62,10 @@ updated: 2026-08-15
 - **Step 5 — MaintenanceSupply + PlayerLabor:** MaintenanceSupply.java (Interface, Port 2),
   PlayerLabor.java (Zeit-Akkumulator: rate=5/s, maxWork=20, withdraw+tick), 28 Tests
   grün. 163 Tests gesamt. Regel 3 erfüllt (zwei Implementierungen benannt: PlayerLabor + DepotStock).
+- **Step 6 — ManualGenerator:** ManualGenerator.java implementiert PowerSupply mit endlichem
+  Brennstoff-Vorrat (fuelMj in MJ, 1000 MJ Default ≈ 278 kWh), maxOutputW=100kW Default,
+  supply(reqW,dt) liefert min(reqW,maxOutputW,fuel*1e6/dt), refuel(amountMJ) als Test-Hook.
+  32 ManualGenerator-Tests grün. 195 Tests gesamt. Regel 3 erfüllt für Port 1 (FixedSupply + ManualGenerator).
 
 ### P2 Steps (Plan §5/P2)
 
@@ -72,16 +77,15 @@ updated: 2026-08-15
 - [x] Step 3 — `Wear` + Integration in Simulator (Z6, T-D31, Regel 5)
 - [x] Step 4 — `PowerGrid` nutzt `condition` für Spannungsabfall (Z4 vollständig, T-D5, T-D27)
 - [x] Step 5 — `MaintenanceSupply` Port + `PlayerLabor` (Z7-Infrastruktur, T-D28, T-D29)
-- [ ] Step 6 — `ManualGenerator` (Port 1, zweite Produktions-Implementierung, T-D30)
+- [x] Step 6 — `ManualGenerator` (Port 1, zweite Produktions-Implementierung, T-D30)
 - [ ] Step 7 — Z7-Bootstrap-Invariante (Property-based Test, T-D32)
 - [ ] Step 8 — Z6-Langlauf-Sim (10.000 Ticks, T-D33)
 - [ ] Step 9 — Done-When-Verifikation + Phasen-Abschluss
 
 ### Nächster Schritt
-**Step 6 — `ManualGenerator`** (Port 1, zweite Produktions-Implementierung, T-D30). Die erste
-produktive `PowerSupply`-Implementierung nach dem Test-Stub `FixedSupply`. Endlicher
-Brennstoff-Vorrat, `supply(reqW, dt)` liefert bis zu `min(reqW, maxOutputW * dt)`,
-`refuel()` als Test-Hook.
+**Step 7 — Z7-Bootstrap-Invariante** (T-D32). Property-based Test mit jqwik: Generator erzeugt
+zufällige Verfallszustände, der Reparatur-Loop reduziert Summe(1 - condition) monoton, terminiert.
+Beweist: Spieler hat immer einen Ausweg (Regel 4).
 
 ### Done-When P2 (Plan §5/P2)
 - [ ] Z6 + Z7 grün in `train-core`
@@ -92,4 +96,4 @@ Brennstoff-Vorrat, `supply(reqW, dt)` liefert bis zu `min(reqW, maxOutputW * dt)
 - **Keine** — P2 ist Category A (reines Java), keine 26.2-API-Kontakte.
 - **Wear-Koeffizient k=1e-10:** Kalibriert auf T-D33 (10.000 Ticks Degradation messbar). Wenn der
   Langlauf-Test in Step 8 keine messbare Degradation zeigt, muss k erhöht werden.
-- **Tool-Calls:** diese Session bisher ~25 Tool-Calls (nach Session-Stop).
+- **Tool-Calls:** diese Session bisher ~15 Tool-Calls (nach Session-Stop).
