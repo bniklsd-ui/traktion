@@ -1,25 +1,22 @@
 package de.traktion.traincore;
 
 /**
- * Das Stromnetz — modelliert Bedarf, Angebot und Spannungsabfall über Distanz (Z4 ohne
- * condition, T-D22).
- *
- * <p><b>Z4 ohne condition:</b> in P1 ist der Spannungsabfall nur f(Distanz), nicht
- * f(Distanz, condition). {@code condition} kommt in P2 (Verschleiß) und erhöht den
- * Spannungsabfall. Das ist bewusst — P1 misst den Durchstich, nicht den Vollumfang.
+ * Das Stromnetz — modelliert Bedarf, Angebot und Spannungsabfall über Distanz und Zustand (Z4,
+ * T-D5, T-D27).
  *
  * <p><b>Spannungsabfall-Modell (linear, deterministisch):</b>
  * <pre>
- *   deliveredW = requestedW * max(0, 1 - distanceMeters / maxReachMeters)
+ *   effectiveReach = maxReachMeters * condition
+ *   deliveredW = requestedW * max(0, 1 - distanceMeters / effectiveReach)
  * </pre>
- * Bei Distanz 0: volle Leistung. Bei Distanz ≥ maxReach: null. Monoton fallend in der Distanz
- * (größere Distanz → weniger oder gleich). Kein Zustand, keine Wall-Clock — reine Funktion
- * der Distanz.
+ * Bei condition = 1.0: volle Reichweite (P1-Verhalten). Bei condition < 1.0: reduzierte
+ * Reichweite → weniger Leistung am Verbraucher (T-D5: Verschleiß → Spannungsabfall ↑).
+ * Bei Distanz 0: volle Leistung. Bei Distanz ≥ effectiveReach: null.
+ * Monoton fallend in der Distanz (größere Distanz → weniger oder gleich).
  *
- * <p><b>Unterwerk-Reset (Z4):</b> in P1 ohne Verschleiß ist das Netz zustandslos — das
- * Unterwerk liefert immer, solange der {@link PowerSupply} liefert. Der Reset ist in P1 ein
- * No-Op, der die API etabliert. P2 macht daraus echtes Zustandsmanagement (Verschleiß
- * degradiert das Angebot, Reset stellt es wieder her).
+ * <p><b>condition ∈ [0, 1]:</b> 1.0 = perfekte Infrastruktur, 0.0 = keine Leitfähigkeit.
+ * Der Simulator leitet {@code min(edge.railCondition(), edge.overheadCondition())} durch
+ * (T-D27).
  *
  * <p><b>Determinismus (Regel 8):</b> keine Wall-Clock, kein Zufall. Die Berechnung ist rein
  * funktional in den Eingaben.
@@ -54,18 +51,22 @@ public final class PowerGrid {
     }
 
     /**
-     * Liefert die verfügbare Leistung an einer Kante mit Länge {@code distanceMeters}, wenn
-     * {@code requestedW} Watt angefordert werden (Z4 ohne condition: f(Distanz)).
+     * Liefert die verfügbare Leistung an einer Kante mit Länge {@code distanceMeters} und
+     * Infrastruktur-Zustand {@code condition}, wenn {@code requestedW} Watt angefordert werden
+     * (Z4 mit condition, T-D5, T-D27).
      *
-     * <p>Der Spannungsabfall reduziert die angeforderte Leistung linear mit der Distanz.
+     * <p>Der Spannungsabfall reduziert die angeforderte Leistung linear mit der Distanz,
+     * aber auch mit dem Zustand: {@code effectiveReach = maxReachMeters * condition}.
      * Das Unterwerk ({@link PowerSupply}) liefert höchstens die reduzierte Menge.
      *
      * @param requestedW      angeforderte Leistung in Watt (≥ 0)
      * @param distanceMeters  Distanz zum Unterwerk in Metern (≥ 0)
+     * @param condition       Infrastruktur-Zustand ∈ [0, 1] (1.0 = perfekt, T-D25)
      * @param dtSeconds       Zeitspanne in Sekunden (> 0)
-     * @return gelieferte Leistung in Watt (0 ≤ result ≤ requestedW); monoton fallend in distance
+     * @return gelieferte Leistung in Watt (0 ≤ result ≤ requestedW); monoton fallend in distance und
+     *         monoton steigend in condition
      */
-    public double availableW(double requestedW, double distanceMeters, double dtSeconds) {
+    public double availableW(double requestedW, double distanceMeters, double condition, double dtSeconds) {
         if (!(requestedW >= 0) || Double.isInfinite(requestedW)) {
             throw new IllegalArgumentException(
                 "requestedW must be finite and >= 0: " + requestedW);
@@ -74,6 +75,10 @@ public final class PowerGrid {
             throw new IllegalArgumentException(
                 "distanceMeters must be finite and >= 0: " + distanceMeters);
         }
+        if (Double.isNaN(condition) || Double.isInfinite(condition) || condition < 0 || condition > 1) {
+            throw new IllegalArgumentException(
+                "condition must be in [0, 1]: " + condition);
+        }
         if (!(dtSeconds > 0) || Double.isInfinite(dtSeconds)) {
             throw new IllegalArgumentException(
                 "dtSeconds must be finite and > 0: " + dtSeconds);
@@ -81,7 +86,12 @@ public final class PowerGrid {
         if (requestedW == 0.0) {
             return 0.0;
         }
-        double reachFactor = Math.max(0.0, 1.0 - distanceMeters / maxReachMeters);
+        if (condition == 0.0) {
+            return 0.0; // keine Leitfähigkeit bei völlig degradiertem Zustand
+        }
+        // Effektive Reichweite skaliert mit condition (T-D27, T-D5)
+        double effectiveReach = maxReachMeters * condition;
+        double reachFactor = Math.max(0.0, 1.0 - distanceMeters / effectiveReach);
         double effectiveRequest = requestedW * reachFactor;
         return supply.supply(effectiveRequest, dtSeconds);
     }

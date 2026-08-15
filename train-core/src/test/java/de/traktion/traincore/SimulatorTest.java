@@ -176,21 +176,24 @@ class SimulatorTest {
 
     @Test
     void determinism_sameSeedSameEndState() {
-        RailGraph g = singleEdgeGraph(500.0, 0.0);
-        Edge edge = firstEdge(g);
+        // Wichtig: separate Edge-Instanzen für jeden Lauf (Wear modifiziert die Edge)
+        RailGraph g1 = singleEdgeGraph(500.0, 0.0);
+        Edge edge1 = firstEdge(g1);
+        RailGraph g2 = singleEdgeGraph(500.0, 0.0);
+        Edge edge2 = firstEdge(g2);
         Consist consist = new Consist(1, 40_000.0, 0.0);
 
         // Lauf 1
         PowerGrid grid1 = new PowerGrid(new FixedSupply(), 1000.0);
         Simulator sim1 = new Simulator(grid1, 99L);
-        Token t1 = new Token(1L, consist, 200_000.0, edge, 0.0);
+        Token t1 = new Token(1L, consist, 200_000.0, edge1, 0.0);
         sim1.addToken(t1);
         sim1.run(100);
 
-        // Lauf 2 — gleicher Seed, gleicher Graph, gleicher Consist
+        // Lauf 2 — gleicher Seed, separate Edge-Instanz (gleicher Anfangszustand)
         PowerGrid grid2 = new PowerGrid(new FixedSupply(), 1000.0);
         Simulator sim2 = new Simulator(grid2, 99L);
-        Token t2 = new Token(1L, consist, 200_000.0, edge, 0.0);
+        Token t2 = new Token(1L, consist, 200_000.0, edge2, 0.0);
         sim2.addToken(t2);
         sim2.run(100);
 
@@ -202,28 +205,31 @@ class SimulatorTest {
 
     @Test
     void determinism_differentSeedMayDiffer() {
-        // Mit unterschiedlichem Seed kann der Endzustand abweichen (in P1 nicht, da kein
-        // Zufall in der Physik — aber der Test etabliert die API für P3)
-        RailGraph g = singleEdgeGraph(500.0, 0.0);
-        Edge edge = firstEdge(g);
+        // Hinweis: In P2 ist Wear rein deterministisch (keine stochastische Komponente).
+        // Der seed wird im rng vorgehalten für zukünftige Nutzung (P3/P5), aber nicht für Wear.
+        // Mit deterministischem Wear: verschiedene Seeds → gleiche Ergebnisse.
+        // Sobald stochastischer Verschleiß gewünscht ist, diesen Test auf assertNotEquals ändern.
+        RailGraph g1 = singleEdgeGraph(500.0, 0.0);
+        Edge edge1 = firstEdge(g1);
+        RailGraph g2 = singleEdgeGraph(500.0, 0.0);
+        Edge edge2 = firstEdge(g2);
         Consist consist = new Consist(1, 40_000.0, 0.0);
 
         PowerGrid grid1 = new PowerGrid(new FixedSupply(), 1000.0);
         Simulator sim1 = new Simulator(grid1, 1L);
-        Token t1 = new Token(1L, consist, 200_000.0, edge, 0.0);
+        Token t1 = new Token(1L, consist, 200_000.0, edge1, 0.0);
         sim1.addToken(t1);
         sim1.run(100);
 
         PowerGrid grid2 = new PowerGrid(new FixedSupply(), 1000.0);
         Simulator sim2 = new Simulator(grid2, 2L);
-        Token t2 = new Token(1L, consist, 200_000.0, edge, 0.0);
+        Token t2 = new Token(1L, consist, 200_000.0, edge2, 0.0);
         sim2.addToken(t2);
         sim2.run(100);
 
-        // In P1 (kein Zufall in Physik) sind sie gleich — das ist ok, der Test dokumentiert
-        // die Erwartung. P3/P5 fügen Zufall hinzu, dann unterscheiden sie sich.
+        // Mit deterministischem Wear: Seed beeinflusst das Ergebnis nicht
         assertEquals(t1.progressMeters(), t2.progressMeters(), TOLERANCE,
-            "P1: kein Zufall in Physik → gleicher Endzustand trotz unterschiedlichem Seed");
+            "P2: deterministischer Wear → gleicher Endzustand trotz unterschiedlichem Seed");
     }
 
     // --- Simulator ruft Physics.requiredPowerW auf (Regel 2 — kein Formel-Duplikat) ---

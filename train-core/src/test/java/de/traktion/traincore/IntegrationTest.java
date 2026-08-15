@@ -120,21 +120,24 @@ class IntegrationTest {
 
     @Test
     void determinism_twoRunsSameSeedSameEndState() {
-        RailGraph g = singleEdgeGraph(500.0, 0.0);
-        Edge edge = firstEdge(g);
+        // Wichtig: separate Edge-Instanzen für jeden Lauf (Wear modifiziert die Edge)
+        RailGraph g1 = singleEdgeGraph(500.0, 0.0);
+        Edge edge1 = firstEdge(g1);
+        RailGraph g2 = singleEdgeGraph(500.0, 0.0);
+        Edge edge2 = firstEdge(g2);
         Consist consist = new Consist(1, 40_000.0, 0.0);
 
         // Lauf 1
         PowerGrid grid1 = new PowerGrid(new FixedSupply(), 1000.0);
         Simulator sim1 = new Simulator(grid1, 77L);
-        Token t1 = new Token(1L, consist, 200_000.0, edge, 0.0);
+        Token t1 = new Token(1L, consist, 200_000.0, edge1, 0.0);
         sim1.addToken(t1);
         sim1.run(200);
 
-        // Lauf 2 — gleicher Seed, gleicher Graph, gleicher Consist
+        // Lauf 2 — gleicher Seed, separate Edge-Instanz
         PowerGrid grid2 = new PowerGrid(new FixedSupply(), 1000.0);
         Simulator sim2 = new Simulator(grid2, 77L);
-        Token t2 = new Token(1L, consist, 200_000.0, edge, 0.0);
+        Token t2 = new Token(1L, consist, 200_000.0, edge2, 0.0);
         sim2.addToken(t2);
         sim2.run(200);
 

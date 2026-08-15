@@ -64,15 +64,10 @@ public final class Wear {
             return;
         }
 
-        // Deterministischer Verschleiß + kleine stochastische Komponente (±5%)
-        // nutzt den gesäten rng → deterministisch bei gleichem seed
-        double factor = 1.0;
-        if (rng != null) {
-            // ±5% Variation
-            factor = 1.0 + (rng.nextDouble() - 0.5) * 0.10;
-        }
-
-        double delta = -WEAR_COEFFICIENT * massKg * speedMps * dtSeconds * factor;
+        // Deterministischer Verschleiß (keine stochastische Komponente — der gesäte rng
+        // in Simulator ist für zukünftige Nutzung (P3/P5), nicht für Wear-Streuung.
+        // Regel 8: deterministisch bei gleichem Seed.
+        double delta = -WEAR_COEFFICIENT * massKg * speedMps * dtSeconds;
 
         // Rail degradiert
         double newRail = edge.railCondition() + delta;

@@ -141,8 +141,8 @@ public final class Simulator {
         // Regel 2: Bedarf aus der EINEN Physikfunktion (kein Duplikat)
         double reqW = Physics.requiredPowerW(consist, v, gradient);
 
-        // Angebot: Token fragt sein Leistungsbudget an (mit Spannungsabfall)
-        double availW = powerGrid.availableW(token.maxPowerW(), distanceOnEdge, dt);
+        // Angebot: Token fragt sein Leistungsbudget an (mit Spannungsabfall, T-D5)
+        double availW = powerGrid.availableW(token.maxPowerW(), distanceOnEdge, edge.effectiveCondition(), dt);
 
         // Überschuss (negativ bei Unterversorgung → Bremsung, Z3)
         double excessW = availW - reqW;

@@ -2,8 +2,6 @@ package de.traktion.traincore;
 
 import org.junit.jupiter.api.Test;
 
-import java.util.Random;
-
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
@@ -128,28 +126,6 @@ class WearTest {
                 Wear.accumulate(e, 50_000, 10.0, 0.0, null));
         assertThrows(IllegalArgumentException.class, () ->
                 Wear.accumulate(e, 50_000, 10.0, -0.01, null));
-    }
-
-    @Test
-    void accumulate_withRng_producesDifferentResults() {
-        Edge e1 = freshEdge();
-        Edge e2 = freshEdge();
-
-        // Same seed → same random factor → same result
-        Random rng1 = new Random(42);
-        Random rng2 = new Random(42);
-
-        for (int i = 0; i < 100; i++) {
-            Wear.accumulate(e1, 50_000, 10.0, 0.05, rng1);
-        }
-
-        for (int i = 0; i < 100; i++) {
-            Wear.accumulate(e2, 50_000, 10.0, 0.05, rng2);
-        }
-
-        // With same seed, results should be identical (determinism)
-        assertEquals(e1.railCondition(), e2.railCondition(), 1e-9,
-                "same seed should produce same wear");
     }
 
     @Test
