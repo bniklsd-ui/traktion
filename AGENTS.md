@@ -20,6 +20,14 @@ Referenzierte Dateien werden **nicht** automatisch geladen. Öffne sie selbst, w
 Header-Card oder ein Verweis dich dorthin schickt. Lies das Minimum, das die Layer erlauben,
 aber überspringe nie das Verständnis des Codes, den eine Änderung berührt.
 
+## Modell-Politik
+
+**Standard-Arbeitstier:** `minimax-coding-plan/MiniMax-M2.7`
+**Pläne & schwieriges Debugging:** `minimax-coding-plan/MiniMax-M3`
+
+> **Historie:** GLM 5.2 (NVIDIA NIM) wurde bis einschließlich P1 genutzt, aber aufgrund
+> schwieriger Nutzung abgelöst. Bezahlter Token-Plan von Minimax als Nachfolger.
+
 ## Harte Grenzen (Plan §3, gekürzt)
 
 - Kein `net.minecraft.*`, kein NBT, kein `ItemStack` in `train-core`.

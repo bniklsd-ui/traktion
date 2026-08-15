@@ -1,7 +1,7 @@
 ---
 description: Schreibt den Phasenplan für Traktion. Schreibt keinen Code, führt nichts aus.
 mode: primary
-model: nvidia/z-ai/glm5.2
+model: minimax-coding-plan/MiniMax-M3
 temperature: 0
 permission:
   read:

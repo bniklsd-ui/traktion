@@ -1,7 +1,7 @@
 ---
 description: Führt einen Phasenplan von Traktion aus. TDD, atomare Commits.
 mode: primary
-model: nvidia/z-ai/glm5.2
+model: minimax-coding-plan/MiniMax-M2.7
 temperature: 0
 permission:
   read:
