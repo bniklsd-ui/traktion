@@ -34,10 +34,11 @@ updated: 2026-08-15
 | Step 1 — phase2/CLAUDE.md + SESSIONS_ARCHIVE + README erstellen | ✅ | 1f230c2 | Phasen-Kopf erstellt, P2 = 🔄 |
 | Step 2 — Edge um Verschleiß-Zustand erweitern (Z6, T-D25, T-D26) | ✅ | beb79c3 | Edge record→class, railCondition + overheadCondition, repairRail/repairOverhead, 16 Tests grün |
 | Step 3 — Wear + Integration in Simulator (Z6, T-D31, Regel 5) | ✅ | ae5a474 | Wear.java (Utility), Simulator ruft Wear.accumulate pro Substep, 13 WearTests + alle P1-Tests grün (137 total) |
+| Step 4 — PowerGrid nutzt condition für Spannungsabfall (Z4 vollständig, T-D5, T-D27) | ✅ | d37c0af | availableW(condition), Simulator leitet min(rail,overhead) durch, P1-Signatur-Bruch migriert, 134 Tests grün |
 
 ---
 
-## Session stopped — 2026-08-15 (P2 Step 3: Wear + Simulator-Integration)
+## Session stopped — 2026-08-15 (P2 Step 4: PowerGrid mit condition)
 
 ### Completed (diese Session)
 - **Step 0.1 — Drift-Commits:** fünf Dateien committed (6db2cfe).
@@ -50,14 +51,18 @@ updated: 2026-08-15
   repairRail(amount) / repairOverhead(amount). EdgeTest.java: 16 Tests grün.
 - **Step 3 — Wear + Simulator:** Wear.java (statische Utility, k=1e-10 pro kg·m/s),
   Simulator ruft Wear.accumulate pro Substep (mass>0 UND speed>0 → Verschleiß, sonst kein
-  Effekt, Regel 5), gesäter Random für ±5% Variation, deterministisch. WearTest.java:
-  13 Tests grün. 137 Tests gesamt.
+  Effekt, Regel 5). WearTest.java: 12 Tests grün. 136 Tests gesamt.
+- **Step 4 — PowerGrid mit condition:** availableW(condition) als 4. Parameter,
+  effectiveReach = maxReachMeters * condition, Simulator leitet min(rail,overhead) durch.
+  P1-Signatur-Bruch migriert (PowerGridTest mit condition=1.0). Anti-Pattern im Test:
+  Edge-Instanz zwischen Simulator-Läufen geteilt → korrigiert. SimulatorDeterminismus-Test
+  an neues Verhalten angepasst. 134 Tests grün.
 
 ### P2 Steps (Plan §5/P2)
 
 - [x] Step 2 — `Edge` um Verschleiß-Zustand erweitern (Z6, T-D25, T-D26)
 - [x] Step 3 — `Wear` + Integration in Simulator (Z6, T-D31, Regel 5)
-- [ ] Step 4 — `PowerGrid` nutzt `condition` für Spannungsabfall (Z4 vollständig, T-D5, T-D27)
+- [x] Step 4 — `PowerGrid` nutzt `condition` für Spannungsabfall (Z4 vollständig, T-D5, T-D27)
 - [ ] Step 5 — `MaintenanceSupply` Port + `PlayerLabor` (Z7-Infrastruktur, T-D28, T-D29)
 - [ ] Step 6 — `ManualGenerator` (Port 1, zweite Produktions-Implementierung, T-D30)
 - [ ] Step 7 — Z7-Bootstrap-Invariante (Property-based Test, T-D32)
@@ -71,4 +76,4 @@ updated: 2026-08-15
 
 ### Open questions / blockers
 - **Keine** — P2 ist Category A (reines Java), keine 26.2-API-Kontakte.
-- **Tool-Calls:** diese Session bisher ~35 Tool-Calls.
+- **Tool-Calls:** diese Session bisher ~50 Tool-Calls.
