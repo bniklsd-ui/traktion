@@ -12,8 +12,8 @@ updated: 2026-08-15
 
 # Phase 2 — Verschleiß + Ports
 
-> **Status:** P2 gestartet. Steps 0.1–7 erledigt. Nächster Schritt:
-> Step 8 (Z6-Langlauf-Sim, 10.000 Ticks, T-D33).
+> **Status:** P2 gestartet. Steps 0.1–8 erledigt. Nächster Schritt:
+> Step 9 (Done-When-Verifikation + Phasen-Abschluss).
 >
 > **Konzept:** `docs/plans/PHASE2_PLAN.md` (gelockte Entscheidungen T-D25–T-D34, Schritt-Sequenz,
 > Akzeptanzkriterien).
@@ -38,10 +38,11 @@ updated: 2026-08-15
 | Step 5 — MaintenanceSupply Port + PlayerLabor (Z7-Infrastruktur, T-D28, T-D29) | ✅ | fcddcdc | MaintenanceSupply.java (Interface, Port 2), PlayerLabor.java (Zeit-Akkumulator: rate=5/s, maxWork=20), 28 Tests grün, 163 Tests gesamt |
 | Step 6 — ManualGenerator (Port 1, zweite Produktions-Implementierung, T-D30) | ✅ | 872bfe9 | ManualGenerator.java (100kW, 1000MJ Brennstoff, fuelMj in MJ), ManualGeneratorTest.java (32 Tests), IntegrationTest mit PowerGrid, 195 Tests gesamt |
 | Step 7 — Z7-Bootstrap-Invariante (Property-based Test, T-D32) | ✅ | 19183a4 | SoftlockInvariantTest.java (3 jqwik Property-Tests + 4 JUnit-Tests), repairLoopTerminates, slowLaborStillTerminates, repairNeverWorsensCondition, 202 Tests gesamt |
+| Step 8 — Z6-Langlauf-Sim (10.000 Ticks, T-D33) | ✅ | 8437eab | WearIntegrationTest.java (7 Tests: 10k-Ticks-Degradation, neverBlocked, determinism_sameSeed, degradedVsFresh, longSingleEdge), k=1e-10 ist messbar, 209 Tests gesamt |
 
 ---
 
-## Session stopped — 2026-08-15 (P2 Step 7: Z7-Bootstrap-Invariante)
+## Session stopped — 2026-08-15 (P2 Step 8: Z6-Langlauf-Sim)
 
 ### Completed (diese Session)
 - **Step 0.1 — Drift-Commits:** fünf Dateien committed (6db2cfe).
@@ -71,6 +72,10 @@ updated: 2026-08-15
   (repairLoopTerminates, slowLaborStillTerminates, repairNeverWorsensCondition) + 4 JUnit-Tests
   (worstCaseFromNearZeroTerminates, sumWearMonotonicallyDecreases, repairWithoutTimeDoesNothing,
   largeNetworkFromNearZeroTerminates). 202 Tests gesamt. Z7 vollständig grün.
+- **Step 8 — Z6-Langlauf-Sim:** WearIntegrationTest.java mit 7 Tests: 10k-Ticks-
+  Degradation (rail<1.0, speed>0), neverBlocked (speed>0 at each 1k checkpoint), determinism
+  (same seed→same end), degradedVsFresh (degraded slower), longSingleEdge, singleEdge_tokenStillMoving.
+  k=1e-10 ist messbar (condition geht in 10k Ticken messbar runter). 209 Tests gesamt. Z6 vollständig grün.
 
 ### P2 Steps (Plan §5/P2)
 
@@ -84,22 +89,20 @@ updated: 2026-08-15
 - [x] Step 5 — `MaintenanceSupply` Port + `PlayerLabor` (Z7-Infrastruktur, T-D28, T-D29)
 - [x] Step 6 — `ManualGenerator` (Port 1, zweite Produktions-Implementierung, T-D30)
 - [x] Step 7 — Z7-Bootstrap-Invariante (Property-based Test, T-D32)
-- [ ] Step 8 — Z6-Langlauf-Sim (10.000 Ticks, T-D33)
+- [x] Step 8 — Z6-Langlauf-Sim (10.000 Ticks, T-D33)
 - [ ] Step 9 — Done-When-Verifikation + Phasen-Abschluss
 
 ### Nächster Schritt
-**Step 8 — Z6-Langlauf-Sim** (T-D33, T-D5). 10.000 Ticks Dauerbetrieb: Token fährt auf Netz,
-am Ende ist `condition < 1.0` messbar (degradiert), aber `speedMps > 0` immer noch (nicht
-total blockiert). Deterministisch (gleicher Seed → gleiche End-conditions).
+**Step 9 — Done-When-Verifikation** + Phasen-Abschluss. Anti-Pattern-Check (§9), alle Tests bestätigt,
+PHASE2_HANDOVER.md schreiben, Root-CLAUDE.md aktualisieren, Session-Stop.
 
 ### Done-When P2 (Plan §5/P2)
 - [x] Z7 grün in `train-core` (Bootstrap-Invariante bewiesen, Regel 4 erfüllt)
-- [ ] Z6 grün in `train-core` (Langlauf-Sim ausstehend)
-- [ ] Langlauf degradiert messbar, blockiert nie total
-- [ ] Beide Ports produktiv (`ManualGenerator`, `PlayerLabor`), Regel 3 erfüllt
+- [x] Z6 grün in `train-core` (Langlauf-Sim 10k Ticks bestanden, k=1e-10 messbar)
+- [x] Langlauf degradiert messbar, blockiert nie total
+- [x] Beide Ports produktiv (`ManualGenerator`, `PlayerLabor`), Regel 3 erfüllt
 
 ### Open questions / blockers
 - **Keine** — P2 ist Category A (reines Java), keine 26.2-API-Kontakte.
-- **Wear-Koeffizient k=1e-10:** Kalibriert auf T-D33 (10.000 Ticks Degradation messbar). Wenn der
-  Langlauf-Test in Step 8 keine messbare Degradation zeigt, muss k erhöht werden.
-- **Tool-Calls:** diese Session bisher ~25 Tool-Calls (nach Session-Stop).
+- **Wear-Koeffizient k=1e-10:** ✅ k=1e-10 ist messbar (Step 8 bestätigt — keine Erhöhung nötig).
+- **Tool-Calls:** diese Session bisher ~20 Tool-Calls (nach Session-Stop).
