@@ -31,23 +31,26 @@ updated: 2026-08-15
 | Step 0.1 — Drift-Commits sync (CLAUDE/ARCHITECTURE/README/phase1/*) | ✅ | 6db2cfe | Fünf Dateien committed |
 | Step 0.2 — P1-Trials Rohdaten an Nikinger | ✅ | 718b6db | Modell korrigiert: glm-5.2 → minimax-coding-plan/MiniMax-M2.7 |
 | Step 0b — Doc-Drift prüfen | ✅ | — | Keine Drift gefunden (leer, wie vom Plan erwartet) |
-| Step 1 — phase2/CLAUDE.md + SESSIONS_ARCHIVE + README erstellen | 🔄 | (dieser Commit) | Phasen-Kopf erstellt, P2 = 🔄 |
+| Step 1 — phase2/CLAUDE.md + SESSIONS_ARCHIVE + README erstellen | ✅ | 1f230c2 | Phasen-Kopf erstellt, P2 = 🔄 |
+| Step 2 — Edge um Verschleiß-Zustand erweitern (Z6, T-D25, T-D26) | ✅ | (dieser Commit) | Edge record→class, railCondition + overheadCondition, repairRail/repairOverhead, 16 Tests grün |
 
 ---
 
-## Session stopped — 2026-08-15 (P2 Step 1: Phase2-Kopf erstellt)
+## Session stopped — 2026-08-15 (P2 Step 2: Edge erweitert)
 
 ### Completed (diese Session)
 - **Step 0.1 — Drift-Commits:** fünf Dateien committed (6db2cfe).
 - **Step 0.2 — P1-Trials:** Rohdaten an Nikinger geliefert, Modell korrigiert (glm-5.2 →
   minimax-coding-plan/MiniMax-M2.7), Zeile eingetragen und committed (718b6db).
 - **Step 0b — Doc-Drift:** keine Drift gefunden (leer).
-- **Step 1 — phase2/CLAUDE.md:** erstellt mit Header-Card, Build-Log (Steps 0.1/0.2/0b ✅,
-  Step 1 🔄), Session-stopped-Block.
+- **Step 1 — phase2/CLAUDE.md:** erstellt mit Header-Card, Build-Log, Session-stopped-Block (1f230c2).
+- **Step 2 — Edge erweitert:** Edge von Record zu final class konvertiert mit railCondition +
+  overheadCondition (double ∈ [0,1], Default 1.0), effectiveCondition() = min(beide),
+  repairRail(amount) / repairOverhead(amount). EdgeTest.java: 16 Tests grün. 121 Tests gesamt.
 
 ### P2 Steps (Plan §5/P2)
 
-- [ ] Step 2 — `Edge` um Verschleiß-Zustand erweitern (Z6, T-D25, T-D26)
+- [x] Step 2 — `Edge` um Verschleiß-Zustand erweitern (Z6, T-D25, T-D26)
 - [ ] Step 3 — `Wear` + Integration in Simulator (Z6, T-D31, Regel 5)
 - [ ] Step 4 — `PowerGrid` nutzt `condition` für Spannungsabfall (Z4 vollständig, T-D5, T-D27)
 - [ ] Step 5 — `MaintenanceSupply` Port + `PlayerLabor` (Z7-Infrastruktur, T-D28, T-D29)
@@ -63,4 +66,4 @@ updated: 2026-08-15
 
 ### Open questions / blockers
 - **Keine** — P2 ist Category A (reines Java), keine 26.2-API-Kontakte.
-- **Tool-Calls:** diese Session bisher ~12 Tool-Calls.
+- **Tool-Calls:** diese Session bisher ~25 Tool-Calls.
