@@ -1,15 +1,16 @@
 ---
-status: plan (ausführungsreif für P3)
-purpose: Phasenplan für P3 — Planer (Z5 — Kern-Orakel). Architektur-Entscheidungen, Schritt-Sequenz, Testlisten, Akzeptanzkriterien. `Planner.predict(route, consist, netState, …) → Optional<RouteForecast>`, asymmetrisch zum Simulator (grobe Auflösung, ein Zug, kein Verkehr), aber **dieselbe** `Physics.requiredPowerW` (Regel 2). Engpass-Erkennung, Soll/Ist-Vergleich (Z11-Kern-Anteil), Z5 property-based.
+status: plan (ausführungsreif für P3; Step 8 präzisiert durch Sub-Plan nach M3-Konsultation 2026-08-16)
+purpose: Phasenplan für P3 — Planer (Z5 — Kern-Orakel). Architektur-Entscheidungen, Schritt-Sequenz, Testlisten, Akzeptanzkriterien. `Planner.predict(route, consist, netState, …) → Optional<RouteForecast>`, asymmetrisch zum Simulator (grobe Auflösung, ein Zug, kein Verkehr), aber **dieselbe** `Physics.requiredPowerW` (Regel 2). Engpass-Erkennung, Soll/Ist-Vergleich (Z11-Kern-Anteil), Z5 property-based. **Step 8 ab Sub-Plan `PHASE3_STEP8_PLAN.md` (M3-Befund, 2026-08-16) — T-D51/T-D52/T-D53/T-D54 präzisieren T-D42 und dokumentieren die strukturelle Planer-Modell-Lücke.**
 read-when: Ausführung von P3; vor jedem P3-Schritt; Referenz für §5/P3 Watchpunkte (Regel-2-Verstoß, Z5-Tautologie)
 detail: L2
 up: ../TRAKTION_OVERALL_PLAN.md
 down:
   - ../docs/CONVENTIONS.md         # Logging, Testmatrix, Root-Layout
   - ./PHASE2_HANDOVER.md           # Vorphase — P2-Abschluss, Watchpunkte, offene P3-Fragen
+  - ./PHASE3_STEP8_PLAN.md         # Sub-Plan für Step 8 nach M3-Befund (T-D51–T-D54)
 related: ../phase3/CLAUDE.md        # Phasen-Kopf (vom ausführenden Agenten als erste Aktion erstellt)
 supersedes: (kein Vorläufer)
-updated: 2026-08-15
+updated: 2026-08-16
 ---
 
 # Phase 3 — Planer
@@ -42,14 +43,14 @@ updated: 2026-08-15
 
 | # | Thema | Lock | Status |
 |---|---|---|---|
-| **T-D35** | Planer-Auflösung | **Pro Kante, analytisch** (T-D14: "grob"). Kein Sub-Tick. Der Planer integriert über die Kantenlänge mit konstantem Reibungs-/Steigungs-/Luft-Modell und dem `PowerGrid`-Angebot; pro Kante wird eine Fahrzeit berechnet und über die Route summiert. Granularität pro Kante reicht für Z5 (≤ 5% Abweichung gegen den numerischen Simulator) — der Simulator integriert feiner (Sub-Tick, T-D13), der Planer integriert gröber (pro Kante). Dieselbe Physikfunktion (Regel 2), zwei Auflösungen. | gelockt (Nikinger, 2026-08-15) |
+| **T-D35** | Planer-Auflösung | **Pro Kante, analytisch** (T-D14: "grob"). Kein Sub-Tick. Der Planer integriert über die Kantenlänge mit konstantem Reibungs-/Steigungs-/Luft-Modell und dem `PowerGrid`-Angebot; pro Kante wird eine Fahrzeit berechnet und über die Route summiert. Granularität pro Kante reicht für Z5 (≤ 5% Abweichung gegen den numerischen Simulator) — der Simulator integriert feiner (Sub-Tick, T-D13), der Planer integriert gröber (pro Kante). Dieselbe Physikfunktion (Regel 2), zwei Auflösungen. **Empirischer Befund (M3-Konsultation, 2026-08-16):** die Annahme "≤ 5% Abweichung pro Kante" hält **nicht im gesamten Definitionsbereich** — der Planer divergiert strukturell vom Simulator durch fehlende Beschleunigungsphase und fehlenden distanzabhängigen Spannungsabfall. Der Befund wird im `PHASE3_HANDOVER.md` §Modell-Gap dokumentiert (T-D53). **T-D35 bleibt gelockt** in P3; ein Revisions-Vorschlag (grobe numerische Integration pro Kante, 10–20 Sub-Steps mit dt im Sekunden-Bereich) ist als T-D54 im `PHASE3_STEP8_PLAN.md` für die Folgephase P3.5/P4 dokumentiert. | gelockt (Nikinger, 2026-08-15), empirischer Befund (M3, 2026-08-16) |
 | **T-D36** | Planer ignoriert Verkehr | **Asymmetrie zum Simulator** (T-D14): keine Reservierungen, keine `BlockSection`, keine Token-Interaktion. Der Planer nimmt **einen** Zug an, nicht mehrere. Override / Fahrplan kommen in P5 — in P3 nur als Vertragsgrenze dokumentiert ("fremder Verkehr → nicht anwendbar"), nicht erzwungen. | gelockt (Nikinger, 2026-08-15) |
 | **T-D37** | `Planner`-Klasse | **Statische Utility** wie `Physics` und `Wear` — `predict(...)` als statische Methode, keine Instanzen. Aufruf: `Planner.predict(route, consist, netState, …) → Optional<RouteForecast>`. Regel 2: ruft `Physics.requiredPowerW` auf, dupliziert die Formel nicht. | gelockt (Nikinger, 2026-08-15) |
 | **T-D38** | `RouteForecast`-Record | Daten-Record, unveränderlich. Felder: `sollFahrzeitSekunden` (Planer-Prognose mit `condition = 1.0` überall) · `istFahrzeitSekunden` (Planer-Prognose mit aktuellem `netState`) · `deltaProzent` (= `(ist − soll) / soll × 100`) · `bottlenecks` (Top-3-Liste von `Bottleneck`, nach Beitrag sortiert). | gelockt (Nikinger, 2026-08-15) |
 | **T-D39** | `Bottleneck`-Record | Daten-Record. Felder: `edge` (`Edge`-Referenz) · `art` (Enum `BottleneckArt ∈ {SPANNUNG, STEIGUNG, KOMBI}`) · `beitragSekunden` (geschätzter Beitrag zur Fahrzeit-Verlängerung). | gelockt (Nikinger, 2026-08-15) |
 | **T-D40** | Rückgabetyp `Optional<RouteForecast>` | **Vertragsgrenze als leere Optional** (statt Exception): Gründe sind (a) `effectiveCondition() == 0` auf mindestens einer Kante der Route (P2-Handover A.3) · (b) leere Route · (c) `Consist` mit `totalMassKg() == 0` · (d) `maxPowerW <= 0`. Keine Exception im Normalbetrieb — der Property-Test mit 1000+ Fällen würde sonst Exception-Spam erzeugen. | gelockt (Nikinger, 2026-08-15) |
 | **T-D41** | Harter Fehler vs. "nicht anwendbar" | **`IllegalArgumentException` bei**: (e) Route nicht zusammenhängend (`route[i].to() != route[i+1].from()`) · `null`-Argumente. Das sind **Invariante-Verstöße**, nicht "nicht anwendbar"-Fälle. Optional.empty nur für die in T-D40 gelisteten vier Gründe. | gelockt (Nikinger, 2026-08-15) |
-| **T-D42** | Z5-Property-Test | **Mit jqwik 1.9.0** (T-D20, in P1 aktiviert und in P1+P2 verifiziert). Generator: zufällige **Routen in einem festen kleinen Test-Graphen** (3–7 Kanten, A→B), zufällige `condition ∈ [0, 1]` auf den Edges, zufällige `gradient ∈ [-0.05, 0.05]`, zufällige `maxPowerW` im sinnvollen Bereich. Akzeptanz: `\|planner.predict(r).istFahrzeit − simulator.runRoute(r)\| / simulator.runRoute(r) < 0.05` für **mindestens 1000 generierte Fälle**. Fälle mit `condition == 0` werden aussortiert (Empty) und nicht in die Z5-Akzeptanz gezählt. | gelockt (Nikinger, 2026-08-15) |
+| **T-D42** | Z5-Property-Test | **Mit jqwik 1.9.0** (T-D20, in P1 aktiviert und in P1+P2 verifiziert). **Präzisiert durch T-D51/T-D52 im Sub-Plan `PHASE3_STEP8_PLAN.md` (M3-Befund, 2026-08-16):** Generator erzeugt zufällige Routen in einem **festen kleinen Test-Graphen** (3 Kanten, 500 m), zufällige `condition ∈ [0.7, 1.0]` (**Kernelbereich**, T-D51), zufällige `gradient ∈ [-0.03, 0.03]`, zufällige `maxPowerW ∈ [200 kW, 3 MW]`, zufällige `startSpeedMps ∈ [0, 10]`. Akzeptanz im Kernelbereich: `\|planner.predict(r).istFahrzeit − simulator.runRoute(r)\| / simulator.runRoute(r) < 0.05` für **mindestens 1000 generierte Fälle**. Fälle mit `condition == 0` werden aussortiert (Empty) und nicht in die Z5-Akzeptanz gezählt. **JUnit-Edge-Cases (T-D52):** `longEdge`-Test entfernt (testet Reichweiten-Erschöpfung, die der Planner per T-D35 nicht abbildet); `gradient`/`startSpeed`-Tests zu Monotonie/Plausibilität recastet (statt 5%-Vergleich). **Strukturelle Lücke** (zwei Befunde: Beschleunigungsphase, distanzabhängiger Spannungsabfall) wird im `PHASE3_HANDOVER.md` §Modell-Gap dokumentiert (T-D53). | gelockt (Nikinger, 2026-08-15), präzisiert (Nikinger, 2026-08-16) |
 | **T-D43** | Bottleneck-Beitrag-Berechnung | Agent entscheidet (Detailgrad-Konstante, M1_PREREGISTRATION §2). Akzeptanz: Bottleneck-Liste ist nach `beitragSekunden` **absteigend** sortiert, maximal **3 Einträge**, jede Bottleneck hat eine plausible Größenordnung (`beitragSekunden > 0` wenn die auslösende Bedingung verletzt ist; `beitragSekunden == 0` ist erlaubt, wenn der Beitrag null ist, wird der Bottleneck nicht aufgenommen). | gelockt (Nikinger, 2026-08-15) |
 | **T-D44** | Planer nutzt Physikfunktion direkt | **Regel 2:** der Planer ruft `Physics.requiredPowerW(consist, speedMps, gradient)` auf, **nicht** eine eigene Variante. Eine zweite Implementierung derselben Formel ist ein **Regel-2-Verstoß** (§9) — protokollieren, nicht stillschweigend korrigieren (Plan §5/P3 Watch). | gelockt (Nikinger, 2026-08-15) |
 | **T-D45** | Determinismus des Planers | **Deterministisch per Konstruktion** — der Planer ist analytisch, hat keinen `Random`. Optional: ein gesäter RNG, falls eine Modellkomponente Stochastik braucht (analog zu `Simulator.rng`, P2-Handover A.2). Akzeptanz: zwei `Planner.predict`-Aufrufe mit gleichen Inputs → **identische** `RouteForecast` (Toleranz wie P1/P2: 1e-9 auf `double`-Feldern). | gelockt (Nikinger, 2026-08-15) |
@@ -514,59 +515,63 @@ pin model-role separation`. Es sind **keine** uncommitted Drift-Dateien zu erwar
 
 ### Step 8 — Z5-Property-Test ≥ 1000 Fälle (T-D42, der Kern-Akzeptanztest)
 
-> T-D42: Property-based Test mit jqwik 1.9.0. Generator erzeugt zufällige Routen in einem
-> **festen kleinen Test-Graphen** (3–7 Kanten, A→B). Pro Fall: zufällige `condition ∈ [0, 1]`
-> auf den Edges, zufällige `gradient ∈ [-0.05, 0.05]`, zufällige `maxPowerW` im sinnvollen
-> Bereich, zufällige `startSpeedMps`.
->
-> Akzeptanz: `|planner.predict(r).istFahrzeit − simulator.runRoute(r)| / simulator.runRoute(r) < 0.05`
-> für **mindestens 1000 generierte Fälle**. Fälle mit `condition == 0` werden aussortiert
-> (Empty, T-D40 (a)) und nicht in die Akzeptanz gezählt — der Planer gibt dann `Optional.empty`
-> zurück, was nicht "falsch" ist, sondern "nicht anwendbar".
->
-> **Wichtig (Plan §4 Z5 Vertragsgrenze):** die Prognose ist **nicht anwendbar** (nicht *falsch*),
-> wenn (a) ein Override aktiv war oder (b) fremder Verkehr die Route belegt hat. In P3 sind beide
-> nicht erzwingbar (Override ist P5, fremder Verkehr ist P5+); die Vertragsgrenze ist nur
-> **dokumentiert** in `Planner.predict` (Javadoc), nicht im Code durchgesetzt.
+> **⚠ Wichtig (2026-08-16):** Step 8 wird im **`PHASE3_STEP8_PLAN.md`** detailliert ausgeführt.
+> Dieser Hauptplan hält nur die Übersicht. Der Sub-Plan entstand nach M3-Konsultation (Plan-Agent
+> für kognitive Aufgaben, 2026-08-16), nachdem der WIP-Commit `0c7db2b` zwei **strukturelle
+> Lücken** im Planer-Modell aufdeckte (Beschleunigungsphase, distanzabhängiger Spannungsabfall).
+> Nikinger hat **Empfehlung A mit Konkretisierungen** angenommen. T-D35 bleibt gelockt; T-D51/T-D52
+> präzisieren T-D42; T-D53 fordert die Modell-Gap-Dokumentation im Handover; T-D54 ist ein
+> Revisions-Vorschlag für die Folgephase P3.5/P4.
 
-**Dateien:**
-- `train-core/src/test/java/de/traktion/traincore/Z5PropertyTest.java` — der Property-Test
+**Übersicht der Sub-Steps (vollständig im Sub-Plan):**
 
-**Typnamen:** keine (nur Test).
+- **Sub-Step 8.1** — `train-core: recast Z5 JUnit edge-cases (M3 Befund, Monotonie statt 5%)`:
+  `longEdge`-Test entfernt, `gradient`/`startSpeed`-Tests zu Monotonie/Plausibilität umgebaut.
+- **Sub-Step 8.2** — `train-core: document Z5 kernelbereich in test (T-D51, M3 Befund)`:
+  `Z5_KERNELBEREICH`-Konstante + Klassen-Javadoc im Test.
+- **Sub-Step 8.3** — `docs: create PHASE3_HANDOVER skeleton with Modell-Gap section (T-D53)`:
+  Skelett des Handover-Dokuments mit der "Modell-Gap"-Sektion (verbatim aus M3-Befund).
+- **Sub-Step 8.4** — `docs: close P3 (Z5 + Z11 green, …, Modell-Gap dokumentiert)`:
+  Step 9 Done-When + Phasen-Abschluss (PHASE3_PLAN.md Step 9 unverändert übernommen).
 
-**Testliste (TDD, T-D42 + Plan §4 Z5 + §5/P3 Akzeptanz):**
-- Property (jqwik): für zufällige `(route, condition, gradient, maxPowerW, startSpeedMps)`
-  gilt: `planner.predict(...).istFahrzeit` ≈ `simulator.runRoute(...)`, **relative Abweichung
-  < 5%** (= `|a − b| / b < 0.05`)
-- Mindestens **1000 Fälle** (jqwik-Default `@Property(tries = 1000)` oder höher)
-- Filter: `condition == 0` → Empty, aussortieren via `Assume.that(...)` oder Generator-Precondition
-- **JUnit-Anker:** ein **deterministischer** Fall mit bekannten Werten, der die Akzeptanz
-  illustriert (z.B. einfache Strecke, ein Soll/Ist-Verhältnis > 1, das zeigt: Planer und
-  Simulator sind im Trend gleich)
-- **Determinismus (Regel 8):** der Test selbst ist deterministisch (jqwik seeded); zwei Läufe
-  liefern die gleiche Anzahl bestandener Fälle
-- **Edge-Case:** Route mit sehr kurzen Kanten (1 m) und sehr langen (10000 m) — die
-  Approximation des Planers wird bei extremen Längen genauer geprüft
-- **Edge-Case:** Route mit starkem Gefälle (`gradient = -0.05`) — Rekuperation wird grob vom
-  Planer modelliert; numerische Abweichung darf hier etwas größer sein, aber < 5%
-- **Edge-Case:** Route mit `startSpeedMps > 0` (der Zug ist bereits in Bewegung) — der Planer
-  muss die Startgeschwindigkeit korrekt weiterverwenden
+**Kernbereich (T-D51, präzisiert):**
+- `condition ∈ [0.7, 1.0]` · `gradient ∈ [-0.03, 0.03]` · `power ∈ [200 kW, 3 MW]` ·
+  `startSpeed ∈ [0, 10] m/s` · Kantenlänge 500 m.
+- Akzeptanz im Kernbereich: relative Abweichung < 5 % über ≥ 1000 Fälle.
+- Außerhalb: strukturelle Divergenz dokumentiert (Modell-Gap), keine Akzeptanz.
 
-**Akzeptanzkriterien:**
-- [ ] Z5-Property-Test mit ≥ 1000 Fällen grün (alle Fälle < 5% Abweichung)
-- [ ] Bei `condition == 0`: `planner.predict` → `Optional.empty`, der Fall wird aussortiert
-      (nicht als "Test-Failure" gezählt)
-- [ ] JUnit-Anker mit deterministischem Fall zeigt: Planer und Simulator sind im Trend gleich
-- [ ] Edge-Cases (kurze Kanten, lange Kanten, Gefälle, Startgeschwindigkeit) halten die 5%-Grenze
-- [ ] **Determinismus (Regel 8):** Test ist deterministisch, gleiche Seed → gleiche Ergebnisse
-- [ ] **`regel2_verstoss`** in M1-Trial: **nein** (genau eine `requiredPowerW`, verifiziert)
-- [ ] **`z5_tautologie`** in M1-Trial: **nein** (Planer ruft `Simulator.runRoute` nicht auf,
-      verifiziert per `grep`)
-- [ ] `gradle :train-core:test` grün
-- [ ] Commit-Message: `train-core: add Z5 property-based test ≥1000 cases (T-D42, Kern-Orakel)`
-- [ ] **Frage an Operator:** "Step 8 erledigt — soll ich mit Step 9 weitermachen?"
+**JUnit-Edge-Cases (T-D52, recastet):**
+- `longEdge`-Test **entfernt** — testet Reichweiten-Erschöpfung, die der Planner per T-D35 nicht abbildet.
+- `gradient`-Test → **Monotonie** (`sDown > sFlat`, `sUp > sFlat`, `sUp > sDown`).
+- `startSpeed`-Test → **Plausibilität** (alle drei Start-Speeds → finite < 300 s).
 
-**Zielzuordnung:** Z5 (Akzeptanz), Z11 (Kern-Anteil, durch vorherige Steps vorbereitet).
+**Modell-Gap (T-D53):** Pflicht-Sektion in `PHASE3_HANDOVER.md` mit (1) zwei strukturellen Lücken
+(Beschleunigung, distanzabhängiger Spannungsabfall), (2) T-D35 als Ursache, (3) Revisions-Vorschlag
+für P3.5/P4. Sektion ist im Sub-Plan verbatim vorgegeben.
+
+**T-D35-Revision (T-D54, Vorschlag für Folgephase):**
+> T-D35 (rev) — Planer-Auflösung: "Pro Kante analytisch ODER grobe numerische Integration pro
+> Kante. Der Planer darf eine grobe numerische Integration über die Kantenlänge durchführen
+> (z.B. 10–20 Sub-Steps mit `dt` im Sekunden-Bereich, nicht im Sub-Tick-Maßstab des Simulators).
+> Die Integration ruft weiterhin `Physics.requiredPowerW` auf (Regel 2) und ist deterministisch
+> (Regel 8)." — **nicht in P3 implementiert**, nur im Handover als Empfehlung dokumentiert.
+
+**Akzeptanzkriterien (für die Sub-Steps 8.1–8.4, vollständig im Sub-Plan):**
+- [ ] Sub-Step 8.1: `longEdge` entfernt + Kommentar; `gradient`/`startSpeed` zu Monotonie/Plausibilität.
+- [ ] Sub-Step 8.2: `Z5_KERNELBEREICH`-Konstanten + Javadoc im Test.
+- [ ] Sub-Step 8.3: `PHASE3_HANDOVER.md` Skelett mit "Modell-Gap"-Sektion.
+- [ ] Sub-Step 8.4: Step 9 Done-When + Phasen-Abschluss vollständig.
+- [ ] Z5-Kerntest ≤ 5 % im Kernelbereich (T-D51).
+- [ ] JUnit-Edge-Cases strukturell konsistent (Monotonie statt 5 %-Vergleich, T-D52).
+- [ ] Modell-Gap im Handover dokumentiert (T-D53).
+- [ ] T-D35 nicht geändert (gelockt, T-D54 nur Empfehlung).
+- [ ] Regel 2 intakt (genau eine `requiredPowerW`).
+- [ ] Z5-Tautologie-Schutz intakt (Planer ruft `Simulator.runRoute` nicht auf).
+- [ ] `gradle :train-core:test` grün.
+
+**Frage an Operator (am Ende jedes Sub-Steps):** "Sub-Step 8.x erledigt — soll ich mit 8.x+1 weitermachen?"
+
+**Zielzuordnung:** Z5 (Akzeptanz), Z11 (Kern-Anteil).
 **Kategorie:** A.
 
 ---
@@ -644,7 +649,7 @@ pin model-role separation`. Es sind **keine** uncommitted Drift-Dateien zu erwar
 - [ ] `Bottleneck` ist korrekt klassifiziert (SPANNUNG/STEIGUNG/KOMBI), sortiert, ≤ 3 (T-D39, T-D43)
 - [ ] Vertragsgrenze: `condition = 0`, leere Route, Masse 0, `maxPowerW ≤ 0` → `Optional.empty` (T-D40)
 - [ ] Harter Fehler: null-Args, nicht-zusammenhängende Route → `IllegalArgumentException` (T-D41)
-- [ ] **Z5-Property-Test ≥ 1000 Fälle grün, kein Fall über 5% Abweichung** (T-D42)
+- [ ] **Z5-Property-Test ≥ 1000 Fälle grün im Kernelbereich, kein Fall über 5% Abweichung** (T-D42 + T-D51/T-D52, Sub-Plan `PHASE3_STEP8_PLAN.md`)
 - [ ] Multi-Edge-Regel-5-Invariante geschlossen (T-D48, P2-Handover E)
 - [ ] `train-core` hat null externe Abhängigkeiten außer Test-Bibliotheken (JUnit, jqwik)
 - [ ] Zwei Läufe mit gleichem Seed liefern bitgleiche Ergebnisse (Regel 8, T-D45)

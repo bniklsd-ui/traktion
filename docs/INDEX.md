@@ -4,7 +4,7 @@ purpose: L0-Karte des Doku-Systems. Eine Zeile pro Doku, Glyph + Größe + read-
 read-when: Session-Start; vor der Suche nach einer Doku; bevor eine neue .md erstellt wird (One-Liner hier ergänzen, im selben Commit)
 detail: L0
 up: ./CLAUDE.md
-updated: 2026-08-15
+updated: 2026-08-16
 ---
 
 # Traktion — Doku-Index
@@ -60,7 +60,8 @@ updated: 2026-08-15
 | 📕 `docs/plans/PHASE1_HANDOVER.md` | L2 | vor P2-Plan-Entwurf; P1-Abschlussanalyse, §9-Check leer, trials-Rohdaten |
 | 📜 `docs/plans/PHASE2_PLAN.md` | L2 | Ausführung von P2; Verschleiß + Ports (Z4-Abschluss, Z6, Z7), T-D25–T-D34, Schritt-Sequenz, Akzeptanzkriterien |
 | 📕 `docs/plans/PHASE2_HANDOVER.md` | L2 | vor P3-Plan-Entwurf; P2-Abschlussanalyse, Z4+Z6+Z7 grün, Ports produktiv, Multi-Edge-Test-Lücke, trials-Rohdaten |
-| 📜 `docs/plans/PHASE3_PLAN.md` | L2 | Ausführung von P3; Planer (Z5, Z11), T-D35–T-D49, Schritt-Sequenz, Akzeptanzkriterien |
+| 📜 `docs/plans/PHASE3_PLAN.md` | L2 | Ausführung von P3; Planer (Z5, Z11), T-D35–T-D50, Schritt-Sequenz, Akzeptanzkriterien |
+| 📜 `docs/plans/PHASE3_STEP8_PLAN.md` | L2 | Ausführung von P3 Step 8 nach M3-Befund; T-D51/T-D52/T-D53/T-D54 (Kernelbereich, JUnit-Recast, Modell-Gap-Handover, T-D35-Revisions-Vorschlag) |
 
 ## Messung (M1-Strang)
 

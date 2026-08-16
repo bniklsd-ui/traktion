@@ -7,7 +7,7 @@ up: ../CLAUDE.md
 down:
   - ../docs/plans/PHASE3_PLAN.md      # Konzept/Plan, aus dem P3 gebaut wird
   - ./SESSIONS_ARCHIVE.md             # alte Session-stopped-Blöcke
-updated: 2026-08-15
+updated: 2026-08-16
 ---
 
 # Phase 3 — Planer
@@ -38,7 +38,7 @@ updated: 2026-08-15
 | Step 5 — Bottleneck-Klassifikation (T-D39/T-D43) | ✅ | a30c6bd | 256 Tests grün (+8 neue: SPANNUNG/STEIGUNG/KOMBI/KOMBI/sorted/max3/empty/deterministic), computeBottlenecks mit marginalem Zeitbeitrag, Klassifikation nach Art, Top-3 Sortierung |
 | Step 6 — Multi-Edge-Regel-5-Invariante (T-D48, P2-Handover E) | ✅ | 5c66d59 | 6 Tests: tokenOnEdgeA/edgeBUntouched, tokenTraversesABtoC, longRunOnEdgeA, manualMoveToEdge, tokenReachesEndOfEdgeA, determinism (alle grün). Kern-Invariante: nur befahrene Kanten degradieren; unberührte bleiben auf 1.0. Nutzt moveToEdge() für kontrollierte Sequenz — Verschleiß pro Tick ist minimal (k=1e-10), daher direkte Edge-Manipulation statt 1000+ Ticks auf einer Kante zu warten. |
 | Step 7 — Simulator.runRoute() Test-Harness (T-D47) | ✅ | d31d8f3 | 11 Tests: empty/null/invalid route, singleEdge, twoEdge, degradedCondition, positiveGradient, determinism (2), startSpeedPositive, nonContiguous, Z5AntiPattern-Dokumentation. maxReachMeters=2000 (condition wirkt auf 500m-Kanten). ManualGenerator 10MW/1e9MJ fuel. Z5-Tautologie-Schutz verifiziert (grep Planner→runRoute: leer). |
-| Step 8 — Z5-Property-Test ≥ 1000 Fälle (T-D42, Kern-Orakel) | ⏳ | — | — |
+| Step 8 — Z5-Property-Test ≥ 1000 Fälle (T-D42, Kern-Orakel) | ⏳ | — | M3-Befund 2026-08-16: zwei strukturelle Lücken im Planer-Modell (Beschleunigung, distanzabhängiger Spannungsabfall). Nikinger-Entscheidung: Empfehlung A mit Konkretisierungen. Sub-Plan `PHASE3_STEP8_PLAN.md` erstellt mit T-D51/T-D52/T-D53/T-D54 — Build-Agent führt Sub-Steps 8.1–8.4 in nächster Session aus. |
 | Step 9 — Done-When-Verifikation + Phasen-Abschluss | ⏳ | — | — |
 
 ---
@@ -76,3 +76,104 @@ updated: 2026-08-15
 - **B:** JUnit-Tests auf Monotonie (degraded>Soll) umbauen ohne direkten 5%-Vergleich
 - (Edge-Case-Tests mit 10% tolerieren, ohne explizite Entscheidung)
 - **Offene Frage:** Ist die 5%-Toleranz in T-D42 wirklich notwendig oder ist die Monotonie (Trend-Gleichheit) das eigentlich wichtige Z5-Indikator?
+
+---
+
+### M3 Plan-Agent Konsultation (2026-08-16) — Empfehlung ausstehend
+
+> **Modell-Rollen-Trennung seit P2:** M3 ist Plan-Agent (kognitive Aufgaben, kein Domänen-Code).
+> Nikinger hat M3 wegen der schwierigen Modellierungs-Entscheidung in Step 8 beauftragt.
+
+**Diagnose (Code-Wahrheit):**
+- `Planner.computeRouteTravelTime` (Planner.java:177-201) projiziert **augenblickliches
+  Gleichgewicht pro Kante**: `v = Lösung(P_requiredPowerW == availablePower)` über die ganze
+  Kante gehalten.
+- `Simulator.stepToken` (Simulator.java:206-248) macht **echtes semi-implizites Euler** mit
+  `F = excessW / v`, `a = F / m`, `v += a*dt`, `x += v*dt`, dazu **distanzabhängigen
+  Spannungsabfall** via `powerGrid.availableW(..., distanceOnEdge, ...)`.
+- **Zwei strukturelle Lücken im Planner-Modell:**
+  1. **Beschleunigungsphase fehlt** — der Simulator startet bei `v=0` (oder `startSpeedMps`)
+     und beschleunigt über viele Substeps; der Planner ist sofort am Gleichgewicht.
+  2. **Distanzabhängiger Spannungsabfall fehlt** — der Planner nutzt `distance=0` durchgehend
+     und skaliert die Leistung mit `× condition` als Multiplikator; der Simulator hat
+     `effectiveReach = maxReachMeters × condition` und einen linearen Abfall in `distance`.
+- Konsequenz: Simulator ist **strukturell langsamer** als Planner — auch bei `condition=1.0,
+  gradient=0` durch die Beschleunigungsphase. Die "23% Abweichung" im M2.7-Befund ist genau
+  diese Beschleunigungs-Lücke.
+- **T-D35 hat "kein Sub-Tick" festgeschrieben** — das ist die Modellwahl, die diese Lücke
+  erzeugt. Sie ist kein Implementierungs-Bug, sondern eine bewusste Designentscheidung, die
+  jetzt empirisch an der 5%-Grenze scheitert.
+
+**Bewertung der Optionen (M3-Analyse):**
+
+| | A (10% JUnit, 5% jqwik) | B (Monotonie) | C (Planner anreichern) |
+|---|---|---|---|
+| Z5 als Zahlen-Orakel? | ja im Kern | nein | ja |
+| Regel-2-Verstoß möglich? | nein | nein | Risiko (muss über Physics) |
+| T-D35-Konformität | gedehnter Kernbereich | faktisch verworfen | muss revidiert werden |
+| Studien-Integrität (M1 §6) | neutral | Z5 weichgespült | neutral |
+| Aufwand | gering | gering | mittel-hoch (Steps 3-5 neu) |
+
+**M3-Empfehlung: Variante A, mit Konkretisierungen — und C als ehrliche Folge-Perspektive.**
+
+- **Kerntest (jqwik) bleibt 5%**: Die im aktuellen `Z5PropertyTest.java` schon vorgenommene
+  Generator-Einengung (`cond ∈ [0.7, 1.0]`, `grad ∈ [-0.03, 0.03]`, 500m-Kanten,
+  `power ≥ 200 kW`) ist **kein Trick**, sondern die ehrliche Beschreibung des Bereichs,
+  in dem das Gleichgewichtsmodell eine gute Approximation ist. Der 5%-Test ist Z5.
+- **JUnit-Edge-Cases recasten, nicht nur Toleranzen hochsetzen**:
+  - `z5EdgeCase_longEdge_within5Percent` (2000m-Kante bei `condition=0.9`): testet
+    distanzabhängigen Spannungsabfall — eine **Funktion, die der Planner per Design nicht
+    hat**. Test **entfernen** mit Kommentar "structural limitation".
+  - `z5EdgeCase_gradientDownhillAndUphill_within5Percent`: ±0.03. **Behalten mit 10%** (hier
+    ist die Lücke klein), ABER umbenennen/ausrichten auf "Beschleunigungsphasen-Gap".
+  - `z5EdgeCase_startSpeedPositive_within5Percent`: `startSpeed=10`. **Behalten mit 10%**.
+- **P3-HANDOVER: Befund als Studienergebnis** — Z5 im Kernbereich grün ≤ 5%; außerhalb
+  divergiert der Planer **strukturell** (zwei dokumentierte Lücken). Das ist eine
+  Modellierungsentscheidung aus T-D35, kein Implementierungs-Bug.
+- **Folgephase-Empfehlung**: T-D35 revidieren — "Planner darf eine grobe numerische
+  Integration pro Kante durchführen (z.B. 10-20 Sub-Steps mit konstantem dt im
+  Sekunden-Bereich, kein Sub-Tick wie der Simulator)". Das ist Option C, für P3.5 oder zu
+  Beginn von P4, wenn numerische Genauigkeit außerhalb des Kernbereichs gebraucht wird.
+
+**Was Nikinger entscheiden muss:**
+1. **A mit den Konkretisierungen** (Kerntest 5%, JUnit-Edge-Cases recasten, Handover-Doku)? —
+   M3-Empfehlung.
+2. **B** (Monotonie-only, Z5 als Kern-Orakel aufgeben)? — ehrlicher, aber schwächt die Studie.
+3. **C jetzt** (Planner reichert das Modell an, T-D35 revidieren)? — sauberste Lösung, aber
+   Steps 3-5 müssen neu; P3 wird faktisch zwei Phasen.
+
+**Trial-Rohdaten-Vorschlag (für Nikinger, nicht in `m1/trials.jsonl` schreiben):**
+> `notiz`: "Z5 grün im Kernbereich (cond ∈ [0.7, 1.0], grad ∈ [-0.03, 0.03], power ≥ 200 kW,
+> kurze Kanten). JUnit-Edge-Cases strukturell außerhalb der Planner-Modell-Annahme —
+> longEdge-Test entfernt, andere zu Monotonie umgebaut. Strukturelle Beschränkung des
+> Gleichgewichtsmodells in PHASE3_HANDOVER dokumentiert. T-D35 wird nicht geändert
+> (P3-Step-Reichweite), aber Folgephase P3.5/P4 als Anschluss empfohlen."
+
+**Step 8 wartet auf Nikinger-Entscheidung. Keine Code-Änderung durch M3.**
+
+---
+
+### Plan-Agent Sub-Plan-Erstellung (2026-08-16) — Build-Agent-Session startklar
+
+> **Nikinger-Entscheidung (2026-08-16):** Empfehlung A mit Konkretisierungen angenommen.
+> Sub-Plan `docs/plans/PHASE3_STEP8_PLAN.md` erstellt (Header-Card, T-D51–T-D54,
+> Sub-Step-Sequenz 8.1–8.4 mit Akzeptanzkriterien und Commit-Messages).
+> `PHASE3_PLAN.md` aktualisiert: T-D35 mit empirischem Befund annotiert, T-D42 präzisiert,
+> Step 8 auf Sub-Plan verwiesen, Done-When angepasst, Header-Card `down:`-Link auf Sub-Plan.
+> `docs/INDEX.md` One-Liner für `PHASE3_STEP8_PLAN.md` ergänzt.
+
+**Nächste Build-Agent-Session (M2.7) startet direkt mit:**
+
+1. `phase3/CLAUDE.md` (Build-Log-Tabelle, Session-Block) lesen — sieht ⏳-Status und M3-Befund.
+2. `docs/plans/PHASE3_STEP8_PLAN.md` lesen — Header-Card → Sub-Step-Sequenz.
+3. Sub-Step 8.1 (`train-core: recast Z5 JUnit edge-cases`) ausführen — longEdge entfernen,
+   gradient/startSpeed zu Monotonie/Plausibilität umbenennen.
+4. Nach jedem Sub-Step: `gradle :train-core:test` grün, dann Operator fragen (T-D49).
+
+**Atomare Commits für die nächste Session (Sub-Plan):**
+- `train-core: recast Z5 JUnit edge-cases (M3 Befund, Monotonie statt 5%)`
+- `train-core: document Z5 kernelbereich in test (T-D51, M3 Befund)`
+- `docs: create PHASE3_HANDOVER skeleton with Modell-Gap section (T-D53)`
+- `docs: close P3 (Z5 + Z11 green, …, Modell-Gap dokumentiert)`
+
+**M3-Session-Block oben bleibt sichtbar** als Diagnose-Quelle; Build-Agent liest ihn on-need-to-know.
