@@ -126,6 +126,83 @@ public final class Simulator {
         }
     }
 
+    /**
+     * Fährt eine Route numerisch ab und gibt die Gesamtfahrzeit in Sekunden zurück.
+     *
+     * <p><b>T-D47:</b> Test-Harness für den Z5-Property-Test (Step 8). Der Planer ruft
+     * diese Methode <b>nicht</b> auf — das wäre eine Z5-Tautologie (T-D47-Watchpunkt).
+     *
+     * <p>Algorithmus:
+     * <ol>
+     *   <li>Leere Route → {@code IllegalArgumentException}</li>
+     *   <li>Nicht-zusammenhängende Route → {@code IllegalStateException}</li>
+     *   <li>Token auf {@code route[0]}, {@code startSpeedMps}</li>
+     *   <li>Bis {@code route[last]} vollständig befahren: {@code tick()}; bei
+     *       {@code reachedEndOfEdge} und weiteren Kanten: {@code moveToEdge(next)}</li>
+     *   <li>Return: {@code tickCount × TICK_SECONDS}</li>
+     * </ol>
+     *
+     * <p>Die Methode erzeugt einen internen {@code Simulator} mit einem festen Seed (42L)
+     * und fügt genau einen Token hinzu. Die Methode ist <b>deterministisch</b> (Regel 8).
+     * Als Stromversorgung dient {@link ManualGenerator} mit 10 MW (ausreichend für alle
+     * Testfälle).
+     *
+     * @param route          Liste zusammenhängender Kanten (route[i].to() == route[i+1].from())
+     * @param consist        Zugverband (Masse, etc.)
+     * @param maxPowerW      Leistungsbudget in Watt (> 0)
+     * @param startSpeedMps  Anfangsgeschwindigkeit in m/s (≥ 0)
+     * @return Gesamtfahrzeit in Sekunden für die komplette Route
+     * @throws IllegalArgumentException if route is empty or maxPowerW <= 0
+     * @throws IllegalStateException    if route is not contiguous
+     */
+    public static double runRoute(List<Edge> route, Consist consist, double maxPowerW, double startSpeedMps) {
+        if (route == null || route.isEmpty()) {
+            throw new IllegalArgumentException("route must not be null or empty");
+        }
+        if (maxPowerW <= 0 || Double.isInfinite(maxPowerW) || Double.isNaN(maxPowerW)) {
+            throw new IllegalArgumentException("maxPowerW must be finite and > 0: " + maxPowerW);
+        }
+        // Validierung: route ist zusammenhängend
+        for (int i = 0; i < route.size() - 1; i++) {
+            Edge current = route.get(i);
+            Edge next = route.get(i + 1);
+            if (current.to().id() != next.from().id()) {
+                throw new IllegalStateException(
+                        "route is not contiguous: edge " + i + " (to=" + current.to().id() +
+                                ") does not match edge " + (i + 1) + " (from=" + next.from().id() + ")");
+            }
+        }
+
+        // Interner Simulator mit festem Seed (deterministisch) und ManualGenerator
+        // als Stromversorgung (10 MW, 1e9 MJ fuel). maxReachMeters=2000 → bei condition=0.1
+        // effectiveReach=200m → auf einer 500m-Kante wird die Leistung stark reduziert.
+        Simulator sim = new Simulator(new PowerGrid(new ManualGenerator(10_000_000.0, 1_000_000_000.0), 2_000.0), 42L);
+        Token token = new Token(1L, consist, maxPowerW, route.get(0), startSpeedMps);
+        sim.addToken(token);
+
+        int edgeIndex = 0;
+        int ticks = 0;
+        int lastEdgeIndex = route.size() - 1;
+
+        // Simuliere, bis die letzte Kante vollständig befahren ist
+        while (edgeIndex < route.size()) {
+            sim.tick();
+            ticks++;
+
+            if (token.reachedEndOfEdge()) {
+                if (edgeIndex < lastEdgeIndex) {
+                    edgeIndex++;
+                    token.moveToEdge(route.get(edgeIndex));
+                } else {
+                    // Letzte Kante ist vollständig befahren — fertig
+                    break;
+                }
+            }
+        }
+
+        return ticks * TICK_SECONDS;
+    }
+
     private void stepToken(Token token, double dt) {
         Consist consist = token.consist();
         double mass = consist.totalMassKg();
