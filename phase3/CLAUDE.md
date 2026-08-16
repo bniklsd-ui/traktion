@@ -33,8 +33,8 @@ updated: 2026-08-15
 | Step 0b — Doc-Drift prüfen | ✅ | — | Kein Drift gefunden (leer) |
 | Step 1 — phase3/CLAUDE.md + SESSIONS_ARCHIVE + README erstellen | ✅ | — | Phasen-Kopf erstellt, P3 = 🔄 |
 | Step 2 — RouteForecast + Bottleneck Records (Z11, T-D38/T-D39) | ✅ | — | 229 Tests grün (BottleneckTest + RouteForecastTest + alle P1/P2) |
-| Step 3 — Planner.predict() Grundgerüst (T-D35–T-D37/T-D44/T-D45) | ✅ | — | 245 Tests grün, PlannerTest 17 Tests, Regel 2 intakt (genau eine requiredPowerW). Hinweis: MAX_SPEED_MPS=50 hatte einen Binary-Search-Früh-Exit-Bug — in Step 4 auf 200 erhöht und korrigiert. |
-| Step 4 — Soll/Ist-Vergleich (Z11-Kern, T-D38) | ✅ | — | 248 Tests grün (+3 neue: Soll/Ist/Trennung/Monotonie/Multi-Edge), MAX_SPEED_MPS=200 (Binary-Search-Fix), condition als Wirkungsgrad-Multiplikator Modell, T-D38 intakt |
+| Step 3 — Planner.predict() Grundgerüst (T-D35–T-D37/T-D44/T-D45) | ✅ | feb4e78 | 245 Tests grün, PlannerTest 17 Tests, Regel 2 intakt (genau eine requiredPowerW). Hinweis: MAX_SPEED_MPS=50 hatte einen Binary-Search-Früh-Exit-Bug — in Step 4 auf 200 erhöht und korrigiert. |
+| Step 4 — Soll/Ist-Vergleich (Z11-Kern, T-D38) | ✅ | a03fda0 | 248 Tests grün (+3 neue: Soll/Ist/Trennung/Monotonie/Multi-Edge), MAX_SPEED_MPS=200 (Binary-Search-Fix), condition als Wirkungsgrad-Multiplikator Modell, T-D38 intakt |
 | Step 5 — Bottleneck-Klassifikation (T-D39/T-D43) | ⏳ | — | — |
 | Step 6 — Multi-Edge-Regel-5-Invariante (T-D48, P2-Handover E) | ⏳ | — | — |
 | Step 7 — Simulator.runRoute() Test-Harness (T-D47) | ⏳ | — | — |
