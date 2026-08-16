@@ -45,6 +45,34 @@ updated: 2026-08-15
 
 ## Session stopped
 
-> Dieser Block wird am Ende von P3 als Phasen-Abschluss-Block geschrieben (analog zu P2).
-> Regime-Wechsel (T-D49): kein Auto-Stop nach ~20-30 Tool-Calls mehr. Nach jedem Step
-> wird proaktiv nachgefragt, ob weitergearbeitet werden soll.
+> **P3-Session-Ende** (2026-08-16, vor P3-Abschluss).
+> Steps 6 und 7 abgeschlossen. Step 8 (Z5) begonnen aber mit Modell-Design-Konflikt
+> gestoppt — Entscheidung für nächste Session offen.
+
+### Step 6 — Multi-Edge-Regel-5-Invariante ✅
+- Commit `5c66d59`: `train-core: add multi-edge Rule-5 invariant test (T-D48, Handover E)`
+- 6 Tests: tokenOnEdgeA_onlyEdgeADegrades, tokenTraversesABtoC, longRunOnEdgeA, manualMoveToEdge, tokenReachesEndOfEdgeA, determinism (alle grün)
+- 262 Tests gesamt, alle grün
+- **Kernbefund:** Verschleiß pro Tick minimal (k=1e-10, 40t×20m/s × 0.0125s/substep ≈ 1e-6/substep). Nutzt `moveToEdge()` für kontrollierte Edge-Sequenzen statt ewig auf natürlichen Verschleiß zu warten.
+
+### Step 7 — Simulator.runRoute() Test-Harness ✅
+- Commit `d31d8f3`: `train-core: add Simulator.runRoute test harness (T-D47, Z5 Vergleich)`
+- 11 Tests: empty/null/invalid route, singleEdge, twoEdge, degradedCondition, positiveGradient, determinism×2, startSpeedPositive, nonContiguous, Z5AntiPattern-Dokumentation
+- **maxReachMeters=2000** (condition wirkt auf 500m-Kanten), ManualGenerator 10MW/1e9MJ fuel
+- Z5-Tautologie-Schutz verifiziert (grep Planner→runRoute: leer)
+- 273 Tests gesamt, alle grün
+
+### Step 8 — Z5-Property-Test ⚠️ OFFEN — Entscheidung needed
+- **Modell-Design-Konflikt entdeckt:**
+  - Planner: `availableW(maxPower, 0, 1.0, 1.0) × effectiveCondition` — einfacher Effizienz-Multiplikator
+  - Simulator: `availableW(maxPower, distance, condition, dt)` — echter Spannungsabfall mit Distanz
+  - Selbst bei `condition=1.0, gradient=0`: ~23% Abweichung (Planner rechnet mit Gleichgewichts-Geschwindigkeit ab Start; Simulator simuliert echte Beschleunigung)
+- **JUnit-Edge-Cases (startSpeed>0, downhill, longEdge)**: alle >30% Fehler — strukturell nicht innerhalb 5% mit aktuellem Modell
+- **jqwik-Kerntest**: cond∈[0.7,1.0], power∈[200kW,3MW], startSpeed≤10 → 5.06% Fehler im ersten Fall (nur knapp über Grenze)
+- **Die 5%-Toleranz aus T-D42 ist mit aktuellem Modell-Design nicht durchgängig erreichbar**
+
+**Für nächste Session — Nikinger-Entscheidung (A oder B):**
+- **A:** JUnit-Tests auf 10% Tolerance anpassen, 5% nur für jqwik-Kerntest
+- **B:** JUnit-Tests auf Monotonie (degraded>Soll) umbauen ohne direkten 5%-Vergleich
+- (Edge-Case-Tests mit 10% tolerieren, ohne explizite Entscheidung)
+- **Offene Frage:** Ist die 5%-Toleranz in T-D42 wirklich notwendig oder ist die Monotonie (Trend-Gleichheit) das eigentlich wichtige Z5-Indikator?
