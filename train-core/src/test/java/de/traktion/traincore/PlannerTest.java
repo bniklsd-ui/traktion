@@ -182,26 +182,78 @@ class PlannerTest {
         assertEquals(rf1.deltaProzent(), rf2.deltaProzent(), 1e-9);
     }
 
-    // ─── Zustandsabhängigkeit ───────────────────────────────────────────────
+    // ─── Step 4: Soll/Ist-Vergleich (T-D38, Z11-Kern) ───────────────────────
 
     @Test
-    void predict_gradientIncrease_istLongerThanSoll() {
-        // Gradient > 0 → höherer Leistungsbedarf → Ist > Soll (Steigung)
-        // Da gradient im Soll/Ist beide Male gleich ist, ist der Unterschied hier nur
-        // die verfügbare Leistung (condition). Bei condition = 1.0 everywhere ist
-        // gradient = 0 das Soll und gradient > 0 das Ist. ABER: im current design
-        // berücksichtigt computeRouteTravelTimeWithPerfectCondition DEN gradient der Kante!
-        // Das ist ein Modellierungs-Fehler: das Soll sollte gradient = 0 sein, nicht
-        // der aktuelle gradient.
-        // → dieser Test zeigt, dass das Modell noch nicht ganz stimmt.
-        // (Step 4 korrigiert das Soll/Ist-Modell.)
-        Edge uphill = new Edge(n1(), n2(), RailKind.NORMAL, 0.05, 1000.0, 1.0, 1.0);
+    void predict_conditionOneAllEdges_deltaZero() {
+        // T-D38 + Akzeptanzkriterium: condition = 1.0 überall → deltaProzent == 0
+        Edge e1 = new Edge(n1(), n2(), RailKind.NORMAL, 0.02, 500.0, 1.0, 1.0);
+        Edge e2 = new Edge(n2(), n3(), RailKind.NORMAL, 0.05, 800.0, 1.0, 1.0);
         Optional<RouteForecast> result = Planner.predict(
-                List.of(uphill), DEFAULT_CONSIST, grid(), 100_000_000, 0.0);
+                List.of(e1, e2), DEFAULT_CONSIST, grid(), 100_000_000, 0.0);
 
         assertTrue(result.isPresent());
-        // Steile Steigung mit viel Leistung → slowest aber noch fahrbar
-        assertTrue(result.get().sollFahrzeitSekunden() > 0);
+        RouteForecast rf = result.get();
+        assertEquals(rf.sollFahrzeitSekunden(), rf.istFahrzeitSekunden(), 1e-9,
+                "Bei condition = 1.0 everywhere: soll == ist");
+        assertEquals(0.0, rf.deltaProzent(), 1e-6,
+                "deltaProzent muss 0 sein bei idealem Zustand");
+    }
+
+    @Test
+    void predict_conditionReduced_istLongerThanSoll() {
+        // Akzeptanzkriterium: condition < 1.0 auf einer Kante → deltaProzent > 0
+        // Modell: availablePower = maxPowerW × condition → bei condition=0.5
+        // ist die Leistung halbiert → langsameres Gleichgewicht → Ist > Soll
+        Edge degraded = new Edge(n1(), n2(), RailKind.NORMAL, 0.0, 1000.0, 0.5, 1.0);
+        Optional<RouteForecast> result = Planner.predict(
+                List.of(degraded), DEFAULT_CONSIST, grid(), 100_000_000, 0.0);
+
+        assertTrue(result.isPresent());
+        RouteForecast rf = result.get();
+        assertTrue(rf.istFahrzeitSekunden() > rf.sollFahrzeitSekunden() + 1e-6,
+                "Ist muss länger sein als Soll bei degraded condition: ist="
+                + rf.istFahrzeitSekunden() + " > soll=" + rf.sollFahrzeitSekunden());
+        assertTrue(rf.deltaProzent() > 0.0,
+                "deltaProzent muss > 0 sein bei condition < 1.0: " + rf.deltaProzent());
+        assertTrue(rf.deltaProzent() < 100.0,
+                "deltaProzent unrealistisch hoch bei condition=0.5 (nicht totales outage): " + rf.deltaProzent());
+    }
+
+    @Test
+    void predict_conditionMonotonie_worseConditionLargerDelta() {
+        // Akzeptanzkriterium Monotonie: schlechteres Netz → größeres deltaProzent
+        Edge cond70 = new Edge(n1(), n2(), RailKind.NORMAL, 0.0, 1000.0, 0.7, 1.0);
+        Edge cond30 = new Edge(n1(), n2(), RailKind.NORMAL, 0.0, 1000.0, 0.3, 1.0);
+
+        Optional<RouteForecast> r70 = Planner.predict(
+                List.of(cond70), DEFAULT_CONSIST, grid(), 100_000_000, 0.0);
+        Optional<RouteForecast> r30 = Planner.predict(
+                List.of(cond30), DEFAULT_CONSIST, grid(), 100_000_000, 0.0);
+
+        assertTrue(r70.isPresent());
+        assertTrue(r30.isPresent());
+        assertTrue(r30.get().deltaProzent() > r70.get().deltaProzent(),
+                "condition=0.3 muss größeres delta haben als condition=0.7: " +
+                r30.get().deltaProzent() + " > " + r70.get().deltaProzent());
+    }
+
+    @Test
+    void predict_multiEdge_partialDegradation() {
+        // Zwei Kanten: eine mit condition=1.0, eine mit condition=0.4
+        Edge perfect = new Edge(n1(), n2(), RailKind.NORMAL, 0.0, 500.0, 1.0, 1.0);
+        Edge degraded = new Edge(n2(), n3(), RailKind.NORMAL, 0.0, 500.0, 0.4, 1.0);
+        Optional<RouteForecast> result = Planner.predict(
+                List.of(perfect, degraded), DEFAULT_CONSIST, grid(), 100_000_000, 0.0);
+
+        assertTrue(result.isPresent());
+        RouteForecast rf = result.get();
+        // Ist sollte länger sein als Soll, da eine Kante degradiert ist
+        assertTrue(rf.istFahrzeitSekunden() > rf.sollFahrzeitSekunden() + 1e-6);
+        assertTrue(rf.deltaProzent() > 0.0);
+        // Beide Zeiten müssen > 0 sein
+        assertTrue(rf.sollFahrzeitSekunden() > 0.0);
+        assertTrue(rf.istFahrzeitSekunden() > 0.0);
     }
 
     // ─── maxPowerW groß genug: Zug erreicht Gleichgewicht ───────────────────

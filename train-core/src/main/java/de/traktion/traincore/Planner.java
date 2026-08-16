@@ -37,8 +37,16 @@ public final class Planner {
     /** Kleinste Geschwindigkeit für die Binary Search (m/s). */
     private static final double MIN_SPEED_MPS = 0.0;
 
-    /** Höchste Geschwindigkeit für die Binary Search (m/s). */
-    private static final double MAX_SPEED_MPS = 50.0;
+    /**
+     * Höchste Geschwindigkeit für die Binary Search (m/s).
+     *
+     * <p>200 m/s = 720 km/h — deutlich über realistischen Zuggeschwindigkeiten.
+     * Notwendig, damit die Binary Search auch bei hoher verfügbarer Leistung (z.B. 100 MW)
+     * das echte Gleichgewicht findet: requiredPowerW(200 m/s) ≈ 221 MW > 100 MW.
+     * Der Zug kann MAX_SPEED_MPS nicht überschreiten, deshalb ist der returned Wert
+     * stets <= MAX_SPEED_MPS.
+     */
+    private static final double MAX_SPEED_MPS = 200.0;
 
     /** Iterationen für die Binary Search (hinreichend für Konvergenz). */
     private static final int BINARY_SEARCH_ITERATIONS = 50;
@@ -153,6 +161,16 @@ public final class Planner {
 
     /**
      * Berechnet die Fahrzeit für eine Route mit dem aktuellen Netz-Zustand.
+     *
+     * <p>Die verfügbare Leistung ist {@code condition × availableW(maxPower, distance=0, 1.0)}.
+     * Dies modelliert, dass degraded infrastructure (condition < 1) den Strom proportional
+     * reduziert — nicht abrupt auf 0, aber spürbar. Die Condition wirkt als
+     * Wirkungsgrad-Multiplikator auf die Leistung.
+     *
+     * <p>Distanz = 0 (Anfang der Kante) — der Zug bekommt hier die maximal mögliche
+     * Leistung (reachFactor = 1.0 bei jeder Condition). Die Condition-Skalierung
+     * {@code × condition} modelliert den Gesamteffekt über die gesamte Kante
+     * (Abschnitts-mittelwert), ohne sub-tick-Simulation.
      */
     private static double computeRouteTravelTime(
             List<Edge> route,
@@ -165,14 +183,11 @@ public final class Planner {
         double currentSpeedMps = startSpeedMps;
 
         for (Edge edge : route) {
-            // Anfang der Kante: hier ist die verfügbare Leistung am höchsten.
-            // Diese Vereinfachung ist robust für alle Kantenlängen — der Zug hat hier
-            // maximalen Strom und kann beschleunigen.
-            double availablePower = netState.availableW(
-                    maxPowerW,
-                    0.0,  // Anfang der Kante: volle Leistung (abzüglich condition)
-                    edge.effectiveCondition(),
-                    1.0);
+            // Condition wirkt als Wirkungsgrad-Multiplikator auf die Leistung.
+            // Dies liefert bei condition < 1.0 eine andere Gleichgewichtsgeschwindigkeit
+            // als condition = 1.0 — die Soll/Ist-Trennung (T-D38) funktioniert.
+            double availablePower = netState.availableW(maxPowerW, 0.0, 1.0, 1.0)
+                    * edge.effectiveCondition();
 
             double edgeSpeed = maxSustainableSpeed(consist, edge.gradient(), availablePower, currentSpeedMps);
             double edgeTime = edge.lengthMeters() / edgeSpeed;
@@ -234,11 +249,12 @@ public final class Planner {
 
         // Prüfe, ob überhaupt eine Lösung existiert
         double powerAtHigh = Physics.requiredPowerW(consist, MAX_SPEED_MPS, gradient);
-        if (powerAtHigh <= availablePowerW) {
-            // Die maximale Geschwindigkeit ist niedriger als unsere Obergrenze
-            vHigh = MAX_SPEED_MPS;
-        } else {
-            // Binary Search nach der Gleichgewichtsdrehzahl
+        if (powerAtHigh > availablePowerW) {
+            // Benötigte Leistung bei MAX_SPEED übersteigt das Angebot.
+            // Binary Search nach der Gleichgewichtsdrehzahl (wo P(v) == availablePowerW).
+            // P(v) ist monoton steigend in v (Air-Drag dominiert), daher:
+            //   - P(vMid) < availablePowerW → Gleichgewicht ist OBEN → vLow = vMid
+            //   - P(vMid) >= availablePowerW → Gleichgewicht ist UNTEN → vHigh = vMid
             for (int i = 0; i < BINARY_SEARCH_ITERATIONS; i++) {
                 double vMid = (vLow + vHigh) / 2.0;
                 double powerAtMid = Physics.requiredPowerW(consist, vMid, gradient);
@@ -252,9 +268,17 @@ public final class Planner {
                 }
             }
         }
-
+        // Wenn powerAtHigh <= availablePowerW: Gleichgewicht ist OBHALB von MAX_SPEED_MPS.
+        // Binary Search hat die Region nicht eingeengt; vLow=0, vHigh=MAX_SPEED.
+        // Das Gleichgewicht liegt ÜBER MAX_SPEED_MPS — der Zug ist durch MAX_SPEED limitiert.
+        // Korrektur: wenn kein Binary-Search-Lauf stattfand (powerAtHigh <= availablePowerW),
+        // ist das Gleichgewicht oberhalb MAX_SPEED_MPS. In diesem Fall MAX_SPEED zurückgeben.
         double equilibriumSpeed = (vLow + vHigh) / 2.0;
+        if (powerAtHigh <= availablePowerW) {
+            // Gleichgewicht über MAX_SPEED — der Zug kann MAX_SPEED fahren (aber nicht schneller).
+            equilibriumSpeed = MAX_SPEED_MPS;
+        }
         // Der Zug beschleunigt nicht über seine Gleichgewichtsdrehzahl hinaus
-        return Math.min(Math.max(equilibriumSpeed, NON_ZERO_SPEED_MPS), MAX_SPEED_MPS);
+        return Math.max(equilibriumSpeed, NON_ZERO_SPEED_MPS);
     }
 }
