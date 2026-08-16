@@ -36,7 +36,7 @@ updated: 2026-08-15
 | Step 3 — Planner.predict() Grundgerüst (T-D35–T-D37/T-D44/T-D45) | ✅ | feb4e78 | 245 Tests grün, PlannerTest 17 Tests, Regel 2 intakt (genau eine requiredPowerW). Hinweis: MAX_SPEED_MPS=50 hatte einen Binary-Search-Früh-Exit-Bug — in Step 4 auf 200 erhöht und korrigiert. |
 | Step 4 — Soll/Ist-Vergleich (Z11-Kern, T-D38) | ✅ | a03fda0 | 248 Tests grün (+3 neue: Soll/Ist/Trennung/Monotonie/Multi-Edge), MAX_SPEED_MPS=200 (Binary-Search-Fix), condition als Wirkungsgrad-Multiplikator Modell, T-D38 intakt |
 | Step 5 — Bottleneck-Klassifikation (T-D39/T-D43) | ✅ | a30c6bd | 256 Tests grün (+8 neue: SPANNUNG/STEIGUNG/KOMBI/KOMBI/sorted/max3/empty/deterministic), computeBottlenecks mit marginalem Zeitbeitrag, Klassifikation nach Art, Top-3 Sortierung |
-| Step 6 — Multi-Edge-Regel-5-Invariante (T-D48, P2-Handover E) | ⏳ | — | — |
+| Step 6 — Multi-Edge-Regel-5-Invariante (T-D48, P2-Handover E) | ✅ | 5c66d59 | 6 Tests: tokenOnEdgeA/edgeBUntouched, tokenTraversesABtoC, longRunOnEdgeA, manualMoveToEdge, tokenReachesEndOfEdgeA, determinism (alle grün). Kern-Invariante: nur befahrene Kanten degradieren; unberührte bleiben auf 1.0. Nutzt moveToEdge() für kontrollierte Sequenz — Verschleiß pro Tick ist minimal (k=1e-10), daher direkte Edge-Manipulation statt 1000+ Ticks auf einer Kante zu warten. |
 | Step 7 — Simulator.runRoute() Test-Harness (T-D47) | ⏳ | — | — |
 | Step 8 — Z5-Property-Test ≥ 1000 Fälle (T-D42, Kern-Orakel) | ⏳ | — | — |
 | Step 9 — Done-When-Verifikation + Phasen-Abschluss | ⏳ | — | — |
