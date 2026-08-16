@@ -271,4 +271,143 @@ class PlannerTest {
         double avgSpeedMps = 100.0 / timeSeconds;
         assertTrue(avgSpeedMps > 10.0, "Mit 100 MW sollte der Zug > 10 m/s erreichen");
     }
+
+    // ─── Step 5: Bottleneck-Klassifikation (T-D39, T-D43) ───────────────────
+
+    @Test
+    void predict_bottleneck_spannung() {
+        // SPANNUNG: condition < 1.0 und gradient == 0
+        Edge spannungEdge = new Edge(n1(), n2(), RailKind.NORMAL, 0.0, 500.0, 0.3, 1.0);
+        Optional<RouteForecast> result = Planner.predict(
+                List.of(spannungEdge), DEFAULT_CONSIST, grid(), 100_000_000, 0.0);
+
+        assertTrue(result.isPresent());
+        RouteForecast rf = result.get();
+        assertEquals(1, rf.bottlenecks().size());
+        Bottleneck bn = rf.bottlenecks().get(0);
+        assertEquals(BottleneckArt.SPANNUNG, bn.art());
+        assertEquals(spannungEdge, bn.edge());
+        assertTrue(bn.beitragSekunden() > 0.0,
+                "SPANNUNG mit condition=0.3 muss Beitrag > 0 haben: " + bn.beitragSekunden());
+    }
+
+    @Test
+    void predict_bottleneck_steigung() {
+        // STEIGUNG: gradient > 0 und condition == 1.0
+        // maxPowerW auf 500 kW reduzieren, damit die Steigungswirkung messbar wird
+        // (bei 100 MW hitten beide den MAX_SPEED_MPS cap)
+        Edge steepEdge = new Edge(n1(), n2(), RailKind.NORMAL, 0.05, 500.0, 1.0, 1.0);
+        Optional<RouteForecast> result = Planner.predict(
+                List.of(steepEdge), DEFAULT_CONSIST, grid(), 500_000, 0.0);
+
+        assertTrue(result.isPresent());
+        RouteForecast rf = result.get();
+        assertEquals(1, rf.bottlenecks().size(),
+                "gradient=0.05 sollte 1 Bottleneck erzeugen: " + rf.bottlenecks().size());
+        Bottleneck bn = rf.bottlenecks().get(0);
+        assertEquals(BottleneckArt.STEIGUNG, bn.art());
+        assertEquals(steepEdge, bn.edge());
+        assertTrue(bn.beitragSekunden() > 0.0,
+                "STEIGUNG mit gradient=0.05 muss Beitrag > 0 haben: " + bn.beitragSekunden());
+    }
+
+    @Test
+    void predict_bottleneck_kombi() {
+        // KOMBI: condition < 1.0 und gradient > 0
+        Edge kombiEdge = new Edge(n1(), n2(), RailKind.NORMAL, 0.05, 500.0, 0.4, 1.0);
+        Optional<RouteForecast> result = Planner.predict(
+                List.of(kombiEdge), DEFAULT_CONSIST, grid(), 100_000_000, 0.0);
+
+        assertTrue(result.isPresent());
+        RouteForecast rf = result.get();
+        assertEquals(1, rf.bottlenecks().size());
+        Bottleneck bn = rf.bottlenecks().get(0);
+        assertEquals(BottleneckArt.KOMBI, bn.art());
+        assertEquals(kombiEdge, bn.edge());
+        assertTrue(bn.beitragSekunden() > 0.0);
+    }
+
+    @Test
+    void predict_bottleneck_twoEdges_topIsWorst() {
+        // Zwei Edges: cond=0.8 (gering) und cond=0.3 (schlimmer) → Top-1 ist cond=0.3
+        // Hinweis: der "marginale" Beitrag von edge 2 wird durch den niedrigeren
+        // currentSpeedMps (aus edge 1) verfälscht — das ist das korrekte Modellverhalten.
+        Edge minor = new Edge(n1(), n2(), RailKind.NORMAL, 0.0, 500.0, 0.8, 1.0);
+        Edge major = new Edge(n2(), n3(), RailKind.NORMAL, 0.0, 500.0, 0.3, 1.0);
+        Optional<RouteForecast> result = Planner.predict(
+                List.of(minor, major), DEFAULT_CONSIST, grid(), 100_000_000, 0.0);
+
+        assertTrue(result.isPresent());
+        RouteForecast rf = result.get();
+        assertTrue(rf.bottlenecks().size() >= 1, "Mindestens 1 Bottleneck erwartet");
+        // Top-1 ist die schlechtere Edge (cond=0.3) oder gleichwertig
+        Bottleneck top = rf.bottlenecks().get(0);
+        assertEquals(BottleneckArt.SPANNUNG, top.art());
+        assertTrue(top.edge().effectiveCondition() <= 0.5,
+                "Top-Bottleneck sollte die schlechtere oder gleichwertige Condition haben: " +
+                top.edge().effectiveCondition());
+    }
+
+    @Test
+    void predict_bottleneck_maxThree() {
+        // Fünf Kanten mit jeweils unterschiedlichem Verschleiß → nur Top 3
+        Edge e1 = new Edge(n1(), new Node(10L), RailKind.NORMAL, 0.0, 100.0, 0.5, 1.0);
+        Edge e2 = new Edge(new Node(10L), new Node(11L), RailKind.NORMAL, 0.0, 100.0, 0.6, 1.0);
+        Edge e3 = new Edge(new Node(11L), new Node(12L), RailKind.NORMAL, 0.0, 100.0, 0.7, 1.0);
+        Edge e4 = new Edge(new Node(12L), new Node(13L), RailKind.NORMAL, 0.0, 100.0, 0.8, 1.0);
+        Edge e5 = new Edge(new Node(13L), n3(), RailKind.NORMAL, 0.0, 100.0, 0.9, 1.0);
+        Optional<RouteForecast> result = Planner.predict(
+                List.of(e1, e2, e3, e4, e5), DEFAULT_CONSIST, grid(), 100_000_000, 0.0);
+
+        assertTrue(result.isPresent());
+        assertTrue(result.get().bottlenecks().size() <= 3,
+                "Maximal 3 Bottlenecks erwartet, aber: " + result.get().bottlenecks().size());
+    }
+
+    @Test
+    void predict_bottleneck_emptyWhenPerfect() {
+        // Perfekte Route (condition=1.0, gradient=0) → keine Bottlenecks
+        Edge e = edgePerfect(500.0);
+        Optional<RouteForecast> result = Planner.predict(
+                List.of(e), DEFAULT_CONSIST, grid(), 100_000_000, 0.0);
+
+        assertTrue(result.isPresent());
+        assertTrue(result.get().bottlenecks().isEmpty(),
+                "Perfekte Kante (condition=1.0, gradient=0) sollte keine Bottlenecks haben");
+    }
+
+    @Test
+    void predict_bottleneck_sortedDescending() {
+        // Zwei Kanten mit unterschiedlichem Verschleiß → sortiert nach Beitrag absteigend
+        Edge worse = new Edge(n1(), n2(), RailKind.NORMAL, 0.0, 500.0, 0.2, 1.0);
+        Edge better = new Edge(n2(), n3(), RailKind.NORMAL, 0.0, 500.0, 0.5, 1.0);
+        Optional<RouteForecast> result = Planner.predict(
+                List.of(worse, better), DEFAULT_CONSIST, grid(), 100_000_000, 0.0);
+
+        assertTrue(result.isPresent());
+        List<Bottleneck> bn = result.get().bottlenecks();
+        assertEquals(2, bn.size());
+        assertTrue(bn.get(0).beitragSekunden() >= bn.get(1).beitragSekunden(),
+                "Erster Bottleneck muss größeren oder gleichen Beitrag haben: " +
+                bn.get(0).beitragSekunden() + " >= " + bn.get(1).beitragSekunden());
+    }
+
+    @Test
+    void predict_bottleneck_deterministic() {
+        // Zwei identische Aufrufe → identische Bottleneck-Liste (T-D45)
+        Edge e = new Edge(n1(), n2(), RailKind.NORMAL, 0.03, 500.0, 0.6, 1.0);
+        Optional<RouteForecast> r1 = Planner.predict(List.of(e), DEFAULT_CONSIST, grid(), 100_000_000, 0.0);
+        Optional<RouteForecast> r2 = Planner.predict(List.of(e), DEFAULT_CONSIST, grid(), 100_000_000, 0.0);
+
+        assertTrue(r1.isPresent());
+        assertTrue(r2.isPresent());
+        List<Bottleneck> bn1 = r1.get().bottlenecks();
+        List<Bottleneck> bn2 = r2.get().bottlenecks();
+        assertEquals(bn1.size(), bn2.size());
+        for (int i = 0; i < bn1.size(); i++) {
+            assertEquals(bn1.get(i).art(), bn2.get(i).art());
+            assertEquals(bn1.get(i).edge(), bn2.get(i).edge());
+            assertEquals(bn1.get(i).beitragSekunden(), bn2.get(i).beitragSekunden(), 1e-9);
+        }
+    }
 }

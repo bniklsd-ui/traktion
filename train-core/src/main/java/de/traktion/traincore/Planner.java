@@ -136,12 +136,14 @@ public final class Planner {
 
         double deltaProzent = (istFahrzeitSekunden - sollFahrzeitSekunden) / sollFahrzeitSekunden * 100.0;
 
-        // Bottleneck-Liste kommt in Step 5 — hier noch leer
+        // Bottleneck-Liste: Top-3 nach beitragSekunden absteigend
+        List<Bottleneck> bottlenecks = computeBottlenecks(route, consist, netState, maxPowerW, startSpeedMps);
+
         return Optional.of(new RouteForecast(
                 sollFahrzeitSekunden,
                 istFahrzeitSekunden,
                 deltaProzent,
-                List.of()));
+                bottlenecks));
     }
 
     /**
@@ -196,6 +198,100 @@ public final class Planner {
         }
 
         return totalSeconds;
+    }
+
+    /**
+     * Klassifiziert Bottlenecks auf einer Route (T-D39, T-D43).
+     *
+     * <p>Algorithmus: für jede Kante wird der Extra-Zeitbeitrag gegenüber einer perfekten
+     * Kante (condition=1.0, gradient=0) berechnet. Dann wird klassifiziert:
+     * <ul>
+     *   <li>{@link BottleneckArt#SPANNUNG}: condition {@code < 1.0} und gradient {@code == 0}</li>
+     *   <li>{@link BottleneckArt#STEIGUNG}: gradient {@code > 0} und condition {@code == 1.0}</li>
+     *   <li>{@link BottleneckArt#KOMBI}: condition {@code < 1.0} und gradient {@code > 0}</li>
+     * </ul>
+     *
+     * <p>Der Extra-Zeitbeitrag ist die Differenz zwischen der Zeit über diese Kante
+     * (mit aktuellem Zustand) und der Zeit über eine perfekte Kante (condition=1.0, gradient=0),
+     * jeweils mit dem gleichen Startspeed.
+     *
+     * <p>Ergebnis: maximal 3 Bottlenecks, sortiert nach beitragSekunden absteigend.
+     */
+    private static List<Bottleneck> computeBottlenecks(
+            List<Edge> route,
+            Consist consist,
+            PowerGrid netState,
+            double maxPowerW,
+            double startSpeedMps) {
+
+        var bottlenecks = new java.util.ArrayList<Bottleneck>();
+        double currentSpeedMps = startSpeedMps;
+
+        for (Edge edge : route) {
+            // Extra-Zeit für diese Kante: actual vs. perfekt (condition=1.0, gradient=0)
+            double actualTime = edgeTime(edge, consist, netState, maxPowerW, currentSpeedMps);
+            double perfectTime = edgeTimeWithPerfectCondition(edge, consist, netState, maxPowerW, currentSpeedMps);
+            double extraSeconds = actualTime - perfectTime;
+
+            // Klassifikation basierend auf condition und gradient
+            boolean isSpannung = edge.effectiveCondition() < 1.0;
+            boolean isSteigung = edge.gradient() > 0.0;
+
+            if (!isSpannung && !isSteigung) {
+                // Kein Bottleneck: condition=1.0 und gradient=0
+                currentSpeedMps = maxSustainableSpeed(consist, edge.gradient(),
+                        netState.availableW(maxPowerW, 0.0, 1.0, 1.0), currentSpeedMps);
+                continue;
+            }
+
+            BottleneckArt art;
+            if (isSpannung && isSteigung) {
+                art = BottleneckArt.KOMBI;
+            } else if (isSpannung) {
+                art = BottleneckArt.SPANNUNG;
+            } else {
+                art = BottleneckArt.STEIGUNG;
+            }
+
+            if (extraSeconds > 0.0) {
+                bottlenecks.add(new Bottleneck(edge, art, extraSeconds));
+            }
+
+            currentSpeedMps = maxSustainableSpeed(consist, edge.gradient(),
+                    netState.availableW(maxPowerW, 0.0, 1.0, 1.0) * edge.effectiveCondition(), currentSpeedMps);
+        }
+
+        // Sortiere nach beitragSekunden absteigend, nimm Top 3
+        bottlenecks.sort((a, b) -> Double.compare(b.beitragSekunden(), a.beitragSekunden()));
+        return bottlenecks.size() <= 3 ? List.copyOf(bottlenecks) : List.copyOf(bottlenecks.subList(0, 3));
+    }
+
+    /**
+     * Fahrzeit über eine einzelne Kante (aktueller Zustand).
+     */
+    private static double edgeTime(
+            Edge edge,
+            Consist consist,
+            PowerGrid netState,
+            double maxPowerW,
+            double currentSpeedMps) {
+        double availablePower = netState.availableW(maxPowerW, 0.0, 1.0, 1.0) * edge.effectiveCondition();
+        double edgeSpeed = maxSustainableSpeed(consist, edge.gradient(), availablePower, currentSpeedMps);
+        return edge.lengthMeters() / edgeSpeed;
+    }
+
+    /**
+     * Fahrzeit über eine einzelne Kante mit perfektem Zustand (condition=1.0, gradient=0).
+     */
+    private static double edgeTimeWithPerfectCondition(
+            Edge edge,
+            Consist consist,
+            PowerGrid netState,
+            double maxPowerW,
+            double currentSpeedMps) {
+        double availablePower = netState.availableW(maxPowerW, 0.0, 1.0, 1.0);
+        double edgeSpeed = maxSustainableSpeed(consist, 0.0, availablePower, currentSpeedMps);
+        return edge.lengthMeters() / edgeSpeed;
     }
 
     /**
