@@ -33,7 +33,7 @@ updated: 2026-08-15
 | Step 0b — Doc-Drift prüfen | ✅ | — | Kein Drift gefunden (leer) |
 | Step 1 — phase3/CLAUDE.md + SESSIONS_ARCHIVE + README erstellen | ✅ | — | Phasen-Kopf erstellt, P3 = 🔄 |
 | Step 2 — RouteForecast + Bottleneck Records (Z11, T-D38/T-D39) | ✅ | — | 229 Tests grün (BottleneckTest + RouteForecastTest + alle P1/P2) |
-| Step 3 — Planner.predict() Grundgerüst (T-D35–T-D37/T-D44/T-D45) | ⏳ | — | — |
+| Step 3 — Planner.predict() Grundgerüst (T-D35–T-D37/T-D44/T-D45) | ✅ | — | 245 Tests grün, PlannerTest 17 Tests, Regel 2 intakt (genau eine requiredPowerW) |
 | Step 4 — Soll/Ist-Vergleich (Z11-Kern, T-D38) | ⏳ | — | — |
 | Step 5 — Bottleneck-Klassifikation (T-D39/T-D43) | ⏳ | — | — |
 | Step 6 — Multi-Edge-Regel-5-Invariante (T-D48, P2-Handover E) | ⏳ | — | — |
