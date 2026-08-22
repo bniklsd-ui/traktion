@@ -38,16 +38,16 @@ updated: 2026-08-16
 | Step 5 — Bottleneck-Klassifikation (T-D39/T-D43) | ✅ | a30c6bd | 256 Tests grün (+8 neue: SPANNUNG/STEIGUNG/KOMBI/KOMBI/sorted/max3/empty/deterministic), computeBottlenecks mit marginalem Zeitbeitrag, Klassifikation nach Art, Top-3 Sortierung |
 | Step 6 — Multi-Edge-Regel-5-Invariante (T-D48, P2-Handover E) | ✅ | 5c66d59 | 6 Tests: tokenOnEdgeA/edgeBUntouched, tokenTraversesABtoC, longRunOnEdgeA, manualMoveToEdge, tokenReachesEndOfEdgeA, determinism (alle grün). Kern-Invariante: nur befahrene Kanten degradieren; unberührte bleiben auf 1.0. Nutzt moveToEdge() für kontrollierte Sequenz — Verschleiß pro Tick ist minimal (k=1e-10), daher direkte Edge-Manipulation statt 1000+ Ticks auf einer Kante zu warten. |
 | Step 7 — Simulator.runRoute() Test-Harness (T-D47) | ✅ | d31d8f3 | 11 Tests: empty/null/invalid route, singleEdge, twoEdge, degradedCondition, positiveGradient, determinism (2), startSpeedPositive, nonContiguous, Z5AntiPattern-Dokumentation. maxReachMeters=2000 (condition wirkt auf 500m-Kanten). ManualGenerator 10MW/1e9MJ fuel. Z5-Tautologie-Schutz verifiziert (grep Planner→runRoute: leer). |
-| Step 8 — Z5-Property-Test ≥ 1000 Fälle (T-D42, Kern-Orakel) | ⏳ | — | M3-Befund 2026-08-16: zwei strukturelle Lücken im Planer-Modell (Beschleunigung, distanzabhängiger Spannungsabfall). Nikinger-Entscheidung: Empfehlung A mit Konkretisierungen. Sub-Plan `PHASE3_STEP8_PLAN.md` erstellt mit T-D51/T-D52/T-D53/T-D54 — Build-Agent führt Sub-Steps 8.1–8.4 in nächster Session aus. |
+| Step 8 — Z5-Property-Test ≥ 1000 Fälle (T-D42, Kern-Orakel) | ⏳ | — | Sub-Step 8.1 ✅ (8244593): JUnit-Edge-Cases recastet (Monotonie statt 5%). Sub-Step 8.2 ✅ (7a03dff): Z5_KERNELBEREICH-Konstanten + Klassen-Javadoc. Sub-Step 8.3 (Handover-Skelett) und 8.4 (Done-When) in separater Session. 278 Tests grün. |
 | Step 9 — Done-When-Verifikation + Phasen-Abschluss | ⏳ | — | — |
 
 ---
 
 ## Session stopped
 
-> **P3-Session-Ende** (2026-08-16, vor P3-Abschluss).
-> Steps 6 und 7 abgeschlossen. Step 8 (Z5) begonnen aber mit Modell-Design-Konflikt
-> gestoppt — Entscheidung für nächste Session offen.
+> **P3-Session-Ende** (2026-08-22, vor P3-Abschluss).
+> Sub-Steps 8.1 und 8.2 abgeschlossen. Sub-Step 8.3 (Handover-Skelett) und 8.4
+> (Done-When + Phasen-Abschluss) folgen in separater Session.
 
 ### Step 6 — Multi-Edge-Regel-5-Invariante ✅
 - Commit `5c66d59`: `train-core: add multi-edge Rule-5 invariant test (T-D48, Handover E)`
