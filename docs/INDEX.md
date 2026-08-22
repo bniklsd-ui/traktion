@@ -4,7 +4,7 @@ purpose: L0-Karte des Doku-Systems. Eine Zeile pro Doku, Glyph + Größe + read-
 read-when: Session-Start; vor der Suche nach einer Doku; bevor eine neue .md erstellt wird (One-Liner hier ergänzen, im selben Commit)
 detail: L0
 up: ./CLAUDE.md
-updated: 2026-08-16
+updated: 2026-08-22
 ---
 
 # Traktion — Doku-Index
@@ -62,6 +62,7 @@ updated: 2026-08-16
 | 📕 `docs/plans/PHASE2_HANDOVER.md` | L2 | vor P3-Plan-Entwurf; P2-Abschlussanalyse, Z4+Z6+Z7 grün, Ports produktiv, Multi-Edge-Test-Lücke, trials-Rohdaten |
 | 📜 `docs/plans/PHASE3_PLAN.md` | L2 | Ausführung von P3; Planer (Z5, Z11), T-D35–T-D50, Schritt-Sequenz, Akzeptanzkriterien |
 | 📜 `docs/plans/PHASE3_STEP8_PLAN.md` | L2 | Ausführung von P3 Step 8 nach M3-Befund; T-D51/T-D52/T-D53/T-D54 (Kernelbereich, JUnit-Recast, Modell-Gap-Handover, T-D35-Revisions-Vorschlag) |
+| 📕 `docs/plans/PHASE3_HANDOVER.md` | L2 | vor P4-Plan-Entwurf; P3-Abschlussanalyse (teilweise), Modell-Gap-Doku (Beschleunigung, distanzabhängiger Spannungsabfall), Z5 als Monotonie im Kernelbereich, Z11-Kern grün, trials-Rohdaten |
 
 ## Messung (M1-Strang)
 

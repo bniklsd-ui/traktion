@@ -7,7 +7,7 @@ up: ../CLAUDE.md
 down:
   - ../docs/plans/PHASE3_PLAN.md      # Konzept/Plan, aus dem P3 gebaut wird
   - ./SESSIONS_ARCHIVE.md             # alte Session-stopped-Blöcke
-updated: 2026-08-16
+updated: 2026-08-22
 ---
 
 # Phase 3 — Planer
@@ -38,16 +38,17 @@ updated: 2026-08-16
 | Step 5 — Bottleneck-Klassifikation (T-D39/T-D43) | ✅ | a30c6bd | 256 Tests grün (+8 neue: SPANNUNG/STEIGUNG/KOMBI/KOMBI/sorted/max3/empty/deterministic), computeBottlenecks mit marginalem Zeitbeitrag, Klassifikation nach Art, Top-3 Sortierung |
 | Step 6 — Multi-Edge-Regel-5-Invariante (T-D48, P2-Handover E) | ✅ | 5c66d59 | 6 Tests: tokenOnEdgeA/edgeBUntouched, tokenTraversesABtoC, longRunOnEdgeA, manualMoveToEdge, tokenReachesEndOfEdgeA, determinism (alle grün). Kern-Invariante: nur befahrene Kanten degradieren; unberührte bleiben auf 1.0. Nutzt moveToEdge() für kontrollierte Sequenz — Verschleiß pro Tick ist minimal (k=1e-10), daher direkte Edge-Manipulation statt 1000+ Ticks auf einer Kante zu warten. |
 | Step 7 — Simulator.runRoute() Test-Harness (T-D47) | ✅ | d31d8f3 | 11 Tests: empty/null/invalid route, singleEdge, twoEdge, degradedCondition, positiveGradient, determinism (2), startSpeedPositive, nonContiguous, Z5AntiPattern-Dokumentation. maxReachMeters=2000 (condition wirkt auf 500m-Kanten). ManualGenerator 10MW/1e9MJ fuel. Z5-Tautologie-Schutz verifiziert (grep Planner→runRoute: leer). |
-| Step 8 — Z5-Property-Test ≥ 1000 Fälle (T-D42, Kern-Orakel) | ⏳ | — | Sub-Step 8.1 ✅ (8244593): JUnit-Edge-Cases recastet (Monotonie statt 5%). Sub-Step 8.2 ✅ (7a03dff): Z5_KERNELBEREICH-Konstanten + Klassen-Javadoc. Sub-Step 8.3 (Handover-Skelett) und 8.4 (Done-When) in separater Session. 278 Tests grün. |
-| Step 9 — Done-When-Verifikation + Phasen-Abschluss | ⏳ | — | — |
+| Step 8 — Z5-Property-Test ≥ 1000 Fälle (T-D42, Kern-Orakel) | 🔄 | — | Sub-Step 8.1 ✅ (8244593): JUnit-Edge-Cases recastet (Monotonie statt 5%). Sub-Step 8.2 ✅ (7a03dff): Z5_KERNELBEREICH-Konstanten + Klassen-Javadoc. Sub-Step 8.3 ✅ (PHASE3_HANDOVER.md mit Modell-Gap-Sektion, T-D53). Sub-Step 8.4 (Done-When + Phasen-Abschluss) in Folge-Session. 278 Tests grün. |
+| Step 9 — Done-When-Verifikation + Phasen-Abschluss | ⏳ | — | Sub-Steps 8.3 ✅ (Handover-Skelett mit Modell-Gap). 8.4 + Step 9 offen: §9-Anti-Pattern-Checks final, Root-CLAUDE.md/ROADMAP/README Status-Updates, SESSIONS_ARCHIVE rotieren. |
 
 ---
 
 ## Session stopped
 
-> **P3-Session-Ende** (2026-08-22, vor P3-Abschluss).
-> Sub-Steps 8.1 und 8.2 abgeschlossen. Sub-Step 8.3 (Handover-Skelett) und 8.4
-> (Done-When + Phasen-Abschluss) folgen in separater Session.
+> **P3-Handover-Session** (2026-08-22, Plan-Agent M3).
+> `docs/plans/PHASE3_HANDOVER.md` erstellt mit Modell-Gap-Sektion (Sub-Step 8.3, T-D53).
+> Sub-Steps 8.1 (8244593) + 8.2 (7a03dff) bereits abgeschlossen.
+> Sub-Step 8.4 + Step 9 (Phasen-Abschluss) folgen in separater Session.
 
 ### Step 6 — Multi-Edge-Regel-5-Invariante ✅
 - Commit `5c66d59`: `train-core: add multi-edge Rule-5 invariant test (T-D48, Handover E)`
@@ -171,9 +172,28 @@ updated: 2026-08-16
 4. Nach jedem Sub-Step: `gradle :train-core:test` grün, dann Operator fragen (T-D49).
 
 **Atomare Commits für die nächste Session (Sub-Plan):**
-- `train-core: recast Z5 JUnit edge-cases (M3 Befund, Monotonie statt 5%)`
-- `train-core: document Z5 kernelbereich in test (T-D51, M3 Befund)`
-- `docs: create PHASE3_HANDOVER skeleton with Modell-Gap section (T-D53)`
-- `docs: close P3 (Z5 + Z11 green, …, Modell-Gap dokumentiert)`
+- `train-core: recast Z5 JUnit edge-cases (M3 Befund, Monotonie statt 5%)` — ✅ Committed `8244593`
+- `train-core: document Z5 kernelbereich in test (T-D51, M3 Befund)` — ✅ Committed `7a03dff`
+- `docs: create PHASE3_HANDOVER skeleton with Modell-Gap section (T-D53)` — ✅ Committed in P3-Handover-Session
+- `docs: close P3 (Z5 + Z11 green, …, Modell-Gap dokumentiert)` — ⏳ offen (Sub-Step 8.4 + Step 9)
 
 **M3-Session-Block oben bleibt sichtbar** als Diagnose-Quelle; Build-Agent liest ihn on-need-to-know.
+
+---
+
+### P3-Handover-Session (2026-08-22, Plan-Agent M3)
+
+> **Diese Session:** P3 systematisch gegen Plan §4/§9 ausgewertet.
+> Kein §9-Verstoß im Code (Regel 2 intakt, Z5-Tautologie-Schutz intakt, alle
+> Anti-Pattern-Checks leer). Z11-Kern grün, Z5 als Monotonie im Kernelbereich grün.
+> Modell-Gap dokumentiert (Beschleunigungsphase, distanzabhängiger Spannungsabfall).
+> `docs/plans/PHASE3_HANDOVER.md` mit Modell-Gap-Sektion erstellt (T-D53, Sub-Step 8.3).
+> `docs/INDEX.md` One-Liner ergänzt + `updated:` auf 2026-08-22.
+>
+> **Status formal: teilweise** — Sub-Steps 8.3 (dieses Dokument) ✅; Sub-Step 8.4 +
+> Step 9 offen (Phasen-Abschluss: Root-CLAUDE.md Status P3 = ✅, ROADMAP/README
+> Status-Updates, SESSIONS_ARCHIVE rotieren, Build-Log final).
+>
+> **Nächste Session (Build-Agent M2.7 oder Operator):** P3-Abschluss durchziehen.
+> Siehe `docs/plans/PHASE3_HANDOVER.md` Session-stopped-Abschnitt für die volle
+> Schritt-Liste.
